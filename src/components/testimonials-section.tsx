@@ -8,8 +8,10 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
-import { Button } from "./ui/button";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 const testimonials = [
   {
@@ -19,6 +21,22 @@ const testimonials = [
     quote: '“Scoutflair has completely changed how I discover talent. The platform connects me with skilled, underrated players I wouldn’t have found otherwise. The detailed player insights and video highlights make scouting efficient and precise.”',
     alt: "Avatar of Samuel Baracunda",
     dataAiHint: "man portrait"
+  },
+    {
+    avatar: '/images/Ellipse_2394_1601_1648.png',
+    name: 'Chinedu Okoro',
+    role: 'Rising Star Player',
+    quote: '“The highlight reel feature was amazing. I could easily share my best moments with clubs and scouts, which directly led to me getting a professional tryout. It’s an incredible tool for any aspiring player.”',
+    alt: "Avatar of Chinedu Okoro",
+    dataAiHint: "man portrait african"
+  },
+    {
+    avatar: '/images/Ellipse_2395_1601_1649.png',
+    name: 'Sofia Gunnarsson',
+    role: 'Head of Recruitment',
+    quote: '“Scoutflair has streamlined our entire recruitment process. The data is reliable, the platform is intuitive, and we’re finding talent faster than ever before. It has become indispensable for our club.”',
+    alt: "Avatar of Sofia Gunnarsson",
+    dataAiHint: "woman portrait blonde"
   },
   {
     avatar: '/images/Ellipse_2397_1601_1659.png',
@@ -35,22 +53,6 @@ const testimonials = [
     quote: '“We’ve discovered exceptional young talent from regions we never thought to look. The platform’s mapping tools are incredibly powerful for grassroots scouting.”',
     alt: "Avatar of Kenji Tanaka",
     dataAiHint: "man portrait asian"
-  },
-  {
-    avatar: '/images/Ellipse_2394_1601_1648.png',
-    name: 'Chinedu Okoro',
-    role: 'Rising Star Player',
-    quote: '“The highlight reel feature was amazing. I could easily share my best moments with clubs and scouts, which directly led to me getting a professional tryout. It’s an incredible tool for any aspiring player.”',
-    alt: "Avatar of Chinedu Okoro",
-    dataAiHint: "man portrait african"
-  },
-  {
-    avatar: '/images/Ellipse_2395_1601_1649.png',
-    name: 'Sofia Gunnarsson',
-    role: 'Head of Recruitment',
-    quote: '“Scoutflair has streamlined our entire recruitment process. The data is reliable, the platform is intuitive, and we’re finding talent faster than ever before. It has become indispensable for our club.”',
-    alt: "Avatar of Sofia Gunnarsson",
-    dataAiHint: "woman portrait blonde"
   },
   {
     avatar: '/images/Ellipse_2396_1601_1651.png',
@@ -71,9 +73,21 @@ const testimonials = [
 ];
 
 export function TestimonialsSection() {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+    
+    setCurrent(api.selectedScrollSnap());
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
+
   return (
     <section className="bg-[#192B4D] py-16 md:py-24 text-white">
-      <div className="container flex flex-col items-center gap-12">
+      <div className="container flex flex-col items-center gap-8">
         <div className="text-center max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/40 py-1.5 px-4 mb-4">
             <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
@@ -85,39 +99,46 @@ export function TestimonialsSection() {
           </p>
         </div>
 
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full max-w-4xl relative"
-        >
-          <CarouselContent>
-            {testimonials.map((testimonial, index) => (
-              <CarouselItem key={index} className="text-center">
-                <div className="flex justify-center mb-6">
-                   <Image
-                      src={testimonial.avatar}
-                      alt={testimonial.alt}
-                      width={140}
-                      height={140}
-                      className="rounded-full border-4 border-white/20 object-cover"
-                      data-ai-hint={testimonial.dataAiHint}
-                    />
-                </div>
-                <div className="max-w-2xl mx-auto">
-                  <p className="text-lg italic text-white/90 mb-6 px-4">{testimonial.quote}</p>
-                  <h3 className="font-manrope text-xl font-semibold">{testimonial.name}</h3>
-                  <p className="font-lato text-sm text-white/70">{testimonial.role}</p>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="hidden md:block">
-            <CarouselPrevious className="absolute left-[-60px] top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border-white/20" />
-            <CarouselNext className="absolute right-[-60px] top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border-white/20" />
+        <div className="w-full relative px-12 md:px-0">
+            <Carousel setApi={setApi} opts={{ align: "center", loop: true }}>
+            <CarouselContent className="h-[140px] flex items-center -ml-4">
+                {testimonials.map((testimonial, index) => (
+                <CarouselItem key={index} className="pl-4 basis-1/3 md:basis-1/5 lg:basis-[14%] flex items-center justify-center">
+                    <div
+                        onClick={() => api?.scrollTo(index)}
+                        className="flex items-center justify-center cursor-pointer"
+                    >
+                        <Image
+                            src={testimonial.avatar}
+                            alt={testimonial.alt}
+                            width={140}
+                            height={140}
+                            className={cn(
+                                "rounded-full object-cover transition-all duration-300 border-4",
+                                current === index
+                                ? "w-[140px] h-[140px] opacity-100 border-white/20"
+                                : "w-[60px] h-[60px] md:w-[80px] md:h-[80px] opacity-60 border-transparent hover:opacity-80"
+                            )}
+                            data-ai-hint={testimonial.dataAiHint}
+                        />
+                    </div>
+                </CarouselItem>
+                ))}
+            </CarouselContent>
+            <div className="hidden md:block">
+                <CarouselPrevious className="absolute left-0 xl:left-[-40px] top-1/2 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white border-0" />
+                <CarouselNext className="absolute right-0 xl:right-[-40px] top-1/2 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white border-0" />
+            </div>
+            </Carousel>
+        </div>
+        
+        {api && (
+          <div className="text-center max-w-3xl mx-auto min-h-[160px]">
+            <h3 className="font-manrope text-xl font-semibold">{testimonials[current].name}</h3>
+            <p className="font-lato text-sm text-white/70">{testimonials[current].role}</p>
+            <p className="text-lg italic text-white/90 mt-6 px-4">{testimonials[current].quote}</p>
           </div>
-        </Carousel>
+        )}
       </div>
     </section>
   );
