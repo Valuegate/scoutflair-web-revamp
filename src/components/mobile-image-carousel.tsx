@@ -4,8 +4,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
 import Image from "next/image";
@@ -59,7 +57,7 @@ export function MobileImageCarousel() {
                 <CarouselContent>
                     {images.map((image, index) => (
                         <CarouselItem key={index}>
-                            <div className="aspect-video relative">
+                            <div className="aspect-[16/9] relative">
                                 <Image
                                     src={image.src}
                                     alt={image.alt}
@@ -72,8 +70,6 @@ export function MobileImageCarousel() {
                         </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
             </Carousel>
             <div className="flex justify-center items-center gap-2 mt-4">
                 {Array.from({ length: count }).map((_, index) => (
