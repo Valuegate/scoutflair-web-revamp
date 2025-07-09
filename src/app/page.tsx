@@ -13,8 +13,14 @@ export default function Home() {
   return (
     <main>
       {/* Hero Text Section */}
-      <section className="bg-[#F8F8FF] pt-20 pb-24">
-        <div className="container flex flex-col items-center text-center">
+      <section className="bg-[#F8F8FF] pt-20 pb-24 relative overflow-hidden">
+        <Image
+          src="/images/Frame_1171276260_1584_1831.png"
+          alt="background pattern"
+          fill
+          className="object-cover opacity-[0.02]"
+        />
+        <div className="container relative flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#E5AA42]/50 bg-white/70 py-2 px-4 mb-8 shadow-sm">
                 <Rocket className="w-5 h-5 text-[#D28E08]" />
                 <span className="font-lato text-lg font-[600] text-[#D28E08]">
@@ -46,7 +52,7 @@ export default function Home() {
       <section className="container py-24">
           <div className="flex flex-wrap items-center justify-center gap-5">
               <Image 
-                  src="/images/hero-main-action.png"
+                  src="/images/Frame_1171276266_1593_1998.png"
                   width={860}
                   height={460}
                   alt="Main soccer action"
@@ -54,7 +60,7 @@ export default function Home() {
                   data-ai-hint="soccer match"
               />
               <Image 
-                  src="/images/hero-player-portrait.png"
+                  src="/images/Frame_1171276267_1593_1999.png"
                   width={200}
                   height={460}
                   alt="Soccer player portrait"
@@ -63,7 +69,7 @@ export default function Home() {
               />
               <div className="flex flex-col gap-5">
                   <Image 
-                      src="/images/hero-stadium.png"
+                      src="/images/Frame_1171276268_1593_2000.png"
                       width={200}
                       height={220}
                       alt="Soccer stadium"
@@ -71,7 +77,7 @@ export default function Home() {
                       data-ai-hint="stadium lights"
                   />
                     <Image 
-                      src="/images/hero-team-celebration.png"
+                      src="/images/Frame_1171276269_1593_2001.png"
                       width={200}
                       height={220}
                       alt="Soccer team celebration"
