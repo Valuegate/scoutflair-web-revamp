@@ -39,7 +39,7 @@ const features = [
 
 export default function FeaturesPage() {
   return (
-    <>
+    <div className="bg-[#F8F8FF]">
       <FeaturesHero />
       <HowItWorks />
       <div className="container py-12 md:py-20">
@@ -68,6 +68,6 @@ export default function FeaturesPage() {
         </div>
       </div>
       <CtaSection />
-    </>
+    </div>
   );
 }
