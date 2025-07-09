@@ -2,28 +2,26 @@ import Image from 'next/image';
 
 export default function AboutPage() {
   return (
-    <div className="container py-12 md:py-20">
-      <div className="grid md:grid-cols-2 gap-12 items-center">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight">About ScoutVerse</h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            ScoutVerse was founded with a simple mission: to democratize sports scouting through the power of artificial intelligence. We believe that talent is everywhere, but opportunity is not. Our platform is designed to level the playing field, giving every team, regardless of size or budget, access to world-class scouting insights.
-          </p>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Our team consists of data scientists, sports analysts, and software engineers who are passionate about the intersection of technology and sports. We are dedicated to building a tool that is not only powerful but also intuitive and easy to use.
+    <main className="py-12 md:py-20">
+      <div className="container">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center mb-12 md:mb-16">
+          <h1 className="font-merriweather text-4xl lg:text-[42px] font-bold leading-tight text-foreground">
+            Changing How Football Talent is Found & Fostered
+          </h1>
+          <p className="text-lg text-foreground/90">
+            We are transforming the way football talent is discovered and nurtured. Through cutting-edge data and insightful scouting, we connect emerging players with top scouts and clubs, ensuring no talent goes unnoticed.
           </p>
         </div>
-        <div>
-          <Image
-            src="/images/team-photo.png"
-            alt="Team photo"
-            width={600}
-            height={400}
-            className="rounded-xl shadow-lg"
-            data-ai-hint="team business"
-          />
-        </div>
+        
+        <Image
+          src="/images/Frame_2121457547_1616_1649.png"
+          alt="A football team on the field, viewed from above"
+          width={1300}
+          height={400}
+          className="w-full h-auto rounded-2xl object-cover"
+          data-ai-hint="football team aerial"
+        />
       </div>
-    </div>
+    </main>
   );
 }
