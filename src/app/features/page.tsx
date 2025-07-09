@@ -1,6 +1,8 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, ClipboardList, Users, BrainCircuit, Search, Share2 } from "lucide-react";
 import { CtaSection } from "@/components/cta-section";
+import { FeaturesHero } from "@/components/features-hero";
+import { HowItWorks } from "@/components/how-it-works";
 
 const features = [
     {
@@ -38,6 +40,8 @@ const features = [
 export default function FeaturesPage() {
   return (
     <>
+      <FeaturesHero />
+      <HowItWorks />
       <div className="container py-12 md:py-20">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight">Platform Features</h1>
