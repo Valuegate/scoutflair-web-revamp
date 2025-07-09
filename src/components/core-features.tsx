@@ -8,7 +8,7 @@ const features = [
         icon: <BinocularsIcon />,
         title: "Advance Scouting",
         description: "Discover talent with precision using our advanced scouting tools, providing in-depth analysis and insights to identify and evaluate top players.",
-        titleColor: "text-[#0DA8A8]",
+        titleColor: "text-[#0E6868]",
         alt: "Binoculars icon representing advanced scouting",
     },
     {

@@ -1,8 +1,8 @@
 export const AnalyticsIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12.25 4.75v14.5" />
-        <path d="M18.25 13.25v6" />
-        <path d="M6.25 10.25v9" />
-        <path d="m15.25 14-3 3-3-3" />
+    <svg width="100%" height="100%" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g opacity="0.92">
+            <path d="M113.333 120V106.667M80 120V100M46.6667 120V86.6667M40 46.6667C61.3133 68.4534 88.2267 73.8733 114.273 66.6133M104.587 56.48L118.413 63.2534C120.053 64.06 120.493 65.92 119.4 67.4134L110.18 80" stroke="#53680E" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M16.6665 80C16.6665 50.1467 16.6665 35.2134 25.9398 25.94C35.2132 16.6667 50.1398 16.6667 79.9998 16.6667C109.853 16.6667 124.786 16.6667 134.06 25.94C143.333 35.2134 143.333 50.14 143.333 80C143.333 109.853 143.333 124.787 134.06 134.06C124.786 143.333 109.86 143.333 79.9998 143.333C50.1465 143.333 35.2132 143.333 25.9398 134.06C16.6665 124.787 16.6665 109.86 16.6665 80Z" stroke="#53680E" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round"/>
+        </g>
     </svg>
 )
