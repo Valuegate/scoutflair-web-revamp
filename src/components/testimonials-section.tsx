@@ -51,6 +51,22 @@ const testimonials = [
     quote: '“Scoutflair has streamlined our entire recruitment process. The data is reliable, the platform is intuitive, and we’re finding talent faster than ever before. It has become indispensable for our club.”',
     alt: "Avatar of Sofia Gunnarsson",
     dataAiHint: "woman portrait blonde"
+  },
+  {
+    avatar: '/images/Ellipse_2396_1601_1651.png',
+    name: 'Javier Morales',
+    role: 'Youth Team Coach',
+    quote: '“Finding the right players for my youth squad used to be a challenge. Scoutflair\'s detailed analytics and player profiles have made the process incredibly efficient. It\'s a game-changer for grassroots development.”',
+    alt: "Avatar of Javier Morales",
+    dataAiHint: "man portrait hispanic"
+  },
+  {
+    avatar: '/images/Ellipse_2396_1601_1663.png',
+    name: 'Lena Schmidt',
+    role: 'Aspiring Professional Player',
+    quote: '“As a player from a small town, getting noticed was my biggest hurdle. Scoutflair gave me the platform to showcase my skills to a wider audience. I\'m now getting attention from clubs I could only dream of before.”',
+    alt: "Avatar of Lena Schmidt",
+    dataAiHint: "woman portrait european"
   }
 ];
 
