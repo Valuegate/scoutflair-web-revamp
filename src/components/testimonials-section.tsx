@@ -99,41 +99,42 @@ export function TestimonialsSection() {
           </p>
         </div>
 
-        <div className="w-full relative px-12 md:px-0">
-            <Carousel setApi={setApi} opts={{ align: "center", loop: true }}>
-            <CarouselContent className="h-[140px] flex items-center -ml-4">
-                {testimonials.map((testimonial, index) => (
-                <CarouselItem key={index} className="pl-4 basis-1/3 md:basis-1/5 lg:basis-[14%] flex items-center justify-center">
-                    <div
-                        onClick={() => api?.scrollTo(index)}
-                        className="flex items-center justify-center cursor-pointer"
-                    >
-                        <Image
-                            src={testimonial.avatar}
-                            alt={testimonial.alt}
-                            width={140}
-                            height={140}
-                            className={cn(
-                                "rounded-full object-cover transition-all duration-300 border-4",
-                                current === index
-                                ? "w-[140px] h-[140px] opacity-100 border-white/20"
-                                : "w-[60px] h-[60px] md:w-[80px] md:h-[80px] opacity-60 border-transparent hover:opacity-80"
-                            )}
-                            data-ai-hint={testimonial.dataAiHint}
-                        />
-                    </div>
-                </CarouselItem>
-                ))}
-            </CarouselContent>
-            <div className="hidden md:block">
-                <CarouselPrevious className="absolute left-0 xl:left-[-40px] top-1/2 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white border-0" />
-                <CarouselNext className="absolute right-0 xl:right-[-40px] top-1/2 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white border-0" />
-            </div>
+        <div className="w-full max-w-6xl mx-auto">
+            <Carousel 
+                setApi={setApi} 
+                opts={{ align: "center", loop: true }}
+            >
+                <CarouselContent className="h-[140px] flex items-center">
+                    {testimonials.map((testimonial, index) => (
+                    <CarouselItem key={index} className="flex-none basis-auto px-2 md:px-4 flex items-center justify-center">
+                        <div
+                            onClick={() => api?.scrollTo(index)}
+                            className="flex items-center justify-center cursor-pointer"
+                        >
+                            <Image
+                                src={testimonial.avatar}
+                                alt={testimonial.alt}
+                                width={140}
+                                height={140}
+                                className={cn(
+                                    "rounded-full object-cover transition-all duration-300 border-4",
+                                    current === index
+                                    ? "w-24 h-24 md:w-[140px] md:h-[140px] opacity-100 border-white/20"
+                                    : "w-16 h-16 md:w-[80px] md:h-[80px] opacity-60 border-transparent hover:opacity-80"
+                                )}
+                                data-ai-hint={testimonial.dataAiHint}
+                            />
+                        </div>
+                    </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white border-0" />
+                <CarouselNext className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 bg-transparent hover:bg-white/10 text-white border-0" />
             </Carousel>
         </div>
         
-        {api && (
-          <div className="text-center max-w-3xl mx-auto min-h-[160px]">
+        {api && testimonials[current] && (
+          <div className="text-center max-w-3xl mx-auto min-h-[160px] pt-8">
             <h3 className="font-manrope text-xl font-semibold">{testimonials[current].name}</h3>
             <p className="font-lato text-sm text-white/70">{testimonials[current].role}</p>
             <p className="text-lg italic text-white/90 mt-6 px-4">{testimonials[current].quote}</p>
