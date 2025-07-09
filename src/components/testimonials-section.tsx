@@ -13,7 +13,7 @@ import { Button } from "./ui/button";
 
 const testimonials = [
   {
-    avatar: '/images/testimonial_avatar_1601_1624.png',
+    avatar: '/images/Ellipse_2391_1601_1624.png',
     name: 'Samuel Baracunda',
     role: 'Professional Scout',
     quote: '“Scoutflair has completely changed how I discover talent. The platform connects me with skilled, underrated players I wouldn’t have found otherwise. The detailed player insights and video highlights make scouting efficient and precise.”',
@@ -21,7 +21,7 @@ const testimonials = [
     dataAiHint: "man portrait"
   },
   {
-    avatar: 'https://placehold.co/140x140.png',
+    avatar: '/images/Ellipse_2397_1601_1659.png',
     name: 'Isabella Rossi',
     role: 'Player Agent',
     quote: '“The ability to connect directly with scouts has been invaluable for my clients. Scoutflair has opened doors that were previously closed. It’s an essential tool for any agent.”',
@@ -29,7 +29,7 @@ const testimonials = [
     dataAiHint: "woman portrait"
   },
   {
-    avatar: 'https://placehold.co/140x140.png',
+    avatar: '/images/Ellipse_2398_1601_1661.png',
     name: 'Kenji Tanaka',
     role: 'Academy Director',
     quote: '“We’ve discovered exceptional young talent from regions we never thought to look. The platform’s mapping tools are incredibly powerful for grassroots scouting.”',
