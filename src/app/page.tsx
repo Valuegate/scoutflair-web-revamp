@@ -4,6 +4,7 @@ import { Rocket } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MobileImageCarousel } from '@/components/mobile-image-carousel';
+import { CoreFeatures } from '@/components/core-features';
 
 
 // The underline for the "Scouting" text in the hero section.
@@ -130,6 +131,7 @@ export default function Home() {
             <MobileImageCarousel />
         </div>
       </section>
+      <CoreFeatures />
     </main>
   );
 }

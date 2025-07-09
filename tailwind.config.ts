@@ -33,6 +33,8 @@ export default {
         roboto: ['Roboto', 'sans-serif'],
         poppins: ['Poppins', 'sans-serif'],
         lato: ['Lato', 'sans-serif'],
+        manrope: ['Manrope', 'sans-serif'],
+        merriweather: ['Merriweather', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
