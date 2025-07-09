@@ -18,7 +18,7 @@ export function AboutSection() {
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
           {/* Left Column: Image */}
           <div className="relative order-last md:order-first">
-            <div className="absolute -inset-4 md:-inset-6 border-4 border-[#E5AA42]/70 rounded-xl z-0"></div>
+            <div className="absolute -inset-4 md:-inset-6 border-2 border-dashed border-[#E5AA42]/70 rounded-xl z-0"></div>
             <Image
               src="/images/Image_1598_2263.png"
               alt="Scouts watching a football match"
