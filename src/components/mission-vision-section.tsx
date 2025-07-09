@@ -41,7 +41,7 @@ export function MissionVisionSection() {
 
                     {/* Vision Section */}
                     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
-                        <div className="grid grid-cols-2 gap-5 md:order-last">
+                        <div className="grid grid-cols-2 gap-5 md:order-first">
                            <Image
                                 src="/images/Frame_2121457555_1617_1625.png"
                                 alt="Young players training"
