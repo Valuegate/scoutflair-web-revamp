@@ -35,6 +35,22 @@ const testimonials = [
     quote: '“We’ve discovered exceptional young talent from regions we never thought to look. The platform’s mapping tools are incredibly powerful for grassroots scouting.”',
     alt: "Avatar of Kenji Tanaka",
     dataAiHint: "man portrait asian"
+  },
+  {
+    avatar: '/images/Ellipse_2394_1601_1648.png',
+    name: 'Chinedu Okoro',
+    role: 'Rising Star Player',
+    quote: '“The highlight reel feature was amazing. I could easily share my best moments with clubs and scouts, which directly led to me getting a professional tryout. It’s an incredible tool for any aspiring player.”',
+    alt: "Avatar of Chinedu Okoro",
+    dataAiHint: "man portrait african"
+  },
+  {
+    avatar: '/images/Ellipse_2395_1601_1649.png',
+    name: 'Sofia Gunnarsson',
+    role: 'Head of Recruitment',
+    quote: '“Scoutflair has streamlined our entire recruitment process. The data is reliable, the platform is intuitive, and we’re finding talent faster than ever before. It has become indispensable for our club.”',
+    alt: "Avatar of Sofia Gunnarsson",
+    dataAiHint: "woman portrait blonde"
   }
 ];
 
