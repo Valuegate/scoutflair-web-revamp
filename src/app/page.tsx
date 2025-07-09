@@ -85,42 +85,42 @@ export default function Home() {
 
       {/* Image Gallery Section */}
       <section className="container py-24">
-          <div className="flex flex-wrap items-center justify-center gap-5">
-              <Image 
-                  src="/images/Frame_1171276266_1593_1998.png"
-                  width={860}
-                  height={460}
-                  alt="Main soccer action"
-                  className="rounded-[20px] border-2 border-[#192B4D] object-cover"
-                  data-ai-hint="soccer match"
-              />
-              <Image 
-                  src="/images/Frame_1171276267_1593_1999.png"
-                  width={200}
-                  height={460}
-                  alt="Soccer player portrait"
-                  className="rounded-[20px] object-cover"
-                  data-ai-hint="soccer player"
-              />
-              <div className="flex flex-col gap-5">
+        <div className="flex items-start justify-center gap-5">
+            <Image 
+                src="/images/Frame_1171276266_1593_1998.png"
+                width={860}
+                height={460}
+                alt="View of a packed soccer stadium during a match"
+                className="rounded-[20px] border-2 border-[#192B4D] object-cover"
+                data-ai-hint="stadium crowd"
+            />
+            <Image 
+                src="/images/Frame_1171276267_1593_1999.png"
+                width={200}
+                height={460}
+                alt="Soccer player celebrating on a barrier"
+                className="rounded-[20px] object-cover"
+                data-ai-hint="player celebrating"
+            />
+            <div className="flex flex-col gap-5">
+                <Image 
+                    src="/images/Frame_1171276268_1593_2000.png"
+                    width={200}
+                    height={220}
+                    alt="Scout watching a soccer match from the stands"
+                    className="rounded-[20px] object-cover"
+                    data-ai-hint="scout watching"
+                />
                   <Image 
-                      src="/images/Frame_1171276268_1593_2000.png"
-                      width={200}
-                      height={220}
-                      alt="Soccer stadium"
-                      className="rounded-[20px] object-cover"
-                      data-ai-hint="stadium lights"
-                  />
-                    <Image 
-                      src="/images/Frame_1171276269_1593_2001.png"
-                      width={200}
-                      height={220}
-                      alt="Soccer team celebration"
-                      className="rounded-[20px] object-cover"
-                      data-ai-hint="team celebration"
-                  />
-              </div>
-          </div>
+                    src="/images/Frame_1171276269_1593_2001.png"
+                    width={200}
+                    height={220}
+                    alt="Soccer manager watching from the sideline"
+                    className="rounded-[20px] object-cover"
+                    data-ai-hint="manager sideline"
+                />
+            </div>
+        </div>
       </section>
     </main>
   );
