@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { MobileImageCarousel } from '@/components/mobile-image-carousel';
 import { CoreFeatures } from '@/components/core-features';
 import { AboutSection } from '@/components/about-section';
+import { TestimonialsSection } from '@/components/testimonials-section';
 
 
 // The underline for the "Scouting" text in the hero section.
@@ -134,6 +135,7 @@ export default function Home() {
       </section>
       <CoreFeatures />
       <AboutSection />
+      <TestimonialsSection />
     </main>
   );
 }
