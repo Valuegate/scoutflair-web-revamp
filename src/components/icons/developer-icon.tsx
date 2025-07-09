@@ -1,6 +1,7 @@
 export const DeveloperIcon = () => (
-    <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-[#680E58] opacity-90">
-        <rect x="16.6667" y="13.3333" width="126.662" height="133.333" rx="6.66667" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M36.6667 53.3333L103.333 53.3333L103.333 86.6667L36.6667 86.6667" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 8l-4 4 4 4" />
+        <path d="M17 8l4 4-4 4" />
+        <path d="M14 4l-4 16" />
     </svg>
-);
+)

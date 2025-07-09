@@ -1,7 +1,6 @@
-import Image from 'next/image';
+import { AnalyticsIcon } from './icons/analytics-icon';
 import { BinocularsIcon } from './icons/binoculars-icon';
 import { DeveloperIcon } from './icons/developer-icon';
-import { AnalyticsIcon } from './icons/analytics-icon';
 import { MindMappingIcon } from './icons/mind-mapping-icon';
 
 const features = [

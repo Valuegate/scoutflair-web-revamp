@@ -1,5 +1,10 @@
 export const BinocularsIcon = () => (
-    <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-[#0DA8A8] opacity-90">
-        <path d="M6.72501 132.894L39.0642 38.3105C42.0469 29.5049 50.8525 27.1056 59.658 30.0883L153.275 62.4275C153.275 62.4275 149.378 85.0116 137.95 102.056C122.625 124.498 83.0456 142.344 59.658 132.894C36.2705 123.444 6.72501 132.894 6.72501 132.894Z" fill="currentColor"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5.5 12.5L3 20" />
+      <path d="M18.5 12.5L21 20" />
+      <path d="M15 4l-2.5 2.5" />
+      <path d="M9 4l2.5 2.5" />
+      <circle cx="7.5" cy="7.5" r="5" />
+      <circle cx="16.5" cy="7.5" r="5" />
     </svg>
-);
+)
