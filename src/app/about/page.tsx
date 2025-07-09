@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { PartnersSection } from '@/components/partners-section';
+import { OurDreamSection } from '@/components/our-dream-section';
 
 export default function AboutPage() {
   return (
@@ -26,6 +27,7 @@ export default function AboutPage() {
         </div>
       </main>
       <PartnersSection />
+      <OurDreamSection />
     </>
   );
 }
