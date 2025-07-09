@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <main>
       {/* Hero Text Section */}
-      <section className="bg-[#F8F8FF] pt-20 pb-24 relative overflow-hidden">
+      <section className="bg-[#F8F8FF] pt-20 pb-24 relative">
         {/* Decorative background images */}
         <Image
           src="/images/Still_life_of_colombia_national_soccer_team_1593_3705.png"
