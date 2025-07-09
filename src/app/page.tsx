@@ -3,13 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Rocket } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+import { MobileImageCarousel } from '@/components/mobile-image-carousel';
 
 
 // The underline for the "Scouting" text in the hero section.
@@ -133,52 +127,7 @@ export default function Home() {
         
         {/* Mobile Carousel */}
         <div className="md:hidden">
-            <Carousel className="w-full max-w-sm mx-auto">
-                <CarouselContent>
-                    <CarouselItem>
-                         <Image 
-                            src="/images/Frame_1171276266_1593_1998.png"
-                            width={860}
-                            height={460}
-                            alt="View of a packed soccer stadium during a match"
-                            className="rounded-[20px] border-2 border-[#192B4D] object-cover"
-                            data-ai-hint="stadium crowd"
-                        />
-                    </CarouselItem>
-                    <CarouselItem>
-                        <Image 
-                            src="/images/Frame_1171276267_1593_1999.png"
-                            width={200}
-                            height={460}
-                            alt="Soccer player celebrating on a barrier"
-                            className="rounded-[20px] object-cover w-full"
-                            data-ai-hint="player celebrating"
-                        />
-                    </CarouselItem>
-                    <CarouselItem>
-                        <Image 
-                            src="/images/Frame_1171276268_1593_2000.png"
-                            width={200}
-                            height={220}
-                            alt="Scout watching a soccer match from the stands"
-                            className="rounded-[20px] object-cover w-full"
-                            data-ai-hint="scout watching"
-                        />
-                    </CarouselItem>
-                    <CarouselItem>
-                        <Image 
-                            src="/images/Frame_1171276269_1593_2001.png"
-                            width={200}
-                            height={220}
-                            alt="Soccer manager watching from the sideline"
-                            className="rounded-[20px] object-cover w-full"
-                            data-ai-hint="manager sideline"
-                        />
-                    </CarouselItem>
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-            </Carousel>
+            <MobileImageCarousel />
         </div>
       </section>
     </main>
