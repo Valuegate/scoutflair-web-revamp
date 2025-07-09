@@ -1,32 +1,33 @@
-import { AnalyticsIcon } from "./icons/analytics-icon";
-import { BinocularsIcon } from "./icons/binoculars-icon";
-import { DeveloperIcon } from "./icons/developer-icon";
-import { MindMappingIcon } from "./icons/mind-mapping-icon";
+import Image from 'next/image';
 
 const features = [
     {
-        icon: <BinocularsIcon />,
+        icon: "/icons/binoculars-icon.svg",
         title: "Advance Scouting",
         description: "Discover talent with precision using our advanced scouting tools, providing in-depth analysis and insights to identify and evaluate top players.",
         titleColor: "text-[#0DA8A8]",
+        alt: "Binoculars icon representing advanced scouting",
     },
     {
-        icon: <DeveloperIcon />,
+        icon: "/icons/developer-icon.svg",
         title: "Talent Development",
         description: "Enhance player skills with our comprehensive talent development programs, focusing on personalized training to maximize potential.",
         titleColor: "text-[#680E58]",
+        alt: "Developer icon representing talent development",
     },
     {
-        icon: <AnalyticsIcon />,
+        icon: "/icons/analytics-icon.svg",
         title: "Data Analytics",
         description: "Unlock valuable insights with our data analytics tools, providing detailed performance metrics and actionable intelligence for decision-making.",
         titleColor: "text-[#53680E]",
+        alt: "Analytics icon representing data analytics",
     },
     {
-        icon: <MindMappingIcon />,
+        icon: "/icons/mind-mapping-icon.svg",
         title: "Information Mapping",
         description: "Visualize and organize complex data with our information mapping tools, making it easier to understand and interpret key insights.",
         titleColor: "text-[#037E11]",
+        alt: "Mind mapping icon representing information mapping",
     }
 ];
 
@@ -61,7 +62,7 @@ export function CoreFeatures() {
                     {features.map((feature, index) => (
                         <div key={index} className="border border-[#192B4D]/20 rounded-2xl p-5 flex flex-col items-center text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
                            <div className="w-40 h-40">
-                             {feature.icon}
+                             <Image src={feature.icon} alt={feature.alt} width={160} height={160} className="opacity-90" />
                            </div>
                            <div className="w-full pt-6">
                                <div className="border-t border-[#1B1B1B]/20 w-full mb-6"></div>
