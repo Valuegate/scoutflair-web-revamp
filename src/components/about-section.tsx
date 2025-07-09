@@ -17,7 +17,7 @@ export function AboutSection() {
         {/* Top Section */}
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
           {/* Left Column: Image */}
-          <div className="relative order-last md:order-first">
+          <div className="relative md:order-first">
             <div className="absolute -inset-4 md:-inset-6 border-2 border-dashed border-[#E5AA42]/70 rounded-xl z-0"></div>
             <Image
               src="/images/Image_1598_2263.png"
@@ -60,8 +60,8 @@ export function AboutSection() {
         </div>
         
         {/* Bottom Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-            <div className="md:col-span-3 rounded-2xl overflow-hidden">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-4 md:grid md:grid-cols-12 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="flex-shrink-0 snap-center w-4/5 md:w-auto md:col-span-3 rounded-2xl overflow-hidden">
                 <Image 
                     src="/images/Frame_2121457504_1598_2371.png"
                     alt="Young player in action"
@@ -71,7 +71,7 @@ export function AboutSection() {
                     data-ai-hint="young player action"
                 />
             </div>
-             <div className="md:col-span-6 rounded-2xl overflow-hidden">
+             <div className="flex-shrink-0 snap-center w-4/5 md:w-auto md:col-span-6 rounded-2xl overflow-hidden">
                 <Image 
                     src="/images/Frame_2121457500_1598_2366.png"
                     alt="Football team huddle"
@@ -81,7 +81,7 @@ export function AboutSection() {
                     data-ai-hint="team huddle"
                 />
             </div>
-             <div className="md:col-span-3 rounded-2xl overflow-hidden">
+             <div className="flex-shrink-0 snap-center w-4/5 md:w-auto md:col-span-3 rounded-2xl overflow-hidden">
                 <Image 
                     src="/images/Frame_2121457503_1598_2369.png"
                     alt="Scout taking notes"
