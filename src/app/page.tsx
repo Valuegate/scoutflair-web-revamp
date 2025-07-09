@@ -46,7 +46,7 @@ export default function Home() {
       <section className="container py-24">
           <div className="flex flex-wrap items-center justify-center gap-5">
               <Image 
-                  src="https://placehold.co/860x460.png"
+                  src="/images/hero-main-action.png"
                   width={860}
                   height={460}
                   alt="Main soccer action"
@@ -54,7 +54,7 @@ export default function Home() {
                   data-ai-hint="soccer match"
               />
               <Image 
-                  src="https://placehold.co/200x460.png"
+                  src="/images/hero-player-portrait.png"
                   width={200}
                   height={460}
                   alt="Soccer player portrait"
@@ -63,7 +63,7 @@ export default function Home() {
               />
               <div className="flex flex-col gap-5">
                   <Image 
-                      src="https://placehold.co/200x220.png"
+                      src="/images/hero-stadium.png"
                       width={200}
                       height={220}
                       alt="Soccer stadium"
@@ -71,7 +71,7 @@ export default function Home() {
                       data-ai-hint="stadium lights"
                   />
                     <Image 
-                      src="https://placehold.co/200x220.png"
+                      src="/images/hero-team-celebration.png"
                       width={200}
                       height={220}
                       alt="Soccer team celebration"

@@ -15,7 +15,7 @@ export default function AboutPage() {
         </div>
         <div>
           <Image
-            src="https://placehold.co/600x400.png"
+            src="/images/team-photo.png"
             alt="Team photo"
             width={600}
             height={400}
