@@ -3,6 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Rocket } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+
 
 // The underline for the "Scouting" text in the hero section.
 const Underline = () => (
@@ -15,14 +23,14 @@ export default function Home() {
   return (
     <main>
       {/* Hero Text Section */}
-      <section className="bg-[#F8F8FF] pt-20 pb-24 relative">
+      <section className="bg-[#F8F8FF] pt-16 md:pt-20 pb-16 md:pb-24 relative">
         {/* Decorative background images */}
         <Image
           src="/images/Still_life_of_colombia_national_soccer_team_1593_3705.png"
           alt="background pattern"
           width={463}
           height={332}
-          className="absolute -top-10 -left-48 opacity-[0.08]"
+          className="absolute -top-10 -left-48 opacity-[0.08] hidden md:block"
           aria-hidden="true"
           data-ai-hint="abstract pattern"
         />
@@ -31,7 +39,7 @@ export default function Home() {
           alt="background pattern"
           width={463}
           height={332}
-          className="absolute -top-20 -right-48 opacity-[0.08]"
+          className="absolute -top-20 -right-48 opacity-[0.08] hidden md:block"
           aria-hidden="true"
           data-ai-hint="abstract pattern"
         />
@@ -40,7 +48,7 @@ export default function Home() {
           alt="background pattern"
           width={260}
           height={187}
-          className="absolute top-1/2 -right-24 opacity-[0.08]"
+          className="absolute top-1/2 -right-24 opacity-[0.08] hidden md:block"
           aria-hidden="true"
           data-ai-hint="abstract pattern"
         />
@@ -49,20 +57,20 @@ export default function Home() {
           alt="background pattern"
           width={260}
           height={187}
-          className="absolute bottom-1/4 -left-32 opacity-[0.08]"
+          className="absolute bottom-1/4 -left-32 opacity-[0.08] hidden md:block"
           aria-hidden="true"
           data-ai-hint="abstract pattern"
         />
 
         <div className="container relative flex flex-col items-center text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5AA42]/50 bg-white/70 py-2 px-4 mb-8 shadow-sm">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5AA42]/50 bg-white/70 py-2 px-4 mb-6 md:mb-8 shadow-sm">
                 <Rocket className="w-5 h-5 text-[#D28E08]" />
-                <span className="font-lato text-lg font-[600] text-[#D28E08]">
+                <span className="font-lato text-base md:text-lg font-[600] text-[#D28E08]">
                     Unleash Your Potential, Get Discovered!
                 </span>
             </div>
 
-            <h1 className="font-poppins text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
+            <h1 className="font-poppins text-4xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
                 Revolutionizing Football <br />
                 <span className="relative inline-block text-[#F2A725]">
                     Scouting
@@ -73,19 +81,20 @@ export default function Home() {
                 {' '}with Data & Insights
             </h1>
 
-            <p className="font-lato text-[22px] text-[#1B1B1B]/90 max-w-4xl mt-12 leading-relaxed">
+            <p className="font-lato text-lg md:text-[22px] text-[#1B1B1B]/90 max-w-4xl mt-8 md:mt-12 leading-relaxed">
                 Our solution provides elite scouting, talent data, and mapping tools to all clubs, helping coaches and scouts identify and develop talent, bridging grassroots and professional football.
             </p>
 
-            <Button asChild size="lg" className="mt-10 rounded-full h-14 px-12 text-lg font-poppins font-semibold bg-[#192B4D] hover:bg-[#192B4D]/90 shadow-lg">
+            <Button asChild size="lg" className="mt-10 rounded-full h-12 md:h-14 px-8 md:px-12 text-base md:text-lg font-poppins font-semibold bg-[#192B4D] hover:bg-[#192B4D]/90 shadow-lg">
                 <Link href="/scouting-report">UNLOCK OPPORTUNITIES</Link>
             </Button>
         </div>
       </section>
 
       {/* Image Gallery Section */}
-      <section className="container py-24">
-        <div className="flex items-start justify-center gap-5">
+      <section className="container py-12 md:py-24">
+        {/* Desktop Gallery */}
+        <div className="hidden md:flex items-start justify-center gap-5">
             <Image 
                 src="/images/Frame_1171276266_1593_1998.png"
                 width={860}
@@ -120,6 +129,56 @@ export default function Home() {
                     data-ai-hint="manager sideline"
                 />
             </div>
+        </div>
+        
+        {/* Mobile Carousel */}
+        <div className="md:hidden">
+            <Carousel className="w-full max-w-sm mx-auto">
+                <CarouselContent>
+                    <CarouselItem>
+                         <Image 
+                            src="/images/Frame_1171276266_1593_1998.png"
+                            width={860}
+                            height={460}
+                            alt="View of a packed soccer stadium during a match"
+                            className="rounded-[20px] border-2 border-[#192B4D] object-cover"
+                            data-ai-hint="stadium crowd"
+                        />
+                    </CarouselItem>
+                    <CarouselItem>
+                        <Image 
+                            src="/images/Frame_1171276267_1593_1999.png"
+                            width={200}
+                            height={460}
+                            alt="Soccer player celebrating on a barrier"
+                            className="rounded-[20px] object-cover w-full"
+                            data-ai-hint="player celebrating"
+                        />
+                    </CarouselItem>
+                    <CarouselItem>
+                        <Image 
+                            src="/images/Frame_1171276268_1593_2000.png"
+                            width={200}
+                            height={220}
+                            alt="Scout watching a soccer match from the stands"
+                            className="rounded-[20px] object-cover w-full"
+                            data-ai-hint="scout watching"
+                        />
+                    </CarouselItem>
+                    <CarouselItem>
+                        <Image 
+                            src="/images/Frame_1171276269_1593_2001.png"
+                            width={200}
+                            height={220}
+                            alt="Soccer manager watching from the sideline"
+                            className="rounded-[20px] object-cover w-full"
+                            data-ai-hint="manager sideline"
+                        />
+                    </CarouselItem>
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
         </div>
       </section>
     </main>
