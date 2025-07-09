@@ -1,144 +1,86 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BarChart, ClipboardList, Users } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+const Underline = () => (
+    <svg className="w-full h-auto" viewBox="0 0 212 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 12.3958C36.1647 3.20501 128.617 -4.2333 209.667 8.2391" stroke="#F2A725" strokeWidth="4" strokeLinecap="round"/>
+    </svg>
+)
+
 export default function Home() {
   return (
-    <div className="flex flex-col gap-16 md:gap-24 pb-12">
-      {/* Hero Section */}
-      <section className="container grid md:grid-cols-2 gap-10 items-center pt-16">
-        <div className="flex flex-col gap-6 items-start text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
-            Unlock Potential with AI-Powered Scouting
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            ScoutVerse leverages cutting-edge AI to provide comprehensive and unbiased player analysis, helping you discover the stars of tomorrow.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-            <Button size="lg" asChild>
-              <Link href="/scouting-report">Generate a Report</Link>
+    <main>
+      {/* Hero Text Section */}
+      <section className="bg-[#F8F8FF] pt-20 pb-24">
+        <div className="container flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E5AA42]/50 bg-white/70 py-2 px-4 mb-8 shadow-sm">
+                <Rocket className="w-5 h-5 text-[#D28E08]" />
+                <span className="font-lato text-lg font-[600] text-[#D28E08]">
+                    Unleash Your Potential, Get Discovered!
+                </span>
+            </div>
+
+            <h1 className="font-poppins text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
+                Revolutionizing Football Scouting with{' '}
+                <span className="relative inline-block">
+                    Data & Insights
+                    <span className="absolute -bottom-1 left-0 w-full">
+                        <Underline />
+                    </span>
+                </span>
+            </h1>
+
+            <p className="font-lato text-[22px] text-[#1B1B1B]/90 max-w-4xl mt-12 leading-relaxed">
+                Our solution provides elite scouting, talent data, and mapping tools to all clubs, helping coaches and scouts identify and develop talent, bridging grassroots and professional football.
+            </p>
+
+            <Button asChild size="lg" className="mt-10 rounded-full h-14 px-12 text-lg font-poppins font-semibold bg-[#192B4D] hover:bg-[#192B4D]/90 shadow-lg">
+                <Link href="/scouting-report">UNLOCK OPPORTUNITIES</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/features">Learn More</Link>
-            </Button>
+        </div>
+      </section>
+
+      {/* Image Gallery Section */}
+      <section className="container py-24">
+          <div className="flex flex-wrap items-center justify-center gap-5">
+              <Image 
+                  src="https://placehold.co/860x460.png"
+                  width={860}
+                  height={460}
+                  alt="Main soccer action"
+                  className="rounded-[20px] border-2 border-[#192B4D] object-cover"
+                  data-ai-hint="soccer match"
+              />
+              <Image 
+                  src="https://placehold.co/200x460.png"
+                  width={200}
+                  height={460}
+                  alt="Soccer player portrait"
+                  className="rounded-[20px] object-cover"
+                  data-ai-hint="soccer player"
+              />
+              <div className="flex flex-col gap-5">
+                  <Image 
+                      src="https://placehold.co/200x220.png"
+                      width={200}
+                      height={220}
+                      alt="Soccer stadium"
+                      className="rounded-[20px] object-cover"
+                      data-ai-hint="stadium lights"
+                  />
+                    <Image 
+                      src="https://placehold.co/200x220.png"
+                      width={200}
+                      height={220}
+                      alt="Soccer team celebration"
+                      className="rounded-[20px] object-cover"
+                      data-ai-hint="team celebration"
+                  />
+              </div>
           </div>
-        </div>
-        <div>
-          <Image
-            src="https://placehold.co/600x400.png"
-            alt="Scouting dashboard"
-            width={600}
-            height={400}
-            className="rounded-xl shadow-2xl mx-auto"
-            data-ai-hint="sports analytics"
-          />
-        </div>
       </section>
-
-      {/* Features Section */}
-      <section className="container">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold">Why ScoutVerse?</h2>
-          <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
-            Our platform provides unparalleled insights into player performance.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card className="text-center">
-            <CardHeader className="items-center">
-              <div className="bg-primary/10 p-3 rounded-full mb-4">
-                <ClipboardList className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle>In-Depth Reports</CardTitle>
-              <CardDescription className="pt-2">
-                Get detailed scouting reports covering everything from physical attributes to psychological profiles.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="text-center">
-            <CardHeader className="items-center">
-              <div className="bg-primary/10 p-3 rounded-full mb-4">
-                <BarChart className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle>Data-Driven Insights</CardTitle>
-              <CardDescription className="pt-2">
-                Leverage advanced analytics and predictive modeling to make informed decisions.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="text-center">
-            <CardHeader className="items-center">
-              <div className="bg-primary/10 p-3 rounded-full mb-4">
-                <Users className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle>Collaborative Platform</CardTitle>
-              <CardDescription className="pt-2">
-                Share reports and collaborate with your team seamlessly within the platform.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="container grid md:grid-cols-2 gap-12 items-center">
-        <div>
-          <Image
-            src="https://placehold.co/600x500.png"
-            alt="AI process illustration"
-            width={600}
-            height={500}
-            className="rounded-xl shadow-xl mx-auto"
-            data-ai-hint="data process"
-          />
-        </div>
-        <div className="flex flex-col gap-6">
-          <h2 className="text-3xl md:text-4xl font-bold">Simple Steps to Uncover Talent</h2>
-          <p className="text-lg text-muted-foreground">
-            Our intuitive process makes advanced scouting accessible to everyone.
-          </p>
-          <ul className="space-y-4">
-            <li className="flex items-start gap-4">
-              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mt-1">1</div>
-              <div>
-                <h3 className="font-semibold text-lg">Define Your Criteria</h3>
-                <p className="text-muted-foreground">Specify the skills, attributes, and potential you're looking for in a player.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-4">
-              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mt-1">2</div>
-              <div>
-                <h3 className="font-semibold text-lg">AI Generates Report</h3>
-                <p className="text-muted-foreground">Our AI analyzes vast datasets to produce a comprehensive scouting report.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-4">
-              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex-shrink-0 flex items-center justify-center font-bold mt-1">3</div>
-              <div>
-                <h3 className="font-semibold text-lg">Review and Decide</h3>
-                <p className="text-muted-foreground">Use the detailed insights to make smarter, faster scouting decisions.</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-card">
-        <div className="container py-16 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold">Ready to Revolutionize Your Scouting?</h2>
-          <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
-            Join the growing number of teams who trust ScoutVerse to find their next superstar. Get started today.
-          </p>
-          <div className="mt-6">
-            <Button size="lg" asChild>
-              <Link href="/scouting-report">Start Scouting Now</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

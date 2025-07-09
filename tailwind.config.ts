@@ -32,6 +32,7 @@ export default {
         code: ['monospace'],
         roboto: ['Roboto', 'sans-serif'],
         poppins: ['Poppins', 'sans-serif'],
+        lato: ['Lato', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
