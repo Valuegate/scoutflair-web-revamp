@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Rocket } from 'lucide-react';
 import Image from 'next/image';
@@ -15,9 +16,9 @@ export default function Home() {
     <main>
       {/* Hero Text Section */}
       <section className="bg-[#F8F8FF] pt-20 pb-24 relative overflow-hidden">
-        {/* Decorative background images - using soccer-ball.png from /public/images */}
+        {/* Decorative background images */}
         <Image
-          src="/images/soccer-ball.png"
+          src="/images/Still_life_of_colombia_national_soccer_team_1593_3705.png"
           alt="background pattern"
           width={463}
           height={332}
@@ -26,7 +27,7 @@ export default function Home() {
           data-ai-hint="abstract pattern"
         />
         <Image
-          src="/images/soccer-ball.png"
+          src="/images/Still_life_of_colombia_national_soccer_team_426_1383.png"
           alt="background pattern"
           width={463}
           height={332}
@@ -35,7 +36,7 @@ export default function Home() {
           data-ai-hint="abstract pattern"
         />
          <Image
-          src="/images/soccer-ball.png"
+          src="/images/Still_life_of_colombia_national_soccer_team_1593_3708.png"
           alt="background pattern"
           width={260}
           height={187}
@@ -44,7 +45,7 @@ export default function Home() {
           data-ai-hint="abstract pattern"
         />
         <Image
-          src="/images/soccer-ball.png"
+          src="/images/Still_life_of_colombia_national_soccer_team_1593_3706.png"
           alt="background pattern"
           width={260}
           height={187}
@@ -86,7 +87,7 @@ export default function Home() {
       <section className="container py-24">
           <div className="flex flex-wrap items-center justify-center gap-5">
               <Image 
-                  src="/images/Frame_1171276266_1593_1998.png"
+                  src="/images/Frame_1171276266.png"
                   width={860}
                   height={460}
                   alt="Main soccer action"
@@ -94,7 +95,7 @@ export default function Home() {
                   data-ai-hint="soccer match"
               />
               <Image 
-                  src="/images/Frame_1171276267_1593_1999.png"
+                  src="/images/Frame_1171276267.png"
                   width={200}
                   height={460}
                   alt="Soccer player portrait"
@@ -103,7 +104,7 @@ export default function Home() {
               />
               <div className="flex flex-col gap-5">
                   <Image 
-                      src="/images/Frame_1171276268_1593_2000.png"
+                      src="/images/Frame_1171276268.png"
                       width={200}
                       height={220}
                       alt="Soccer stadium"
@@ -111,7 +112,7 @@ export default function Home() {
                       data-ai-hint="stadium lights"
                   />
                     <Image 
-                      src="/images/Frame_1171276269_1593_2001.png"
+                      src="/images/Frame_1171276269.png"
                       width={200}
                       height={220}
                       alt="Soccer team celebration"
