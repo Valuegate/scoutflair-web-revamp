@@ -2,28 +2,28 @@ import Image from 'next/image';
 
 const features = [
     {
-        icon: "/icons/binoculars-icon.svg",
+        icon: "/icons/game-icons_binoculars.svg",
         title: "Advance Scouting",
         description: "Discover talent with precision using our advanced scouting tools, providing in-depth analysis and insights to identify and evaluate top players.",
         titleColor: "text-[#0DA8A8]",
         alt: "Binoculars icon representing advanced scouting",
     },
     {
-        icon: "/icons/developer-icon.svg",
+        icon: "/icons/hugeicons_developer.svg",
         title: "Talent Development",
         description: "Enhance player skills with our comprehensive talent development programs, focusing on personalized training to maximize potential.",
         titleColor: "text-[#680E58]",
         alt: "Developer icon representing talent development",
     },
     {
-        icon: "/icons/analytics-icon.svg",
+        icon: "/icons/hugeicons_analytics-down.svg",
         title: "Data Analytics",
         description: "Unlock valuable insights with our data analytics tools, providing detailed performance metrics and actionable intelligence for decision-making.",
         titleColor: "text-[#53680E]",
         alt: "Analytics icon representing data analytics",
     },
     {
-        icon: "/icons/mind-mapping-icon.svg",
+        icon: "/icons/icon-park-outline_mind-mapping.svg",
         title: "Information Mapping",
         description: "Visualize and organize complex data with our information mapping tools, making it easier to understand and interpret key insights.",
         titleColor: "text-[#037E11]",
