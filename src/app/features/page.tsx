@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, ClipboardList, Users, BrainCircuit, Search, Share2 } from "lucide-react";
+import { CtaSection } from "@/components/cta-section";
 
 const features = [
     {
@@ -36,30 +37,33 @@ const features = [
 
 export default function FeaturesPage() {
   return (
-    <div className="container py-12 md:py-20">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold tracking-tight">Platform Features</h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Explore the powerful tools ScoutVerse offers to enhance your scouting process.
-        </p>
+    <>
+      <div className="container py-12 md:py-20">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold tracking-tight">Platform Features</h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            Explore the powerful tools ScoutVerse offers to enhance your scouting process.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+              <Card key={index}>
+                  <CardHeader>
+                      <div className="flex flex-col items-center text-center gap-4">
+                          <div className="bg-primary/10 p-3 rounded-full">
+                              {feature.icon}
+                          </div>
+                          <CardTitle>{feature.title}</CardTitle>
+                      </div>
+                      <CardDescription className="pt-2 text-center">
+                          {feature.description}
+                      </CardDescription>
+                  </CardHeader>
+              </Card>
+          ))}
+        </div>
       </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {features.map((feature, index) => (
-            <Card key={index}>
-                <CardHeader>
-                    <div className="flex flex-col items-center text-center gap-4">
-                        <div className="bg-primary/10 p-3 rounded-full">
-                            {feature.icon}
-                        </div>
-                        <CardTitle>{feature.title}</CardTitle>
-                    </div>
-                    <CardDescription className="pt-2 text-center">
-                        {feature.description}
-                    </CardDescription>
-                </CardHeader>
-            </Card>
-        ))}
-      </div>
-    </div>
+      <CtaSection />
+    </>
   );
 }
