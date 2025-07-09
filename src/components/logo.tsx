@@ -19,7 +19,7 @@ export function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2" aria-label="ScoutFlair Home">
       <ScoutFlairLogoSvg />
-      <span className="text-2xl font-bold tracking-tight text-[#1B1B1B]/80">ScoutFlair</span>
+      <span className="text-2xl font-bold tracking-tight text-[#1B1B1B]">ScoutFlair</span>
     </Link>
   );
 }
