@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { PartnersSection } from '@/components/partners-section';
 import { OurDreamSection } from '@/components/our-dream-section';
 import { MissionVisionSection } from '@/components/mission-vision-section';
+import { TestimonialsSection } from '@/components/testimonials-section';
 
 export default function AboutPage() {
   return (
@@ -30,6 +31,7 @@ export default function AboutPage() {
       <PartnersSection />
       <OurDreamSection />
       <MissionVisionSection />
+      <TestimonialsSection />
     </>
   );
 }
