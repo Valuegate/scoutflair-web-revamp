@@ -26,7 +26,7 @@ export function HowItWorks() {
     ];
 
     return (
-        <section className="bg-background -mt-16 pb-12 md:pb-20 relative z-10">
+        <section className="relative z-10 pb-12 md:pb-20 -mt-28">
             <div className="container">
                 <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
                     <div className="flex flex-col gap-5">
