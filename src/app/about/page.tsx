@@ -4,6 +4,7 @@ import { OurDreamSection } from '@/components/our-dream-section';
 import { MissionVisionSection } from '@/components/mission-vision-section';
 import { TestimonialsSection } from '@/components/testimonials-section';
 import { MeetTheTeamSection } from '@/components/meet-the-team-section';
+import { CtaSection } from '@/components/cta-section';
 
 export default function AboutPage() {
   return (
@@ -34,6 +35,7 @@ export default function AboutPage() {
       <MissionVisionSection />
       <TestimonialsSection />
       <MeetTheTeamSection />
+      <CtaSection />
     </>
   );
 }
