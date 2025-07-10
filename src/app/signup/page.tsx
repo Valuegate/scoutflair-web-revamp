@@ -1,8 +1,11 @@
 // src/app/signup/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const roles = [
@@ -29,24 +32,43 @@ const roles = [
     },
 ];
 
-const RoleCard = ({ role, className }: { role: typeof roles[0], className?: string }) => (
-    <Link href={role.href} className={cn(
-        "group relative bg-white rounded-xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm mx-auto",
-        className
-    )}>
-        <CheckCircle2 className="absolute top-4 right-4 w-6 h-6 text-gray-300 group-hover:text-primary transition-colors" />
-        <div className="relative w-40 h-40 mb-6">
+const RoleCard = ({ role, className, isSelected, onClick }: {
+    role: typeof roles[0],
+    className?: string,
+    isSelected: boolean,
+    onClick: () => void
+}) => (
+    <Link
+        href={role.href}
+        onClick={onClick}
+        className={cn(
+            // Responsive padding for the card itself
+            "group bg-white rounded-2xl p-6 md:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm mx-auto h-full",
+            className
+        )}>
+        {/* Responsive image sizing */}
+        <div className="relative w-32 h-32 md:w-40 md:h-40 mb-6">
             <Image
                 src={role.image}
                 alt={role.name}
                 width={160}
                 height={160}
-                className="rounded-full object-cover border-4 border-gray-100 group-hover:border-primary/20 transition-colors"
+                className="rounded-full object-cover w-full h-full"
                 data-ai-hint={role.hint}
             />
+            <div className={cn(
+                "absolute top-1 right-1 rounded-full p-1.5 border-2 border-white flex items-center justify-center transition-colors duration-300",
+                isSelected ? "bg-[#192B4D]" : "bg-gray-300"
+            )}>
+                <Check className={cn(
+                    "w-4 h-4 transition-colors duration-300",
+                    isSelected ? "text-white" : "text-gray-500"
+                )} strokeWidth={3} />
+            </div>
         </div>
         <div className="flex flex-col items-center gap-4 flex-grow">
-            <h2 className="font-manrope text-2xl font-bold text-[#192B4D]">
+            {/* Responsive heading size */}
+            <h2 className="font-manrope text-xl md:text-2xl font-bold text-[#192B4D]">
                 {role.name}
             </h2>
             <p className="font-lato text-base text-black/80 leading-relaxed">
@@ -54,7 +76,7 @@ const RoleCard = ({ role, className }: { role: typeof roles[0], className?: stri
             </p>
         </div>
         <div className="mt-6 flex flex-col items-center gap-2">
-            <Button className="rounded-full bg-[#041931] hover:bg-[#041931]/90 h-11 px-8 font-poppins text-base font-semibold">
+            <Button className="rounded-full bg-[#041931] hover:bg-[#041931]/90 h-11 px-8 font-poppins text-base font-semibold flex items-center justify-center gap-2">
                 <span>Dive In</span>
                 <ArrowRight className="w-4 h-4" />
             </Button>
@@ -64,17 +86,34 @@ const RoleCard = ({ role, className }: { role: typeof roles[0], className?: stri
 );
 
 export default function SignUpPage() {
+    const [selectedRole, setSelectedRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        const storedRole = localStorage.getItem('selectedSignUpRole');
+        if (storedRole && roles.some(r => r.name === storedRole)) {
+            setSelectedRole(storedRole);
+        }
+    }, []);
+
+    const handleRoleClick = (roleName: string) => {
+        setSelectedRole(roleName);
+        localStorage.setItem('selectedSignUpRole', roleName);
+    };
+    
     return (
         <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
-            <div className="absolute inset-0 bg-[#192B4D]/60 backdrop-blur-sm" />
-            
-            <div className="relative z-10 w-full max-w-screen-xl mx-auto rounded-2xl bg-cover bg-center bg-[#192B4D] bg-[url('/images/Color_frame_1736_1900.png')]">
-                <div className="bg-[#192B4D]/80 rounded-2xl p-6 md:p-12 lg:p-24">
-                     <div className="flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-12 w-full">
-                        {roles.map((role) => (
-                            <RoleCard key={role.name} role={role} />
-                        ))}
-                    </div>
+            {/* Main container with responsive padding */}
+            <div className="relative z-10 w-full max-w-6xl mx-auto rounded-2xl bg-cover bg-center bg-[#192B4D]/90 bg-[url('/images/Color_frame_1736_1900.png')] p-6 md:p-12 lg:p-16">
+                 {/* The grid stacks vertically by default and becomes 3 columns on large screens */}
+                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
+                    {roles.map((role) => (
+                        <RoleCard
+                            key={role.name}
+                            role={role}
+                            isSelected={selectedRole === role.name}
+                            onClick={() => handleRoleClick(role.name)}
+                        />
+                    ))}
                 </div>
             </div>
         </div>
