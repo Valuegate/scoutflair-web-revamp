@@ -12,7 +12,7 @@ const features = [
 
 export function AboutSection() {
   return (
-    <section className="bg-white bg-[url('/images/background-texture.png')] bg-cover bg-center py-16 md:py-24">
+    <section className="bg-white bg-[url('https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/About_frame_1598_2381.png')] bg-cover bg-center py-16 md:py-24">
       <div className="container">
         {/* Top Section */}
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
