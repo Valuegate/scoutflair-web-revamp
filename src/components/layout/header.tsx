@@ -54,7 +54,7 @@ export function Header() {
                   Sign In
                 </Link>
                 <Button asChild className="rounded-[20px] bg-[#041931] px-6 h-auto text-base font-poppins font-semibold text-white hover:bg-[#041931]/90">
-                  <Link href="#">Sign Up</Link>
+                  <Link href="/signup">Sign Up</Link>
                 </Button>
               </div>
             </div>
@@ -92,7 +92,7 @@ export function Header() {
                               Sign In
                           </Link>
                           <Button asChild className="rounded-[20px] bg-[#041931] text-base font-poppins font-semibold text-white hover:bg-[#041931]/90">
-                              <Link href="#" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+                              <Link href="/signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
                           </Button>
                       </div>
                   </div>
