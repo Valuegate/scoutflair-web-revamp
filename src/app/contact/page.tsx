@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CtaSection } from "@/components/cta-section";
 import { ContactInfo } from "@/components/contact-info";
+import { TestimonialsSection } from "@/components/testimonials-section";
+import { FaqSection } from "@/components/faq-section";
 
 export default function ContactPage() {
   return (
@@ -62,6 +64,8 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
+      <TestimonialsSection />
+      <FaqSection />
       <CtaSection />
     </>
   );
