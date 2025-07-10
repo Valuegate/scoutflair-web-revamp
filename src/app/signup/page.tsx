@@ -68,7 +68,7 @@ export default function SignUpPage() {
         <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/background-texture.png')] bg-[#192B4D]">
             <div className="absolute inset-0 bg-[#192B4D]/60 backdrop-blur-sm" />
             
-            <div className="relative z-10 w-full rounded-2xl bg-cover bg-center bg-[#192B4D] bg-[url('/images/Frame_2121457625_1737_2020.png')]">
+            <div className="relative z-10 w-full rounded-2xl bg-cover bg-center bg-[#192B4D] bg-[url('/images/background-texture.png')]">
                 <div className="bg-[#192B4D]/90 rounded-2xl p-6 md:p-12">
                      <div className="flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-12 w-full">
                         {roles.map((role) => (
