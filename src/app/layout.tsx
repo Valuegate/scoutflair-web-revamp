@@ -35,7 +35,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;500;700;900&family=Manrope:wght@700&family=Merriweather&family=Montserrat:wght@500&family=Poppins:wght@500;600&family=Roboto:ital,wght@0,500;1,500&display=swap" rel="stylesheet" />
       </head>
       <body className="font-lato antialiased">
-        <div className={cn("flex flex-col min-h-screen", { 'bg-[#192B4D]': pathname.startsWith('/signup') && pathname.endsWith('/signup') , 'bg-white': hideHeaderFooter && !(pathname.startsWith('/signup') && pathname.endsWith('/signup')) })}>
+        <div className={cn("flex flex-col min-h-screen", { 'bg-[#192B4D]': pathname.startsWith('/signup') && (pathname.endsWith('/signup') || pathname.endsWith('/signin')), 'bg-white': hideHeaderFooter && !(pathname.startsWith('/signup') && (pathname.endsWith('/signup') || pathname.endsWith('/signin'))) })}>
           {!hideHeaderFooter && <Header />}
           <main className="flex-grow">{children}</main>
           {!hideHeaderFooter && <Footer />}
