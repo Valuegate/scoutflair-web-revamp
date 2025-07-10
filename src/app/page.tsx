@@ -21,44 +21,47 @@ export default function Home() {
     <main>
       {/* Hero Text Section */}
       <section className="bg-[#F8F8FF] pt-16 md:pt-20 pb-16 md:pb-24 relative overflow-hidden">
-        {/* --- FIX APPLIED HERE --- */}
         {/* Decorative background images */}
-        <div className="hidden md:block">
+        <div>
             <Image
               src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3705.png"
               alt="background pattern"
               width={463}
               height={332}
-              // FIX: Adjusted position from -left-48 to -left-20 and opacity to make it visible
-              className="absolute -top-10 -left-20 opacity-10"
+              // Added floating animation with a delay
+              className="absolute -top-10 -left-20 animate-float"
               aria-hidden="true"
+              style={{ animationDelay: '0s' }}
             />
             <Image
               src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_426_1383.png"
               alt="background pattern"
               width={463}
               height={332}
-              // FIX: Adjusted position from -right-48 to -right-20 and opacity to make it visible
-              className="absolute -top-20 -right-20 opacity-10"
+              // Added floating animation with a delay
+              className="absolute -top-20 -right-20 animate-float"
               aria-hidden="true"
+              style={{ animationDelay: '-2s' }} // This image starts partway through its animation
             />
             <Image
               src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3708.png"
               alt="background pattern"
               width={260}
               height={187}
-              // FIX: Adjusted position from -right-24 to -right-12 and opacity to make it visible
-              className="absolute top-1/2 -right-12 opacity-10"
+              // Added floating animation with a delay
+              className="absolute top-1/2 -right-12 animate-float"
               aria-hidden="true"
+              style={{ animationDelay: '-4s' }}
             />
             <Image
               src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3706.png"
               alt="background pattern"
               width={260}
               height={187}
-              // FIX: Adjusted position from -left-32 to -left-16 and opacity to make it visible
-              className="absolute bottom-1/4 -left-16 opacity-10"
+              // Added floating animation with a delay
+              className="absolute bottom-1/4 -left-16 animate-float"
               aria-hidden="true"
+              style={{ animationDelay: '-1s' }}
             />
         </div>
 
