@@ -22,55 +22,57 @@ export default function Home() {
   return (
     <main>
       {/* Hero Text Section */}
-      <section className="bg-[#F8F8FF] pt-16 md:pt-20 pb-16 md:pb-24 relative">
+      <section className="bg-[#F8F8FF] pt-16 md:pt-20 pb-16 md:pb-24 relative overflow-hidden">
         {/* Decorative background images */}
-        <Image
-          src="/images/Still_life_of_colombia_national_soccer_team_1593_3705.png"
-          alt="background pattern"
-          width={463}
-          height={332}
-          className="absolute -top-10 -left-48 opacity-[0.08] hidden md:block"
-          aria-hidden="true"
-          data-ai-hint="abstract pattern"
-        />
-        <Image
-          src="/images/Still_life_of_colombia_national_soccer_team_426_1383.png"
-          alt="background pattern"
-          width={463}
-          height={332}
-          className="absolute -top-20 -right-48 opacity-[0.08] hidden md:block"
-          aria-hidden="true"
-          data-ai-hint="abstract pattern"
-        />
-         <Image
-          src="/images/Still_life_of_colombia_national_soccer_team_1593_3708.png"
-          alt="background pattern"
-          width={260}
-          height={187}
-          className="absolute top-1/2 -right-24 opacity-[0.08] hidden md:block"
-          aria-hidden="true"
-          data-ai-hint="abstract pattern"
-        />
-        <Image
-          src="/images/Still_life_of_colombia_national_soccer_team_1593_3706.png"
-          alt="background pattern"
-          width={260}
-          height={187}
-          className="absolute bottom-1/4 -left-32 opacity-[0.08] hidden md:block"
-          aria-hidden="true"
-          data-ai-hint="abstract pattern"
-        />
+        <div className="hidden md:block">
+            <Image
+            src="/images/Still_life_of_colombia_national_soccer_team_1593_3705.png"
+            alt="background pattern"
+            width={463}
+            height={332}
+            className="absolute -top-10 -left-48 opacity-[0.08]"
+            aria-hidden="true"
+            data-ai-hint="abstract pattern"
+            />
+            <Image
+            src="/images/Still_life_of_colombia_national_soccer_team_426_1383.png"
+            alt="background pattern"
+            width={463}
+            height={332}
+            className="absolute -top-20 -right-48 opacity-[0.08]"
+            aria-hidden="true"
+            data-ai-hint="abstract pattern"
+            />
+            <Image
+            src="/images/Still_life_of_colombia_national_soccer_team_1593_3708.png"
+            alt="background pattern"
+            width={260}
+            height={187}
+            className="absolute top-1/2 -right-24 opacity-[0.08]"
+            aria-hidden="true"
+            data-ai-hint="abstract pattern"
+            />
+            <Image
+            src="/images/Still_life_of_colombia_national_soccer_team_1593_3706.png"
+            alt="background pattern"
+            width={260}
+            height={187}
+            className="absolute bottom-1/4 -left-32 opacity-[0.08]"
+            aria-hidden="true"
+            data-ai-hint="abstract pattern"
+            />
+        </div>
 
         <div className="container relative flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#E5AA42]/50 bg-white/70 py-2 px-4 mb-6 md:mb-8 shadow-sm">
                 <Rocket className="w-5 h-5 text-[#D28E08]" />
-                <span className="font-lato text-base md:text-lg font-[600] text-[#D28E08]">
+                <span className="font-lato text-sm md:text-base font-medium text-[#D28E08]">
                     Unleash Your Potential, Get Discovered!
                 </span>
             </div>
 
-            <h1 className="font-poppins text-4xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
-                Revolutionizing Football <br />
+            <h1 className="font-poppins text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
+                Revolutionizing Football <br className="hidden sm:inline" />
                 <span className="relative inline-block text-[#F2A725]">
                     Scouting
                     <span className="absolute -bottom-2 left-0 w-full">
@@ -80,11 +82,11 @@ export default function Home() {
                 {' '}with Data & Insights
             </h1>
 
-            <p className="font-lato text-lg md:text-[22px] text-[#1B1B1B]/90 max-w-4xl mt-8 md:mt-12 leading-relaxed">
+            <p className="font-lato text-base sm:text-lg md:text-xl text-[#1B1B1B]/90 max-w-3xl mt-8 md:mt-10 leading-relaxed">
                 Our solution provides elite scouting, talent data, and mapping tools to all clubs, helping coaches and scouts identify and develop talent, bridging grassroots and professional football.
             </p>
 
-            <Button asChild size="lg" className="mt-10 rounded-full h-12 md:h-14 px-8 md:px-12 text-base md:text-lg font-poppins font-semibold bg-[#192B4D] hover:bg-[#192B4D]/90 shadow-lg">
+            <Button asChild size="lg" className="mt-8 md:mt-10 rounded-full h-12 md:h-14 px-8 md:px-12 text-base md:text-lg font-poppins font-semibold bg-[#192B4D] hover:bg-[#192B4D]/90 shadow-lg">
                 <Link href="/scouting-report">UNLOCK OPPORTUNITIES</Link>
             </Button>
         </div>
