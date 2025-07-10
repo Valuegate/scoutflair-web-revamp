@@ -138,7 +138,7 @@ export default function Home() {
         </div>
       </section>
       
-       <section className="bg-[#192B4D] bg-[url('https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3707.png')] bg-cover bg-center">
+       <section className="bg-[#192B4D] bg-[url('https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Frame_1171276255_1574_2109.png')] bg-cover bg-center">
         <div className="container py-5">
           <p className="text-white/90 text-center text-lg font-lato">
             Scoutflair equips you with powerful tools to showcase talent, analyze performance, and elevate football scouting
