@@ -1,52 +1,67 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CtaSection } from "@/components/cta-section";
+import { ContactInfo } from "@/components/contact-info";
 
 export default function ContactPage() {
   return (
     <>
-      <div className="container py-12 md:py-20">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight">Contact Us</h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Have a question or want to give us feedback? We'd love to hear from you.
-          </p>
+      <main className="py-12 md:py-20">
+        <div className="container">
+          <div className="grid lg:grid-cols-2 gap-10 xl:gap-20">
+            {/* Left Column: Form */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border">
+              <div className="flex flex-col gap-8 h-full">
+                {/* Header */}
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 py-1.5 px-4">
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                    <span className="font-merriweather text-sm text-primary-dark">Get in touch</span>
+                  </div>
+                  <h1 className="font-manrope text-3xl md:text-4xl font-bold text-foreground leading-tight">
+                    Scouting Talent? Chasing Dreams? Let’s Talk
+                  </h1>
+                  <p className="text-lg text-foreground/80">
+                    Whether you're scouting the next big star or chasing your football dreams, we're here to help. Reach out and let's make it happen!
+                  </p>
+                </div>
+
+                <div className="border-t border-gray-200"></div>
+
+                {/* Form */}
+                <form className="space-y-6">
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label htmlFor="first-name" className="font-lato text-base text-foreground/90">First Name:</label>
+                      <Input id="first-name" name="first-name" className="h-11 border-primary/20 focus-visible:border-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="last-name" className="font-lato text-base text-foreground/90">Last Name:</label>
+                      <Input id="last-name" name="last-name" className="h-11 border-primary/20 focus-visible:border-primary" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="font-lato text-base text-foreground/90">Email Address:</label>
+                    <Input id="email" name="email" type="email" className="h-11 border-primary/20 focus-visible:border-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="message" className="font-lato text-base text-foreground/90">Message:</label>
+                    <Textarea id="message" name="message" className="min-h-[150px] border-primary/20 focus-visible:border-primary" />
+                  </div>
+                  <Button type="submit" size="lg" className="w-full bg-[#E5AA42] text-black hover:bg-[#E5AA42]/90 font-poppins font-medium text-base h-12">
+                    Send Message
+                  </Button>
+                </form>
+              </div>
+            </div>
+
+            {/* Right Column: Info */}
+            <ContactInfo />
+
+          </div>
         </div>
-        <div className="max-w-2xl mx-auto">
-          <Card>
-              <CardHeader>
-                  <CardTitle>Send us a message</CardTitle>
-                  <CardDescription>Fill out the form below and we'll get back to you as soon as possible.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                  <form className="grid gap-4">
-                      <div className="grid md:grid-cols-2 gap-4">
-                          <div className="grid gap-1.5">
-                              <Label htmlFor="first-name">First Name</Label>
-                              <Input id="first-name" placeholder="John" />
-                          </div>
-                          <div className="grid gap-1.5">
-                              <Label htmlFor="last-name">Last Name</Label>
-                              <Input id="last-name" placeholder="Doe" />
-                          </div>
-                      </div>
-                      <div className="grid gap-1.5">
-                          <Label htmlFor="email">Email</Label>
-                          <Input id="email" type="email" placeholder="john.doe@example.com" />
-                      </div>
-                      <div className="grid gap-1.5">
-                          <Label htmlFor="message">Message</Label>
-                          <Textarea id="message" placeholder="Your message..." />
-                      </div>
-                      <Button type="submit">Send Message</Button>
-                  </form>
-              </CardContent>
-          </Card>
-        </div>
-      </div>
+      </main>
       <CtaSection />
     </>
   );
