@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Rocket } from 'lucide-react';
 import Image from 'next/image';
@@ -9,7 +8,6 @@ import { AboutSection } from '@/components/about-section';
 import { TestimonialsSection } from '@/components/testimonials-section';
 import { FaqSection } from '@/components/faq-section';
 import { CtaSection } from '@/components/cta-section';
-
 
 // The underline for the "Scouting" text in the hero section.
 const Underline = () => (
@@ -23,43 +21,44 @@ export default function Home() {
     <main>
       {/* Hero Text Section */}
       <section className="bg-[#F8F8FF] pt-16 md:pt-20 pb-16 md:pb-24 relative overflow-hidden">
+        {/* --- FIX APPLIED HERE --- */}
         {/* Decorative background images */}
         <div className="hidden md:block">
             <Image
-            src="/images/Still_life_of_colombia_national_soccer_team_1593_3705.png"
-            alt="background pattern"
-            width={463}
-            height={332}
-            className="absolute -top-10 -left-48 opacity-[0.08]"
-            aria-hidden="true"
-            data-ai-hint="abstract pattern"
+              src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3705.png"
+              alt="background pattern"
+              width={463}
+              height={332}
+              // FIX: Adjusted position from -left-48 to -left-20 and opacity to make it visible
+              className="absolute -top-10 -left-20 opacity-10"
+              aria-hidden="true"
             />
             <Image
-            src="/images/Still_life_of_colombia_national_soccer_team_426_1383.png"
-            alt="background pattern"
-            width={463}
-            height={332}
-            className="absolute -top-20 -right-48 opacity-[0.08]"
-            aria-hidden="true"
-            data-ai-hint="abstract pattern"
+              src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_426_1383.png"
+              alt="background pattern"
+              width={463}
+              height={332}
+              // FIX: Adjusted position from -right-48 to -right-20 and opacity to make it visible
+              className="absolute -top-20 -right-20 opacity-10"
+              aria-hidden="true"
             />
             <Image
-            src="/images/Still_life_of_colombia_national_soccer_team_1593_3708.png"
-            alt="background pattern"
-            width={260}
-            height={187}
-            className="absolute top-1/2 -right-24 opacity-[0.08]"
-            aria-hidden="true"
-            data-ai-hint="abstract pattern"
+              src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3708.png"
+              alt="background pattern"
+              width={260}
+              height={187}
+              // FIX: Adjusted position from -right-24 to -right-12 and opacity to make it visible
+              className="absolute top-1/2 -right-12 opacity-10"
+              aria-hidden="true"
             />
             <Image
-            src="/images/Still_life_of_colombia_national_soccer_team_1593_3706.png"
-            alt="background pattern"
-            width={260}
-            height={187}
-            className="absolute bottom-1/4 -left-32 opacity-[0.08]"
-            aria-hidden="true"
-            data-ai-hint="abstract pattern"
+              src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3706.png"
+              alt="background pattern"
+              width={260}
+              height={187}
+              // FIX: Adjusted position from -left-32 to -left-16 and opacity to make it visible
+              className="absolute bottom-1/4 -left-16 opacity-10"
+              aria-hidden="true"
             />
         </div>
 
@@ -103,7 +102,6 @@ export default function Home() {
                   height={460}
                   alt="View of a packed soccer stadium during a match"
                   className="rounded-[20px] border-2 border-[#192B4D] object-cover"
-                  data-ai-hint="stadium crowd"
               />
               <Image 
                   src="/images/Frame_1171276267_1593_1999.png"
@@ -111,7 +109,6 @@ export default function Home() {
                   height={460}
                   alt="Soccer player celebrating on a barrier"
                   className="rounded-[20px] object-cover"
-                  data-ai-hint="player celebrating"
               />
               <div className="flex flex-col gap-5">
                   <Image 
@@ -120,7 +117,6 @@ export default function Home() {
                       height={220}
                       alt="Scout watching a soccer match from the stands"
                       className="rounded-[20px] object-cover"
-                      data-ai-hint="scout watching"
                   />
                     <Image 
                       src="/images/Frame_1171276269_1593_2001.png"
@@ -128,7 +124,6 @@ export default function Home() {
                       height={220}
                       alt="Soccer manager watching from the sideline"
                       className="rounded-[20px] object-cover"
-                      data-ai-hint="manager sideline"
                   />
               </div>
           </div>
@@ -139,13 +134,15 @@ export default function Home() {
           </div>
         </div>
       </section>
-       <section className="bg-[#192B4D] bg-[url('/images/background-texture.png')] bg-cover bg-center">
+      
+       <section className="bg-[#192B4D] bg-[url('https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3707.png')] bg-cover bg-center">
         <div className="container py-5">
           <p className="text-white/90 text-center text-lg font-lato">
             Scoutflair equips you with powerful tools to showcase talent, analyze performance, and elevate football scouting
           </p>
         </div>
       </section>
+
       <CoreFeatures />
       <AboutSection />
       <TestimonialsSection />

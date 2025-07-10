@@ -1,7 +1,16 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'mediumslateblue-salamander-253615.hostingersite.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
