@@ -4,7 +4,7 @@ import { Mail, Phone } from 'lucide-react';
 const InfoCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string }) => (
     <div className="bg-gray-100/70 rounded-2xl p-4">
         <div className="flex items-center gap-4">
-            <div className="bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center shrink-0">
+            <div className="bg-[#192B4D] text-white rounded-full w-14 h-14 flex items-center justify-center shrink-0">
                 {icon}
             </div>
             <div className="flex flex-col gap-1">

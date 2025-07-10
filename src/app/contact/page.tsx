@@ -16,8 +16,8 @@ export default function ContactPage() {
                 {/* Header */}
                 <div className="space-y-4">
                   <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 py-1.5 px-4">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                    <span className="font-merriweather text-sm text-primary-dark">Get in touch</span>
+                    <div className="w-1.5 h-1.5 bg-[#041931] rounded-full"></div>
+                    <span className="font-merriweather text-sm text-[#192B4D]">Get in touch</span>
                   </div>
                   <h1 className="font-manrope text-3xl md:text-4xl font-bold text-foreground leading-tight">
                     Scouting Talent? Chasing Dreams? Let’s Talk
@@ -49,7 +49,7 @@ export default function ContactPage() {
                     <label htmlFor="message" className="font-lato text-base text-foreground/90">Message:</label>
                     <Textarea id="message" name="message" className="min-h-[150px] border-primary/20 focus-visible:border-primary" />
                   </div>
-                  <Button type="submit" size="lg" className="w-full bg-[#E5AA42] text-black hover:bg-[#E5AA42]/90 font-poppins font-medium text-base h-12">
+                  <Button type="submit" size="lg" variant="outline" className="w-full border-[#E5AA42] text-foreground hover:bg-[#E5AA42]/10 h-12 font-poppins font-medium text-base">
                     Send Message
                   </Button>
                 </form>
