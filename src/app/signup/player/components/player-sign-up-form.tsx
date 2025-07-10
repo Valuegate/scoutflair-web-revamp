@@ -19,12 +19,27 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
+const positions = [
+  "Goalkeeper", "Center Back", "Right Back", "Left Back", "Sweeper", 
+  "Defensive Midfielder", "Central Midfielder", "Attacking Midfielder", 
+  "Right Midfielder", "Left Midfielder", "Right Wing/Forward", 
+  "Left Wing/Forward", "Striker", "Center Forward", "False Nine", 
+  "Deep-Lying Playmaker", "Box-to-Box Midfielder", "Advanced Playmaker", 
+  "Trequartista", "Second Striker", "Target Man", "Poacher", 
+  "Wide Midfielder", "Inside Forward", "Right Wing-Back", "Left Wing-Back", 
+  "Libero", "Wingback", "Holding Midfielder", "Full-Back", "Center Half", 
+  "Stopper", "Shadow Striker"
+];
+// Remove duplicates
+const uniquePositions = [...new Set(positions)];
+
+
 const GoogleIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M21.8182 10.1818H22V12H12V2H13.8182V10.1818H21.8182Z" fill="#FFC107"/>
-        <path d="M2.18182 11.8182H2V10H12V22H10.1818V11.8182H2.18182Z" fill="#FF3D00"/>
-        <path d="M12 22V21.8182H3.89636C3.10273 21.3155 2.5 20.4545 2.5 19.4545V14.2273H12V22Z" fill="#4CAF50"/>
-        <path d="M2 12V11.8182H10.1036C10.8973 11.3155 11.5 10.4545 11.5 9.45455V4.22727H2V12Z" fill="#1976D2"/>
+        <path d="M22.56 12.25C22.56 11.45 22.49 10.68 22.36 9.92H12V14.45H18.42C18.13 15.99 17.22 17.31 15.82 18.22V20.77H19.5C21.56 18.91 22.56 15.89 22.56 12.25Z" fill="#4285F4"/>
+        <path d="M12 23C15.24 23 17.95 21.92 19.5 20.24L15.82 17.69C14.71 18.44 13.46 18.88 12 18.88C9.38 18.88 7.15 17.15 6.34 14.88H2.5V17.52C4.34 20.86 7.89 23 12 23Z" fill="#34A853"/>
+        <path d="M6.34 14.88C6.12 14.25 6 13.57 6 12.88C6 12.19 6.12 11.51 6.34 10.88V8.33H2.5C1.62 10.03 1 11.9 1 14.88C1 17.86 1.62 19.73 2.5 21.43L6.34 18.88V14.88Z" fill="#FBBC05"/>
+        <path d="M12 6.88C13.56 6.88 14.88 7.42 15.85 8.33L19.58 4.59C17.95 2.92 15.24 1.75 12 1.75C7.89 1.75 4.34 4.14 2.5 7.48L6.34 10.03C7.15 7.76 9.38 6.88 12 6.88Z" fill="#EA4335"/>
     </svg>
 )
 
@@ -62,9 +77,9 @@ export function PlayerSignUpForm() {
                     <h1 className="text-2xl font-bold text-[#1B1B1B]">Create an account</h1>
                     <p className="text-[#1B1B1B]/70">Register Your Skills: Show the world what you’ve got</p>
                 </div>
-                <Button variant="outline" className="w-full h-11 shadow-sm bg-white">
+                <Button variant="outline" className="w-full h-11 shadow-sm bg-white flex items-center gap-2">
                     <GoogleIcon />
-                    <span className="font-medium text-base">Sign up with Google</span>
+                    <span className="font-medium text-base text-[#1B1B1B]">Sign up with Google</span>
                 </Button>
             </div>
 
@@ -86,10 +101,9 @@ export function PlayerSignUpForm() {
                             <SelectValue placeholder="Choose" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="striker">Striker</SelectItem>
-                            <SelectItem value="midfielder">Midfielder</SelectItem>
-                            <SelectItem value="defender">Defender</SelectItem>
-                            <SelectItem value="goalkeeper">Goalkeeper</SelectItem>
+                            {uniquePositions.map(position => (
+                                <SelectItem key={position} value={position.toLowerCase().replace(/ /g, '-')}>{position}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
