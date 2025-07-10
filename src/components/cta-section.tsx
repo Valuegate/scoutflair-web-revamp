@@ -6,7 +6,7 @@ export function CtaSection() {
   return (
     <section className="py-16 md:py-24">
       <div className="container">
-        <div className="relative rounded-2xl bg-[#192B4D] bg-[url('https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/LAst_CTA_1617_1696.png')] bg-cover bg-center p-8 md:p-16 text-center text-white overflow-hidden">
+        <div className="relative rounded-2xl bg-[url('https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/LAst_CTA_1617_1696.png')] bg-cover bg-center p-8 md:p-16 text-center text-white overflow-hidden">
           <div className="absolute inset-0 bg-black/50"></div>
           <div className="relative z-10 flex flex-col items-center gap-8">
             <div className="flex flex-col items-center gap-2">
