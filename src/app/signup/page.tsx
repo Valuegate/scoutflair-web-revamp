@@ -23,7 +23,7 @@ const roles = [
     {
         name: 'For Scouts',
         description: 'Find outstanding players, track rising potential, and uncover the next big soccer star.',
-        image: '/images/Frame_2121457625_1737_2058.png',
+        image: '/images/Frame_2121457625_I1741_2700;1737_2058.png',
         hint: 'football scout portrait',
         href: '/signup/scout',
     },
@@ -65,7 +65,7 @@ const RoleCard = ({ role, className }: { role: typeof roles[0], className?: stri
 
 export default function SignUpPage() {
     return (
-        <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/background-texture.png')] bg-[#192B4D]">
+        <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
             <div className="absolute inset-0 bg-[#192B4D]/60 backdrop-blur-sm" />
             
             <div className="relative z-10 w-full rounded-2xl bg-cover bg-center bg-[#192B4D] bg-[url('/images/background-texture.png')]">
