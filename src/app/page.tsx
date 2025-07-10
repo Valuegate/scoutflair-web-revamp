@@ -137,6 +137,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+       <section className="bg-[#192B4D] bg-[url('/images/background-texture.png')] bg-cover bg-center">
+        <div className="container py-5">
+          <p className="text-white/90 text-center text-lg font-lato">
+            Scoutflair equips you with powerful tools to showcase talent, analyze performance, and elevate football scouting
+          </p>
+        </div>
+      </section>
       <CoreFeatures />
       <AboutSection />
       <TestimonialsSection />

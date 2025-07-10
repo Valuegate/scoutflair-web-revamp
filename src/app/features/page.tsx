@@ -8,7 +8,9 @@ export default function FeaturesPage() {
     <div className="bg-[#F8F8FF]">
       <FeaturesHero />
       <HowItWorks />
-      <CoreFeatures />
+      <div className="bg-white">
+        <CoreFeatures />
+      </div>
       <CtaSection />
     </div>
   );
