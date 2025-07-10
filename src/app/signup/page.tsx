@@ -9,14 +9,14 @@ const roles = [
     {
         name: 'For Players',
         description: 'Showcase your exceptional skills, connect with top scouts, and kickstart your professional career.',
-        image: '/images/Frame_2121457625_1737_2020.png',
+        image: '/images/Frame_2121457625_I1737_2116;1737_2020.png',
         hint: 'football player portrait',
         href: '/signup/player',
     },
     {
         name: 'For Coaches',
         description: 'Discover promising talent, build your winning team, and lead with unwavering confidence.',
-        image: '/images/Frame_2121457625_1737_2039.png',
+        image: '/images/Frame_2121457625_I1741_2667;1737_2039.png',
         hint: 'football coach portrait',
         href: '/signup/coach',
     },
