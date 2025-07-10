@@ -68,8 +68,8 @@ export default function SignUpPage() {
         <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
             <div className="absolute inset-0 bg-[#192B4D]/60 backdrop-blur-sm" />
             
-            <div className="relative z-10 w-full rounded-2xl bg-cover bg-center bg-[#192B4D] bg-[url('/images/background-texture.png')]">
-                <div className="bg-[#192B4D]/90 rounded-2xl p-6 md:p-12">
+            <div className="relative z-10 w-full max-w-screen-xl mx-auto rounded-2xl bg-cover bg-center bg-[#192B4D] bg-[url('/images/Color_frame_1736_1900.png')]">
+                <div className="bg-[#192B4D]/80 rounded-2xl p-6 md:p-12 lg:p-24">
                      <div className="flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-12 w-full">
                         {roles.map((role) => (
                             <RoleCard key={role.name} role={role} />
