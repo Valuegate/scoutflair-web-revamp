@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hideHeaderFooter = pathname === '/signup';
+  const hideHeaderFooter = pathname.startsWith('/signup') || pathname.startsWith('/signin');
 
   return (
     <html lang="en" suppressHydrationWarning>

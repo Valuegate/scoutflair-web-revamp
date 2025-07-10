@@ -50,7 +50,7 @@ export function Header() {
                 })}
               </nav>
               <div className="flex items-center gap-6">
-                <Link href="#" className="font-poppins text-base font-semibold text-[#041931] hover:opacity-80 transition-opacity">
+                <Link href="/signin" className="font-poppins text-base font-semibold text-[#041931] hover:opacity-80 transition-opacity">
                   Sign In
                 </Link>
                 <Button asChild className="rounded-[20px] bg-[#041931] px-6 h-auto text-base font-poppins font-semibold text-white hover:bg-[#041931]/90">
@@ -88,7 +88,7 @@ export function Header() {
                     </nav>
                     <Separator className="my-4" />
                     <div className="flex flex-col gap-4">
-                          <Link href="#" onClick={() => setIsMenuOpen(false)} className="font-poppins text-base font-semibold text-center text-[#041931]">
+                          <Link href="/signin" onClick={() => setIsMenuOpen(false)} className="font-poppins text-base font-semibold text-center text-[#041931]">
                               Sign In
                           </Link>
                           <Button asChild className="rounded-[20px] bg-[#041931] text-base font-poppins font-semibold text-white hover:bg-[#041931]/90">
