@@ -116,7 +116,7 @@ const FaqCategory = ({ title, faqs }: { title: string, faqs: { question: string,
                         <Minus className="h-6 w-6 text-[#041931] shrink-0 transition-transform duration-200 hidden group-data-[state=open]:block" />
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
-                        <div className="space-y-3 text-[#1B1B1B]/80 font-lato text-sm leading-relaxed">
+                        <div className="space-y-3 text-[#1B1B1B]/80 font-lato text-base leading-relaxed">
                             {faq.answer.split('\n').map((paragraph, index) => (
                                 <p key={index}>{paragraph}</p>
                             ))}
