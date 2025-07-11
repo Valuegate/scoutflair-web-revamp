@@ -7,7 +7,7 @@ export function MissionVisionSection() {
                 <div className="space-y-16 md:space-y-24">
                     {/* Mission Section */}
                     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
-                        <div className="md:order-last">
+                        <div>
                             <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 py-1.5 px-4 mb-6">
                                 <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
                                 <span className="font-merriweather text-sm text-primary-dark">Our Mission</span>
