@@ -15,7 +15,7 @@ export function MissionVisionSection() {
                             <h2 className="font-manrope text-3xl font-bold text-foreground leading-tight mb-4">
                                 Empowering Players, Transforming Scouting
                             </h2>
-                            <p className="text-lg text-foreground/90">
+                            <p className="text-lg text-foreground/90 font-lato">
                                 We are redefining football scouting by empowering players with a platform to showcase their skills, track progress, and connect with the right opportunities. At the same time, we equip scouts with advanced data-driven insights to make informed recruitment decisions. By bridging the gap between raw talent and professional opportunities, we are creating a more transparent, efficient, and impactful scouting ecosystem that benefits both players and the football industry at large.
                             </p>
                         </div>
