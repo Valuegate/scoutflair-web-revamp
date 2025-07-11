@@ -67,7 +67,7 @@ export function MissionVisionSection() {
                             <h2 className="font-manrope text-3xl font-bold text-foreground leading-tight mb-4">
                                 Breaking Barriers, Creating Football Legends
                             </h2>
-                            <p className="text-lg text-foreground/90">
+                            <p className="text-lg text-foreground/90 font-lato">
                                 We are revolutionizing football scouting by eliminating barriers that prevent talented players from being discovered. Our platform ensures that every aspiring footballer, regardless of background, location, or resources, has the opportunity to showcase their skills and get noticed. By leveraging advanced data-driven insights and innovative scouting solutions, we connect players with scouts and clubs that can propel their careers forward. Our vision is to create a football ecosystem where raw talent is recognized, nurtured, and transformed.
                             </p>
                         </div>
