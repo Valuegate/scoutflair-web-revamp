@@ -68,12 +68,12 @@ export default function Home() {
         <div className="container relative flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#E5AA42]/50 bg-white/70 py-2 px-4 mb-6 md:mb-8 shadow-sm">
                 <Rocket className="w-5 h-5 text-[#D28E08]" />
-                <span className="font-lato text-sm md:text-base font-medium text-[#D28E08]">
+                <span className="font-lato text-sm md:text-base font-semibold text-[#D28E08]">
                     Unleash Your Potential, Get Discovered!
                 </span>
             </div>
 
-            <h1 className="font-poppins text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
+            <h1 className="font-merriweather text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
                 Revolutionizing Football <br className="hidden sm:inline" />
                 <span className="relative inline-block text-[#F2A725]">
                     Scouting

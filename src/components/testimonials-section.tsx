@@ -4,10 +4,9 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
 import { FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight } from 'react-icons/fa';
 
-// Updated data structure to match the new component's needs
 const testimonials = [
   {
     image: '/images/Ellipse_2391_1601_1624.png',
@@ -60,9 +59,10 @@ const testimonials = [
   },
 ];
 
+const SWIPE_THRESHOLD = 50;
+
 export function TestimonialsSection() {
-  // Start with a middle index to have avatars on both sides initially
-  const [currentIndex, setCurrentIndex] = useState(Math.floor(testimonials.length / 2));
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
@@ -71,62 +71,66 @@ export function TestimonialsSection() {
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
   };
+  
+  // FIX: Added handler for swipe gestures
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.x > SWIPE_THRESHOLD) {
+      prevSlide();
+    } else if (info.offset.x < -SWIPE_THRESHOLD) {
+      nextSlide();
+    }
+  };
 
   return (
     <section className="bg-[#192B4D] text-white py-16 md:py-24 overflow-hidden">
-      <div className="container mx-auto px-4 flex flex-col items-center gap-12">
-        {/* Header Content - Simplified to match target */}
+      <div className="container mx-auto px-4 flex flex-col items-center gap-8 md:gap-12">
         <div className="text-center max-w-3xl">
+          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/30 py-1.5 px-4 mb-4">
+            <div className="w-1.5 h-1.5 bg-white rounded-full" />
+            <span className="font-lato text-sm font-normal">Testimonials</span>
+          </div>
           <h2 className="font-manrope text-3xl md:text-4xl font-bold">
             Game-Changing Experiences
           </h2>
-          <p className="mt-4 text-base text-white/90 max-w-lg mx-auto font-lato">
+          <p className="mt-4 text-base text-white/90 max-w-xl mx-auto font-lato">
             Hear firsthand from players, coaches and scouts who turned
             opportunities into success with Scoutflair.
           </p>
         </div>
 
-        {/* Dynamic Carousel Container */}
-        <div className="w-full flex items-center justify-center gap-4">
+        <div className="w-full flex items-center justify-center gap-2 md:gap-4">
+          {/* FIX: Arrows are now hidden on mobile and visible on larger screens */}
           <FaRegArrowAltCircleLeft
-            className="text-white/80 text-3xl cursor-pointer hover:text-white transition-colors flex-shrink-0"
+            className="hidden md:block text-white/80 text-3xl cursor-pointer hover:text-white transition-colors flex-shrink-0"
             onClick={prevSlide}
           />
 
-          <div className="relative w-full max-w-2xl h-[120px] flex items-center justify-center">
+          {/* FIX: Wrapped avatars in a draggable motion.div for swipe functionality */}
+          <motion.div
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            onDragEnd={handleDragEnd}
+            className="relative w-full max-w-xs sm:max-w-lg md:max-w-5xl h-[160px] flex items-center justify-center cursor-grab active:cursor-grabbing"
+          >
             {testimonials.map((testimonial, index) => {
-              const position = (index - currentIndex + testimonials.length) % testimonials.length;
+              const total = testimonials.length;
+              const position = (index - currentIndex + total) % total;
               const isCenter = position === 0;
-              const isVisible = Math.abs(index - currentIndex) <= 2 || Math.abs(index - currentIndex) >= testimonials.length - 2;
 
-              // Calculate dynamic styles for the 3D effect
-              let scale = 0.6;
-              let opacity = 0.4;
-              let zIndex = 1;
-              // The `translateX` value is the distance from the center. Adjust the multiplier to change spacing.
-              let translateX = (position - (testimonials.length / 2)) * 80;
-
-              if (isCenter) {
-                scale = 1;
-                opacity = 1;
-                zIndex = 10;
-                translateX = 0;
-              } else if(position === 1 || position === testimonials.length - 1) {
-                scale = 0.8;
-                opacity = 0.7;
-                zIndex = 5;
-                translateX = position === 1 ? 90 : -90;
-              } else if(position === 2 || position === testimonials.length - 2) {
-                scale = 0.6;
-                opacity = 0.5;
-                zIndex = 1;
-                translateX = position === 2 ? 160 : -160;
-              } else {
-                 opacity = 0; // Hide avatars that are too far away
+              // These values work well for both mobile and desktop due to responsive container widths
+              let scale = 1, opacity = 1, zIndex = 1, translateX = 0;
+              switch (position) {
+                case 0: scale = 1; opacity = 1; zIndex = 10; translateX = 0; break;
+                case 1: scale = 0.8; opacity = 0.8; zIndex = 5; translateX = 160; break;
+                case total - 1: scale = 0.8; opacity = 0.8; zIndex = 5; translateX = -160; break;
+                case 2: scale = 0.6; opacity = 0.6; zIndex = 3; translateX = 300; break;
+                case total - 2: scale = 0.6; opacity = 0.6; zIndex = 3; translateX = -300; break;
+                default:
+                  scale = 0.4;
+                  opacity = 0;
+                  translateX = position < total / 2 ? 400 : -400;
+                  break;
               }
-              
-              if(!isVisible) opacity = 0;
-
 
               return (
                 <motion.div
@@ -134,36 +138,34 @@ export function TestimonialsSection() {
                   className="absolute"
                   initial={false}
                   animate={{ x: translateX, scale, opacity, zIndex }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 25 }}
                 >
                   <Image
                     src={testimonial.image}
                     alt={testimonial.name}
-                    width={isCenter ? 100 : 80}
-                    height={isCenter ? 100 : 80}
-                    className="rounded-full border-4 transition-colors"
+                    width={120}
+                    height={120}
+                    className="rounded-full border-4 pointer-events-none" // pointer-events-none prevents image drag interference
                     style={{
-                      borderColor: isCenter ? 'white' : 'rgba(255, 255, 255, 0.3)',
+                      borderColor: isCenter ? 'white' : 'transparent',
                     }}
                   />
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
           <FaRegArrowAltCircleRight
-            className="text-white/80 text-3xl cursor-pointer hover:text-white transition-colors flex-shrink-0"
+            className="hidden md:block text-white/80 text-3xl cursor-pointer hover:text-white transition-colors flex-shrink-0"
             onClick={nextSlide}
           />
         </div>
 
-        {/* Testimonial Quote Display with Animation */}
         <div className="text-center max-w-3xl min-h-[190px] md:min-h-[160px]">
           <motion.div
-            key={currentIndex} // This key is crucial for re-triggering the animation
+            key={currentIndex}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
           >
             <h3 className="font-manrope text-xl font-medium">
@@ -172,7 +174,7 @@ export function TestimonialsSection() {
             <p className="font-lato text-sm text-white/70 mt-1.5">
               {testimonials[currentIndex].title}
             </p>
-            <blockquote className="mt-6">
+            <blockquote className="mt-6 max-w-2xl mx-auto">
               <p className="font-lato text-base md:text-lg text-white/90 leading-relaxed">
                 {testimonials[currentIndex].description}
               </p>
