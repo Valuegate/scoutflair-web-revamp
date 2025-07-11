@@ -87,7 +87,7 @@ export function TestimonialsSection() {
         <div className="text-center max-w-3xl">
           <div className="inline-flex items-center gap-2.5 rounded-full border border-white/30 py-1.5 px-4 mb-4">
             <div className="w-1.5 h-1.5 bg-white rounded-full" />
-            <span className="font-lato text-sm font-normal">Testimonials</span>
+            <span className="font-merriweather text-sm">Testimonials</span>
           </div>
           <h2 className="font-manrope text-3xl md:text-4xl font-bold">
             Game-Changing Experiences
@@ -171,7 +171,7 @@ export function TestimonialsSection() {
             <h3 className="font-manrope text-xl font-medium">
               {testimonials[currentIndex].name}
             </h3>
-            <p className="font-lato text-sm text-white/70 mt-1.5">
+            <p className="font-lato text-sm font-light text-white/70 mt-1.5">
               {testimonials[currentIndex].title}
             </p>
             <blockquote className="mt-6 max-w-2xl mx-auto">
