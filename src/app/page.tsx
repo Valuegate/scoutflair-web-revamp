@@ -140,7 +140,7 @@ export default function Home() {
       
        <section className="bg-[#192B4D] bg-[url('https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Frame_1171276255_1574_2109.png')] bg-cover bg-center">
         <div className="container py-5">
-          <p className="text-white/90 text-center text-lg font-lato">
+          <p className="text-white/90 text-center text-lg font-lato font-medium">
             Scoutflair equips you with powerful tools to showcase talent, analyze performance, and elevate football scouting
           </p>
         </div>
