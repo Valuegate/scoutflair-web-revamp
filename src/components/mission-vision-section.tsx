@@ -68,7 +68,7 @@ export function MissionVisionSection() {
                                 Breaking Barriers, Creating Football Legends
                             </h2>
                             <p className="text-lg text-foreground/90 font-lato">
-                                We are revolutionizing football scouting by eliminating barriers that prevent talented players from being discovered. Our platform ensures that every aspiring footballer, regardless of background, location, or resources, has the opportunity to showcase their skills and get noticed. By leveraging advanced data-driven insights and innovative scouting solutions, we connect players with scouts and clubs that can propel their careers forward. Our vision is to create a football ecosystem where raw talent is recognized, nurtured, and transformed.
+                                We are revolutionizing football scouting by eliminating the geographical and financial barriers that prevent talented players from being discovered. Our platform ensures that every aspiring footballer, regardless of background, location, or resources, has an equal opportunity to showcase their skills and get noticed. By leveraging advanced data-driven insights and innovative scouting solutions, we connect players with scouts and clubs that can propel their careers forward. Our ultimate vision is to create a more inclusive and meritocratic football ecosystem where raw talent is the only metric that matters, nurturing a global community where the legends of tomorrow are born today.
                             </p>
                         </div>
                     </div>
