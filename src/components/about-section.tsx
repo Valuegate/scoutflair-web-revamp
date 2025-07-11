@@ -17,18 +17,18 @@ export function AboutSection() {
         {/* Top Section */}
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
           {/* Left Column: Image */}
-          <div className="relative md:order-first h-[470px] flex items-center justify-center">
-            <div className="absolute inset-0 border-4 border-[#E5AA42] rounded-xl z-0"></div>
-            <div className="relative w-[440px] h-[460px] z-10">
-                <Image
+          <div className="relative md:order-first h-[506px]">
+            <div className="absolute top-0 left-0 w-[440px] h-[460px]">
+              <Image
                 src="/images/Image_1598_2263.png"
                 alt="Scouts watching a football match"
                 fill
                 className="rounded-2xl object-cover"
                 data-ai-hint="scouts watching match"
                 sizes="(max-width: 768px) 100vw, 440px"
-                />
+              />
             </div>
+            <div className="absolute top-9 left-9 w-[450px] h-[470px] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75"></div>
           </div>
 
           {/* Right Column: Content */}
