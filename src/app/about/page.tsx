@@ -21,7 +21,7 @@ export default function AboutPage() {
           </div>
           
           <Image
-            src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/About_Us_1615_1586.png"
+            src="/images/Frame_2121457547_1616_1649.png"
             alt="A football team on the field, viewed from above"
             width={1300}
             height={400}
