@@ -2,6 +2,7 @@ import { AnalyticsIcon } from './icons/analytics-icon';
 import { BinocularsIcon } from './icons/binoculars-icon';
 import { DeveloperIcon } from './icons/developer-icon';
 import { MindMappingIcon } from './icons/mind-mapping-icon';
+import { cn } from '@/lib/utils';
 
 const features = [
     {
@@ -9,6 +10,7 @@ const features = [
         title: "Advance Scouting",
         description: "Discover talent with precision using our advanced scouting tools, providing in-depth analysis and insights to identify and evaluate top players.",
         titleColor: "text-[#0E6868]",
+        hoverBgColor: "hover:bg-[#0E6868]",
         alt: "Binoculars icon representing advanced scouting",
     },
     {
@@ -16,6 +18,7 @@ const features = [
         title: "Talent Development",
         description: "Enhance player skills with our comprehensive talent development programs, focusing on personalized training to maximize potential.",
         titleColor: "text-[#680E58]",
+        hoverBgColor: "hover:bg-[#680E58]",
         alt: "Developer icon representing talent development",
     },
     {
@@ -23,6 +26,7 @@ const features = [
         title: "Data Analytics",
         description: "Unlock valuable insights with our data analytics tools, providing detailed performance metrics and actionable intelligence for decision-making.",
         titleColor: "text-[#53680E]",
+        hoverBgColor: "hover:bg-[#53680E]",
         alt: "Analytics icon representing data analytics",
     },
     {
@@ -30,6 +34,7 @@ const features = [
         title: "Information Mapping",
         description: "Visualize and organize complex data with our information mapping tools, making it easier to understand and interpret key insights.",
         titleColor: "text-[#037E11]",
+        hoverBgColor: "hover:bg-[#037E11]",
         alt: "Mind mapping icon representing information mapping",
     }
 ];
@@ -54,14 +59,14 @@ export function CoreFeatures() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {features.map((feature, index) => (
-                    <div key={index} className="border border-[#192B4D]/20 rounded-2xl p-5 flex flex-col items-center text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
-                       <div className="w-40 h-40">
+                    <div key={index} className={cn("group border border-[#192B4D]/20 rounded-2xl p-5 flex flex-col items-center text-center shadow-sm hover:shadow-lg transition-all duration-300", feature.hoverBgColor)}>
+                       <div className="w-40 h-40 group-hover:[&_svg_path]:stroke-white group-hover:[&_svg_g]:stroke-white transition-all duration-300">
                          {feature.icon}
                        </div>
                        <div className="w-full pt-6">
-                           <div className="border-t border-[#1B1B1B]/20 w-full mb-6"></div>
-                           <h3 className={`font-manrope text-xl font-semibold ${feature.titleColor} mb-3`}>{feature.title}</h3>
-                           <p className="font-lato text-sm text-[#1B1B1B]/80 leading-relaxed">{feature.description}</p>
+                           <div className="border-t border-[#1B1B1B]/20 group-hover:border-white/30 w-full mb-6 transition-colors duration-300"></div>
+                           <h3 className={cn("font-manrope text-xl font-semibold mb-3 transition-colors duration-300", feature.titleColor, "group-hover:text-white")}>{feature.title}</h3>
+                           <p className="font-lato text-sm text-[#1B1B1B]/80 group-hover:text-white/90 leading-relaxed transition-colors duration-300">{feature.description}</p>
                        </div>
                     </div>
                 ))}
