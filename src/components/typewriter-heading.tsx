@@ -65,7 +65,7 @@ export function TypewriterHeading({ text, className }: TypewriterHeadingProps) {
           </span>
         );
       }
-      return part.replace(/ /g, "\u00A0");
+      return part;
     });
   };
 
