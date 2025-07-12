@@ -18,16 +18,21 @@ export function AboutSection() {
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
           {/* Left Column: Image */}
           <div className="relative w-full max-w-[450px] h-[470px] mx-auto md:max-w-none md:h-[506px]">
+            {/* Dashed Border - Rendered first to be in the background */}
             <div className="absolute top-9 left-9 w-[calc(100%-36px)] h-[calc(100%-36px)] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75"></div>
+            
+            {/* Image Container - Positioned on top of the border */}
             <div className="absolute top-0 left-0 w-full h-full p-[18px_0_0_18px] box-content">
-              <Image
-                src="/images/Image_1598_2263.png"
-                alt="Scouts watching a football match"
-                fill
-                className="rounded-2xl object-cover"
-                data-ai-hint="scouts watching match"
-                sizes="(max-width: 768px) 100vw, 440px"
-              />
+              <div className="relative w-[440px] h-[460px]">
+                <Image
+                  src="/images/Image_1598_2263.png"
+                  alt="Scouts watching a football match"
+                  fill
+                  className="rounded-2xl object-cover"
+                  data-ai-hint="scouts watching match"
+                  sizes="(max-width: 768px) 100vw, 440px"
+                />
+              </div>
             </div>
           </div>
 
