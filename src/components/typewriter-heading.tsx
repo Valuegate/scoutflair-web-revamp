@@ -36,8 +36,8 @@ export function TypewriterHeading({ text, className }: TypewriterHeadingProps) {
       setTypingSpeed(isDeleting ? 30 : 150);
 
       if (!isDeleting && displayedText === fullText) {
-        // Pauses for 3 seconds, then starts deleting. Total time so far ~7.5s + 3s = 10.5s
-        setTimeout(() => setIsDeleting(true), 3000); 
+        // Pauses for 13 seconds, then starts deleting.
+        setTimeout(() => setIsDeleting(true), 13000); 
       } else if (isDeleting && displayedText === '') {
         setIsDeleting(false);
         // loopNum update will trigger re-typing
@@ -70,7 +70,7 @@ export function TypewriterHeading({ text, className }: TypewriterHeadingProps) {
   };
 
   return (
-    <h1 className={cn(className)}>
+    <h1 className={cn(className, "min-h-[180px] sm:min-h-[220px] md:min-h-[180px]")}>
       {renderTextWithScouting()}
       <motion.span
         initial={{ opacity: 0 }}
