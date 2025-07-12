@@ -89,7 +89,7 @@ export default function Home() {
             </p>
 
             <Button asChild size="lg" className="mt-8 md:mt-10 rounded-full h-12 md:h-14 px-8 md:px-12 text-base md:text-lg font-poppins font-semibold bg-[#192B4D] hover:bg-[#192B4D]/90 shadow-lg">
-                <Link href="/scouting-report">UNLOCK OPPORTUNITIES</Link>
+                <Link href="/signin">UNLOCK OPPORTUNITIES</Link>
             </Button>
         </div>
       </section>
