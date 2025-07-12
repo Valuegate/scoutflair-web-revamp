@@ -8,15 +8,15 @@ import { AboutSection } from '@/components/about-section';
 import { TestimonialsSection } from '@/components/testimonials-section';
 import { FaqSection } from '@/components/faq-section';
 import { CtaSection } from '@/components/cta-section';
-
-// The underline for the "Scouting" text in the hero section.
-const Underline = () => (
-    <svg className="w-full h-auto" viewBox="0 0 212 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M1 12.3958C36.1647 3.20501 128.617 -4.2333 209.667 8.2391" stroke="#F2A725" strokeWidth="4" strokeLinecap="round"/>
-    </svg>
-)
+import { TypewriterHeading } from '@/components/typewriter-heading';
 
 export default function Home() {
+  const typewriterText = [
+    "Revolutionizing Football Scouting with Data & Insights",
+    "Connecting Talent with Opportunity, Worldwide",
+    "Your Journey to Professional Football Starts Here"
+  ];
+
   return (
     <main>
       {/* Hero Text Section */}
@@ -69,17 +69,11 @@ export default function Home() {
                 </span>
             </div>
 
-            <h1 className="font-merriweather text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
-                Revolutionizing Football <br className="hidden sm:inline" />
-                <span className="relative inline-block text-[#F2A725]">
-                    Scouting
-                    <span className="absolute -bottom-2 left-0 w-full">
-                        <Underline />
-                    </span>
-                </span>
-                {' '}with Data & Insights
-            </h1>
-
+            <TypewriterHeading
+              text={typewriterText}
+              className="font-merriweather text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B] min-h-[180px] sm:min-h-[220px] md:min-h-[180px]"
+            />
+            
             <p className="font-lato text-base sm:text-lg md:text-xl text-[#1B1B1B]/90 max-w-3xl mt-8 md:mt-10 leading-relaxed">
                 Our solution provides elite scouting, talent data, and mapping tools to all clubs, helping coaches and scouts identify and develop talent, bridging grassroots and professional football.
             </p>

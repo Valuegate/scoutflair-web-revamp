@@ -125,6 +125,10 @@ export default {
           '50%': { transform: 'translateY(10px)' },
           '100%': { transform: 'translateY(0px)' },
         },
+        'blink-caret': {
+          'from, to': { borderColor: 'transparent' },
+          '50%': { borderColor: 'hsl(var(--foreground))' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -132,6 +136,7 @@ export default {
         'marquee': 'marquee 40s linear infinite',
         'float-up': 'float-up 6s ease-in-out infinite',
         'float-down': 'float-down 6s ease-in-out infinite',
+        'blink-caret': 'blink-caret 1s step-end infinite',
       },
     },
   },
