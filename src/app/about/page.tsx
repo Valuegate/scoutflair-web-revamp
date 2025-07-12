@@ -25,7 +25,7 @@ export default function AboutPage() {
             alt="A football team on the field, viewed from above"
             width={1300}
             height={400}
-            className="w-full h-auto rounded-2xl object-cover"
+            className="w-full h-auto rounded-2xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
             data-ai-hint="football team"
           />
         </div>
