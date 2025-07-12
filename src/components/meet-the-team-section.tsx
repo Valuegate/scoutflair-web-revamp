@@ -68,12 +68,12 @@ export function MeetTheTeamSection() {
                 {/* Desktop Grid */}
                 <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     {teamMembers.map((member, index) => (
-                        <div key={index} className="relative aspect-[3/4] w-full h-auto">
+                        <div key={index} className="relative aspect-[3/4] w-full h-auto overflow-hidden rounded-2xl">
                            <Image
                              src={member.image}
                              alt={member.name}
                              fill
-                             className="rounded-2xl object-cover"
+                             className="rounded-2xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
                              data-ai-hint={member.hint}
                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                            />
@@ -87,12 +87,12 @@ export function MeetTheTeamSection() {
                         <CarouselContent>
                             {teamMembers.map((member, index) => (
                                 <CarouselItem key={index}>
-                                     <div className="relative aspect-[3/4] w-full h-auto">
+                                     <div className="relative aspect-[3/4] w-full h-auto overflow-hidden rounded-2xl">
                                         <Image
                                             src={member.image}
                                             alt={member.name}
                                             fill
-                                            className="rounded-2xl object-cover"
+                                            className="rounded-2xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
                                             data-ai-hint={member.hint}
                                             sizes="90vw"
                                         />
