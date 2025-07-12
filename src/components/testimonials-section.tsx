@@ -6,6 +6,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { motion, PanInfo } from 'framer-motion';
 import { FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight } from 'react-icons/fa';
+import { cn } from '@/lib/utils';
 
 const testimonials = [
   {
@@ -141,7 +142,10 @@ export function TestimonialsSection() {
                     alt={testimonial.name}
                     width={120}
                     height={120}
-                    className="rounded-full border-4 pointer-events-none"
+                    className={cn(
+                        "rounded-full border-4 pointer-events-none",
+                        isCenter && "transition-transform duration-300 ease-in-out hover:scale-110"
+                    )}
                     style={{
                       borderColor: isCenter ? 'white' : 'transparent',
                     }}
