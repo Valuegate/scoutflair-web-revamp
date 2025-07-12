@@ -18,12 +18,12 @@ export function AboutSection() {
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
 
           {/* Left Column: Image (High-fidelity responsive version) */}
-          <div className="relative mx-auto w-full max-w-sm aspect-[486/506] md:max-w-[486px] animate-float">
+          <div className="relative mx-auto w-full max-w-sm aspect-[486/506] md:max-w-[486px]">
             {/* Dashed Border - Positioned to match Figma spec */}
-            <div className="absolute bottom-0 right-0 w-[92.6%] h-[92.8%] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75"></div>
+            <div className="absolute bottom-0 right-0 w-[92.6%] h-[92.8%] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75 animate-float-down"></div>
             
             {/* Image Wrapper - Positioned on top-left of the border */}
-            <div className="absolute top-0 left-0 w-[90.5%] h-[90.9%] rounded-2xl overflow-hidden">
+            <div className="absolute top-0 left-0 w-[90.5%] h-[90.9%] rounded-2xl overflow-hidden animate-float-up">
               <Image
                 src="/images/Image_1598_2263.png"
                 alt="Scouts watching a football match"

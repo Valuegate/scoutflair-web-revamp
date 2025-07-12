@@ -115,9 +115,14 @@ export default {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
-        'float': {
+        'float-up': {
           '0%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
+          '50%': { transform: 'translateY(-10px)' },
+          '100%': { transform: 'translateY(0px)' },
+        },
+        'float-down': {
+          '0%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(10px)' },
           '100%': { transform: 'translateY(0px)' },
         },
       },
@@ -125,7 +130,8 @@ export default {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'marquee': 'marquee 40s linear infinite',
-        'float': 'float 6s ease-in-out infinite',
+        'float-up': 'float-up 6s ease-in-out infinite',
+        'float-down': 'float-down 6s ease-in-out infinite',
       },
     },
   },
