@@ -13,8 +13,6 @@ import { TypewriterHeading } from '@/components/typewriter-heading';
 export default function Home() {
   const typewriterText = [
     "Revolutionizing Football Scouting with Data & Insights",
-    "Connecting Talent with Opportunity, Worldwide",
-    "Your Journey to Professional Football Starts Here"
   ];
 
   return (
