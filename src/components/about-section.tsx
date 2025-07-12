@@ -16,23 +16,22 @@ export function AboutSection() {
       <div className="container">
         {/* Top Section */}
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
-          {/* Left Column: Image */}
-          <div className="relative w-full max-w-[450px] h-[470px] mx-auto md:max-w-none md:h-[506px]">
-            {/* Dashed Border - Rendered first to be in the background */}
-            <div className="absolute top-9 left-9 w-[calc(100%-36px)] h-[calc(100%-36px)] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75"></div>
+
+          {/* Left Column: Image (High-fidelity responsive version) */}
+          <div className="relative mx-auto w-full max-w-sm aspect-[486/506] md:max-w-[486px]">
+            {/* Dashed Border - Positioned to match Figma spec */}
+            <div className="absolute bottom-0 right-0 w-[92.6%] h-[92.8%] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75"></div>
             
-            {/* Image Container - Positioned on top of the border */}
-            <div className="absolute top-0 left-0 w-full h-full p-[18px_0_0_18px] box-content">
-              <div className="relative w-[440px] h-[460px]">
-                <Image
-                  src="/images/Image_1598_2263.png"
-                  alt="Scouts watching a football match"
-                  fill
-                  className="rounded-2xl object-cover"
-                  data-ai-hint="scouts watching match"
-                  sizes="(max-width: 768px) 100vw, 440px"
-                />
-              </div>
+            {/* Image Wrapper - Positioned on top-left of the border */}
+            <div className="absolute top-0 left-0 w-[90.5%] h-[90.9%] rounded-2xl overflow-hidden">
+              <Image
+                src="/images/Image_1598_2263.png"
+                alt="Scouts watching a football match"
+                fill
+                className="object-cover"
+                data-ai-hint="scouts watching match"
+                sizes="(max-width: 640px) 90vw, (max-width: 768px) 40vw, 440px"
+              />
             </div>
           </div>
 
@@ -40,7 +39,7 @@ export function AboutSection() {
           <div className="flex flex-col gap-8">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-[#041931]/40 py-1.5 px-4 mb-4">
-                 <div className="w-1.is-2 h-1.5 bg-[#041931] rounded-full"></div>
+                 <div className="w-1.5 h-1.5 bg-[#041931] rounded-full"></div>
                 <span className="font-merriweather text-sm text-[#192B4D]">About Us</span>
               </div>
               <h2 className="font-manrope text-3xl md:text-4xl font-bold text-[#1B1B1B] max-w-lg leading-tight">

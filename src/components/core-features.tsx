@@ -60,7 +60,7 @@ export function CoreFeatures() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {features.map((feature, index) => (
                     <div key={index} className={cn("group border border-[#192B4D]/20 rounded-2xl p-5 flex flex-col items-center text-center shadow-sm hover:shadow-lg transition-all duration-300", feature.hoverBgColor)}>
-                       <div className="w-40 h-40 group-hover:[&_svg_path]:stroke-white group-hover:[&_svg_g]:stroke-white transition-all duration-300">
+                       <div className={cn("w-40 h-40 group-hover:text-white transition-colors duration-300", feature.titleColor)}>
                          {feature.icon}
                        </div>
                        <div className="w-full pt-6">
