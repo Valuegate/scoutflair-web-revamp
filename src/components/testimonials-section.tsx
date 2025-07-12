@@ -72,7 +72,6 @@ export function TestimonialsSection() {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
   };
   
-  // FIX: Added handler for swipe gestures
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (info.offset.x > SWIPE_THRESHOLD) {
       prevSlide();
@@ -99,13 +98,11 @@ export function TestimonialsSection() {
         </div>
 
         <div className="w-full flex items-center justify-center gap-2 md:gap-4">
-          {/* FIX: Arrows are now hidden on mobile and visible on larger screens */}
           <FaRegArrowAltCircleLeft
             className="hidden md:block text-white/80 text-3xl cursor-pointer hover:text-white transition-colors flex-shrink-0"
             onClick={prevSlide}
           />
 
-          {/* FIX: Wrapped avatars in a draggable motion.div for swipe functionality */}
           <motion.div
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
@@ -117,7 +114,6 @@ export function TestimonialsSection() {
               const position = (index - currentIndex + total) % total;
               const isCenter = position === 0;
 
-              // These values work well for both mobile and desktop due to responsive container widths
               let scale = 1, opacity = 1, zIndex = 1, translateX = 0;
               switch (position) {
                 case 0: scale = 1; opacity = 1; zIndex = 10; translateX = 0; break;
@@ -145,7 +141,7 @@ export function TestimonialsSection() {
                     alt={testimonial.name}
                     width={120}
                     height={120}
-                    className="rounded-full border-4 pointer-events-none" // pointer-events-none prevents image drag interference
+                    className="rounded-full border-4 pointer-events-none"
                     style={{
                       borderColor: isCenter ? 'white' : 'transparent',
                     }}
