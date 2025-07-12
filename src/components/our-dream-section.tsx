@@ -26,7 +26,7 @@ export function OurDreamSection() {
               alt="Football players in a huddle."
               width={640}
               height={289}
-              className="w-full h-auto rounded-2xl object-cover"
+              className="w-full h-auto rounded-2xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
               data-ai-hint="football huddle professional"
             />
             <Image
@@ -34,7 +34,7 @@ export function OurDreamSection() {
               alt="A young football player kicking a ball on a dirt field."
               width={640}
               height={289}
-              className="w-full h-auto rounded-2xl object-cover"
+              className="w-full h-auto rounded-2xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
               data-ai-hint="young footballer street"
             />
           </div>
