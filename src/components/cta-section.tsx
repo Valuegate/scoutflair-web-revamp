@@ -23,7 +23,7 @@ export function CtaSection() {
               asChild
               className="rounded-[24px] bg-transparent hover:bg-white/10 border-white border h-14 px-12 text-lg font-poppins font-semibold shadow-[0_4px_12px_2px_rgba(0,0,0,0.15)] transition-all"
             >
-              <Link href="#">GET STARTED</Link>
+              <Link href="/signup">GET STARTED</Link>
             </Button>
           </div>
         </div>
