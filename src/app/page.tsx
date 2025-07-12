@@ -69,7 +69,7 @@ export default function Home() {
 
             <TypewriterHeading
               text={typewriterText}
-              className="font-merriweather text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B] min-h-[180px] sm:min-h-[220px] md:min-h-[180px]"
+              className="font-merriweather text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]"
             />
             
             <p className="font-lato text-base sm:text-lg md:text-xl text-[#1B1B1B]/90 max-w-3xl mt-8 md:mt-10 leading-relaxed">
