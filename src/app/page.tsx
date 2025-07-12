@@ -28,8 +28,7 @@ export default function Home() {
               alt="background pattern"
               width={463}
               height={332}
-              // Added floating animation with a delay
-              className="absolute -top-10 -left-20 animate-float"
+              className="absolute -top-10 -left-20 animate-float-up"
               aria-hidden="true"
               style={{ animationDelay: '0s' }}
             />
@@ -38,18 +37,16 @@ export default function Home() {
               alt="background pattern"
               width={463}
               height={332}
-              // Added floating animation with a delay
-              className="absolute -top-20 -right-20 animate-float"
+              className="absolute -top-20 -right-20 animate-float-up"
               aria-hidden="true"
-              style={{ animationDelay: '-2s' }} // This image starts partway through its animation
+              style={{ animationDelay: '-2s' }}
             />
             <Image
               src="https://mediumslateblue-salamander-253615.hostingersite.com/wp-content/uploads/2025/07/Still_life_of_colombia_national_soccer_team_1593_3708.png"
               alt="background pattern"
               width={260}
               height={187}
-              // Added floating animation with a delay
-              className="absolute top-1/2 -right-12 animate-float"
+              className="absolute top-1/2 -right-12 animate-float-down"
               aria-hidden="true"
               style={{ animationDelay: '-4s' }}
             />
@@ -58,8 +55,7 @@ export default function Home() {
               alt="background pattern"
               width={260}
               height={187}
-              // Added floating animation with a delay
-              className="absolute bottom-1/4 -left-16 animate-float"
+              className="absolute bottom-1/4 -left-16 animate-float-down"
               aria-hidden="true"
               style={{ animationDelay: '-1s' }}
             />
