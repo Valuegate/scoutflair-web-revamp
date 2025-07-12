@@ -17,14 +17,14 @@ export function AboutSection() {
         {/* Top Section */}
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center mb-16 md:mb-24">
           {/* Left Column: Image */}
-          <div className="relative h-[506px]">
-            <div className="absolute top-9 left-9 w-[450px] h-[470px] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75"></div>
-            <div className="absolute top-0 left-0 w-[440px] h-[460px]">
+          <div className="relative w-full max-w-[450px] h-[470px] mx-auto md:max-w-none md:h-[506px]">
+            <div className="absolute top-9 left-9 w-[calc(100%-36px)] h-[calc(100%-36px)] border-4 border-dashed border-[#E5AA42] rounded-xl opacity-75"></div>
+            <div className="absolute top-0 left-0 w-full h-full">
               <Image
                 src="/images/Image_1598_2263.png"
                 alt="Scouts watching a football match"
                 fill
-                className="rounded-2xl object-cover"
+                className="rounded-2xl object-cover p-[36px_0_0_0] box-content"
                 data-ai-hint="scouts watching match"
                 sizes="(max-width: 768px) 100vw, 440px"
               />
@@ -35,13 +35,13 @@ export function AboutSection() {
           <div className="flex flex-col gap-8">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-[#041931]/40 py-1.5 px-4 mb-4">
-                 <div className="w-1.5 h-1.5 bg-[#041931] rounded-full"></div>
+                 <div className="w-1.is-2 h-1.5 bg-[#041931] rounded-full"></div>
                 <span className="font-merriweather text-sm text-[#192B4D]">About Us</span>
               </div>
-              <h2 className="font-manrope text-4xl font-bold text-[#1B1B1B] max-w-lg leading-tight">
+              <h2 className="font-manrope text-3xl md:text-4xl font-bold text-[#1B1B1B] max-w-lg leading-tight">
                 Connecting Talent with Opportunity – Bridging the Gap in Football.
               </h2>
-              <p className="mt-4 text-lg text-[#1B1B1B]/90">
+              <p className="mt-4 text-base md:text-lg text-[#1B1B1B]/90">
                 Scoutflair is a dynamic football scouting platform designed to bridge the gap between talent and opportunity. Whether you're a player striving for exposure, a coach seeking the right prospects, or a scout looking for top talent, Scoutflair streamlines the connection process. We make talent discovery seamless, helping footballers advance their careers while enabling scouts and coaches to find the right fit with ease.
               </p>
             </div>
