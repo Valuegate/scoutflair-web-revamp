@@ -25,7 +25,7 @@ export function MissionVisionSection() {
                                 alt="Scout on phone"
                                 width={312}
                                 height={359}
-                                className="rounded-2xl object-cover w-full h-full"
+                                className="rounded-2xl object-cover w-full h-full transition-transform duration-300 ease-in-out hover:scale-105"
                                 data-ai-hint="scout phone"
                             />
                              <Image
@@ -33,7 +33,7 @@ export function MissionVisionSection() {
                                 alt="Player in action"
                                 width={312}
                                 height={305}
-                                className="rounded-2xl object-cover w-full h-full self-end"
+                                className="rounded-2xl object-cover w-full h-full self-end transition-transform duration-300 ease-in-out hover:scale-105"
                                 data-ai-hint="player action"
                             />
                         </div>
@@ -47,7 +47,7 @@ export function MissionVisionSection() {
                                 alt="Young players training"
                                 width={312}
                                 height={369}
-                                className="rounded-2xl object-cover w-full h-full"
+                                className="rounded-2xl object-cover w-full h-full transition-transform duration-300 ease-in-out hover:scale-105"
                                 data-ai-hint="young players training"
                             />
                             <Image
@@ -55,7 +55,7 @@ export function MissionVisionSection() {
                                 alt="Player celebrating"
                                 width={312}
                                 height={304}
-                                className="rounded-2xl object-cover w-full h-full self-end"
+                                className="rounded-2xl object-cover w-full h-full self-end transition-transform duration-300 ease-in-out hover:scale-105"
                                 data-ai-hint="player celebrating"
                             />
                         </div>
