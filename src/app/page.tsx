@@ -71,7 +71,7 @@ export default function Home() {
             <h1 className="font-merriweather text-4xl sm:text-5xl md:text-[56px] font-bold max-w-4xl leading-tight text-[#1B1B1B]">
               Revolutionizing Football <span className="relative inline-block text-[#F2A725]">
             Scouting
-            <span className="absolute -bottom-2 sm:-bottom-3 md:-bottom-4 left-0 w-full">
+            <span className="absolute -bottom-2 sm:-bottom-3 md:-bottom-4 -left-4 sm:-left-6 md:-left-8 w-[120%]">
               <Underline />
             </span>
           </span> with Data & Insights
