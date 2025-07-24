@@ -82,7 +82,7 @@ export function TestimonialsSection() {
   };
 
   return (
-    <section className="bg-[#192B4D] text-white py-12 md:py-20 overflow-hidden">
+    <section className="bg-[#192B4D] text-white py-12 overflow-hidden">
       <div className="container mx-auto px-4 flex flex-col items-center gap-8 md:gap-12">
         <div className="text-center max-w-3xl">
           <div className="inline-flex items-center gap-2.5 rounded-full border border-white/30 py-1.5 px-4 mb-4">
