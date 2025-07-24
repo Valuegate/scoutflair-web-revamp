@@ -73,7 +73,7 @@ export function MeetTheTeamSection() {
                              src={member.image}
                              alt={member.name}
                              fill
-                             className="rounded-2xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                             className="rounded-2xl object-cover transition-transform duration-300 ease-in-out"
                              data-ai-hint={member.hint}
                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                            />
@@ -92,7 +92,7 @@ export function MeetTheTeamSection() {
                                             src={member.image}
                                             alt={member.name}
                                             fill
-                                            className="rounded-2xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                                            className="rounded-2xl object-cover transition-transform duration-300 ease-in-out"
                                             data-ai-hint={member.hint}
                                             sizes="90vw"
                                         />
