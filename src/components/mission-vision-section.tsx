@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export function MissionVisionSection() {
     return (
-        <section className="py-12 md:py-24">
+        <section className="pt-0 pb-12 md:pb-24">
             <div className="container">
                 <div className="space-y-16 md:space-y-24">
                     {/* Mission Section */}
