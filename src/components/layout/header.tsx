@@ -39,7 +39,7 @@ export function Header() {
                       key={link.href}
                       href={link.href}
                       className={cn(
-                        'flex items-center gap-2 font-roboto text-lg font-medium italic',
+                        'flex items-center gap-2 font-roboto text-lg font-medium',
                         isActive ? 'text-[#1B1B1B]' : 'text-[#333333] opacity-[0.66]'
                       )}
                     >
@@ -78,7 +78,7 @@ export function Header() {
                           href={link.href}
                           onClick={() => setIsMenuOpen(false)}
                           className={cn(
-                            'font-roboto text-lg font-medium italic',
+                            'font-roboto text-lg font-medium',
                             pathname === link.href ? 'text-primary' : 'text-muted-foreground'
                           )}
                         >
