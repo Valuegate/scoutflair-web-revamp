@@ -18,7 +18,7 @@ export function FeaturesHero() {
           </div>
           
           <div className="flex justify-center pt-4">
-            <Button asChild className="bg-[#E5AA42] text-[#1B1B1B] font-poppins font-semibold rounded-full px-8 h-11 text-base hover:bg-[#E5AA42]/90 hover:scale-105 transition-all duration-300 shadow-lg">
+            <Button asChild className="bg-[#E5AA42] text-[#1B1B1B] font-poppins font-semibold rounded-full px-8 h-11 text-base hover:bg-[#E5AA42]/90 shadow-lg">
               <Link href="/signin">UNLOCK OPPORTUNITIES</Link>
             </Button>
           </div>
