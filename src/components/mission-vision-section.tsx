@@ -4,7 +4,7 @@ export function MissionVisionSection() {
     return (
         <section className="pt-0 pb-12 md:pb-24">
             <div className="container">
-                <div className="space-y-16 md:space-y-24">
+                <div className="space-y-16">
                     {/* Mission Section */}
                     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
                         <div>
