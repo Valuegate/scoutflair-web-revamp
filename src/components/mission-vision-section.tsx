@@ -24,7 +24,7 @@ export function MissionVisionSection() {
                                 src="/images/Frame_2121457548_1617_1608.png"
                                 alt="Scout on phone"
                                 width={312}
-                                height={359}
+                                height={400}
                                 className="rounded-2xl object-cover w-full h-full transition-transform duration-300 ease-in-out hover:scale-105"
                                 data-ai-hint="scout phone"
                             />
@@ -32,7 +32,7 @@ export function MissionVisionSection() {
                                 src="/images/Frame_2121457554_1617_1624.png"
                                 alt="Player in action"
                                 width={312}
-                                height={305}
+                                height={340}
                                 className="rounded-2xl object-cover w-full h-full self-end transition-transform duration-300 ease-in-out hover:scale-105"
                                 data-ai-hint="player action"
                             />
