@@ -25,7 +25,7 @@ export function MissionVisionSection() {
                                 alt="Scout on phone"
                                 width={312}
                                 height={400}
-                                className="rounded-2xl object-cover w-full h-full transition-transform duration-300 ease-in-out hover:scale-105"
+                                className="rounded-2xl object-cover w-full h-full transition-transform duration-300 ease-in-out"
                                 data-ai-hint="scout phone"
                             />
                              <Image
@@ -33,7 +33,7 @@ export function MissionVisionSection() {
                                 alt="Player in action"
                                 width={312}
                                 height={340}
-                                className="rounded-2xl object-cover w-full h-full self-end transition-transform duration-300 ease-in-out hover:scale-105"
+                                className="rounded-2xl object-cover w-full h-full self-end transition-transform duration-300 ease-in-out"
                                 data-ai-hint="player action"
                             />
                         </div>
