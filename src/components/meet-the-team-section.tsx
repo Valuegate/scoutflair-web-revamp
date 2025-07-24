@@ -53,7 +53,7 @@ export function MeetTheTeamSection() {
     }, [api]);
 
     return (
-        <section className="py-12 md:py-24">
+        <section className="py-12 md:py-16">
             <div className="container">
                 <div className="flex flex-col gap-4 mb-12 md:mb-14">
                     <div className="inline-flex items-center gap-2 rounded-full border border-foreground/20 py-1.5 px-4 self-start">
