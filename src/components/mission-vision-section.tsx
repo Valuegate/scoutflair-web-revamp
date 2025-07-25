@@ -31,7 +31,7 @@ function ContentBlock({ data }: { data: typeof contentData[0] }) {
 
     // The block of two images
     const imageBlock = (
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-3 md:gap-5">
             {images.map((image) => (
                 <Image
                     key={image.src}
@@ -42,8 +42,10 @@ function ContentBlock({ data }: { data: typeof contentData[0] }) {
                     // The className from our data object is applied here.
                     // This is how `self-end` gets added to the correct image.
                     // Removed hover animations and h-full to maintain exact dimensions
-                    className={`rounded-2xl object-cover w-full ${image.className || ''}`}
-                    style={{ height: `${image.height}px` }}
+                    className={`rounded-xl md:rounded-2xl object-cover w-full ${image.className || ''}`}
+                    style={{ 
+                        height: `${image.height}px`
+                    }}
                 />
             ))}
         </div>
@@ -51,15 +53,15 @@ function ContentBlock({ data }: { data: typeof contentData[0] }) {
 
     // The block of text content
     const textBlock = (
-        <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 py-1.5 px-4 mb-6">
+        <div className="px-4 md:px-0">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 py-1.5 px-4 mb-4 md:mb-6">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full" aria-hidden="true"></div>
-                <span className="font-merriweather text-sm text-primary-dark">{pill}</span>
+                <span className="font-merriweather text-xs md:text-sm text-primary-dark">{pill}</span>
             </div>
-            <h2 className="font-manrope text-3xl font-bold text-foreground leading-tight mb-4">
+            <h2 className="font-manrope text-2xl md:text-3xl font-bold text-foreground leading-tight mb-3 md:mb-4">
                 {title}
             </h2>
-            <p className="text-lg text-foreground/90 font-lato">
+            <p className="text-base md:text-lg text-foreground/90 font-lato leading-relaxed">
                 {description}
             </p>
         </div>
@@ -67,18 +69,18 @@ function ContentBlock({ data }: { data: typeof contentData[0] }) {
 
     return (
         // The main grid that holds text and images.
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-16 items-center">
             {imagePosition === 'right' ? (
                 // Mission: Text first, then images
                 <>
-                    <div>{textBlock}</div>
-                    <div>{imageBlock}</div>
+                    <div className="order-2 md:order-1">{textBlock}</div>
+                    <div className="order-1 md:order-2 px-4 md:px-0">{imageBlock}</div>
                 </>
             ) : (
                 // Vision: Images first, then text
                 <>
-                    <div>{imageBlock}</div>
-                    <div>{textBlock}</div>
+                    <div className="order-1 px-4 md:px-0">{imageBlock}</div>
+                    <div className="order-2">{textBlock}</div>
                 </>
             )}
         </div>
@@ -88,9 +90,9 @@ function ContentBlock({ data }: { data: typeof contentData[0] }) {
 // The final component that you export
 export function MissionVisionSection() {
     return (
-        <section className="py-12 md:py-24">
-            <div className="container">
-                <div className="space-y-16 md:space-y-24">
+        <section className="py-8 md:py-12 lg:py-24">
+            <div className="container px-4 md:px-6 lg:px-8">
+                <div className="space-y-12 md:space-y-16 lg:space-y-24">
                     {contentData.map((item, index) => (
                         <ContentBlock key={index} data={item} />
                     ))}

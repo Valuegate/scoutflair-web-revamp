@@ -23,9 +23,10 @@ const MailIcon = () => (
 );
 
 const SendIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 57 57" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-    <path d="M36.1484 15.4444C37.0992 15.1122 38.0126 16.0256 37.6804 16.9764L32.1355 32.8203C31.7752 33.8479 30.3433 33.9059 29.9016 32.9111L27.226 26.8917L30.9919 23.1249C31.1158 22.9919 31.1833 22.8159 31.1801 22.634C31.1769 22.4522 31.1032 22.2787 30.9747 22.1501C30.8461 22.0215 30.6726 21.9478 30.4907 21.9446C30.3089 21.9414 30.1329 22.0089 29.9999 22.1329L26.2331 25.8988L20.2137 23.2232C19.2189 22.7805 19.2778 21.3496 20.3045 20.9893L36.1484 15.4444Z" fill="#192B4D"/>
-  </svg>
+    <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path id="Vector" d="M16.6484 0.444399C17.5992 0.112173 18.5126 1.02556 18.1804 1.97638L12.6355 17.8203C12.2752 18.8479 10.8433 18.9059 10.4016 17.9111L7.726 11.8917L11.4919 8.12491C11.6158 7.99185 11.6833 7.81587 11.6801 7.63403C11.6769 7.4522 11.6032 7.2787 11.4747 7.15011C11.3461 7.02151 11.1726 6.94784 10.9907 6.94464C10.8089 6.94143 10.6329 7.00893 10.4999 7.13291L6.73306 10.8988L0.713688 8.22317C-0.281119 7.78051 -0.222161 6.3496 0.804465 5.9893L16.6484 0.444399Z" fill="#192B4D"/>
+    </svg>
+    
 );
 
 export function Footer() {
@@ -98,7 +99,7 @@ export function Footer() {
             <Separator className="bg-white/20" />
             <div className="pt-6 flex justify-center items-center gap-2">
                 <Copyright className="w-4 h-4" />
-                <p className="text-sm font-lato text-white/80">&copy; Copyright {new Date().getFullYear()}, All Right Reserved. Scoutflair</p>
+                <p className="text-sm font-lato text-white/80"> Copyright {new Date().getFullYear()}, All Right Reserved. Scoutflair</p>
             </div>
         </div>
     </footer>

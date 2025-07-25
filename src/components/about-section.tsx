@@ -73,7 +73,7 @@ export function AboutSection() {
                     alt="Young player in action"
                     width={310}
                     height={252}
-                    className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                    className="w-full h-full object-cover"
                     data-ai-hint="young player action"
                 />
             </div>
@@ -83,7 +83,7 @@ export function AboutSection() {
                     alt="Football team huddle"
                     width={640}
                     height={252}
-                    className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                    className="w-full h-full object-cover"
                     data-ai-hint="team huddle"
                 />
             </div>
@@ -93,7 +93,7 @@ export function AboutSection() {
                     alt="Scout taking notes"
                     width={310}
                     height={252}
-                    className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+                    className="w-full h-full object-cover"
                     data-ai-hint="scout notes"
                 />
             </div>
