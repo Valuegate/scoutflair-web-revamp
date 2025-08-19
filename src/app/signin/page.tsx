@@ -1,11 +1,13 @@
 // src/app/signin/page.tsx
 'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const roles = [
@@ -15,6 +17,7 @@ const roles = [
         image: '/images/Frame_2121457625_I1737_2116;1737_2020.png',
         hint: 'football player portrait',
         href: '/signin/player',
+        dashboardRoute: '/signin/player/dashboard',
     },
     {
         name: 'For Coaches',
@@ -22,6 +25,7 @@ const roles = [
         image: '/images/Frame_2121457625_I1741_2667;1737_2039.png',
         hint: 'football coach portrait',
         href: '/signin/coach',
+        dashboardRoute: '/signin/coach/dashboard',
     },
     {
         name: 'For Scouts',
@@ -29,8 +33,144 @@ const roles = [
         image: '/images/Frame_2121457625_I1741_2700;1737_2058.png',
         hint: 'football scout portrait',
         href: '/signin/scout',
+        dashboardRoute: '/signin/scout/dashboard',
     },
 ];
+
+const LoginForm = ({ selectedRole, onBack, onLogin }: {
+    selectedRole: typeof roles[0],
+    onBack: () => void,
+    onLogin: (email: string, password: string) => void
+}) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        
+        // Simulate login process
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        onLogin(email, password);
+        setIsLoading(false);
+    };
+
+    const handleQuickLogin = () => {
+        setEmail('player@scoutflair.com');
+        setPassword('password123');
+    };
+
+    return (
+        <div className="w-full max-w-md mx-auto bg-white rounded-2xl p-8 shadow-2xl">
+            <div className="flex flex-col items-center mb-8">
+                <div className="relative w-24 h-24 mb-4">
+                    <Image
+                        src={selectedRole.image}
+                        alt={selectedRole.name}
+                        width={96}
+                        height={96}
+                        className="rounded-full object-cover w-full h-full"
+                    />
+                </div>
+                <h2 className="font-manrope text-2xl font-bold text-[#192B4D] text-center">
+                    Sign In {selectedRole.name.replace('For ', 'as ')}
+                </h2>
+                <p className="font-lato text-sm text-black/70 text-center mt-2">
+                    {selectedRole.description}
+                </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                    <div className="relative">
+                        <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#192B4D] focus:border-transparent outline-none font-lato"
+                            required
+                        />
+                    </div>
+
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#192B4D] focus:border-transparent outline-none font-lato"
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                        >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                    <label className="flex items-center">
+                        <input type="checkbox" className="mr-2 rounded" />
+                        <span className="font-lato text-black/70">Remember me</span>
+                    </label>
+                    <button type="button" className="font-lato text-[#192B4D] hover:underline">
+                        Forgot password?
+                    </button>
+                </div>
+
+                <Button 
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full rounded-lg bg-[#041931] hover:bg-[#041931]/90 h-12 font-poppins text-base font-semibold flex items-center justify-center gap-2"
+                >
+                    {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        <>
+                            <span>Sign In</span>
+                            <ArrowRight className="w-4 h-4" />
+                        </>
+                    )}
+                </Button>
+
+                {/* Quick Login Button for Development */}
+                <Button 
+                    type="button"
+                    onClick={handleQuickLogin}
+                    variant="outline"
+                    className="w-full rounded-lg border-[#192B4D] text-[#192B4D] hover:bg-[#192B4D] hover:text-white h-12 font-poppins text-base font-semibold"
+                >
+                    Quick Login (Demo)
+                </Button>
+
+                <div className="text-center">
+                    <p className="font-lato text-sm text-black/70">
+                        Don't have an account?{' '}
+                        <button type="button" className="text-[#192B4D] hover:underline font-semibold">
+                            Sign up
+                        </button>
+                    </p>
+                </div>
+            </form>
+
+            <button
+                onClick={onBack}
+                className="mt-6 w-full text-center font-lato text-sm text-black/70 hover:text-black/90"
+            >
+                ← Back to role selection
+            </button>
+        </div>
+    );
+};
 
 const RoleCard = ({ role, className, isSelected, onClick }: {
     role: typeof roles[0],
@@ -38,11 +178,10 @@ const RoleCard = ({ role, className, isSelected, onClick }: {
     isSelected: boolean,
     onClick: () => void
 }) => (
-    <Link
-        href={role.href}
+    <div
         onClick={onClick}
         className={cn(
-            "group bg-white rounded-2xl p-6 md:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm mx-auto h-full",
+            "group bg-white rounded-2xl p-6 md:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm mx-auto h-full cursor-pointer",
             className
         )}>
         <div className="relative w-32 h-32 md:w-40 md:h-40 mb-6">
@@ -79,23 +218,85 @@ const RoleCard = ({ role, className, isSelected, onClick }: {
             </Button>
             <p className="font-lato text-xs text-black/70">Continue Your Journey</p>
         </div>
-    </Link>
+    </div>
 );
 
 export default function SignInPage() {
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
+    const [showLoginForm, setShowLoginForm] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
-        const storedRole = localStorage.getItem('selectedSignInRole');
-        if (storedRole && roles.some(r => r.name === storedRole)) {
-            setSelectedRole(storedRole);
+        if (typeof window !== 'undefined') {
+            const storedRole = localStorage.getItem('selectedSignInRole');
+            if (storedRole && roles.some(r => r.name === storedRole)) {
+                setSelectedRole(storedRole);
+            }
         }
     }, []);
 
     const handleRoleClick = (roleName: string) => {
         setSelectedRole(roleName);
-        localStorage.setItem('selectedSignInRole', roleName);
+        setShowLoginForm(true);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('selectedSignInRole', roleName);
+        }
     };
+
+    const handleLogin = (email: string, password: string) => {
+        console.log('handleLogin called', { email, selectedRole });
+        
+        // Store login session
+        const loginSession = {
+            email,
+            role: selectedRole,
+            loginTime: new Date().toISOString(),
+            isLoggedIn: true
+        };
+        
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('userSession', JSON.stringify(loginSession));
+            console.log('Session stored:', loginSession);
+        }
+        
+        // Force the correct dashboard path based on role
+        let dashboardPath = '/signin/player/dashboard'; // Default to player
+        
+        if (selectedRole === 'For Players') {
+            dashboardPath = '/signin/player/dashboard';
+        } else if (selectedRole === 'For Coaches') {
+            dashboardPath = '/signin/coach/dashboard';
+        } else if (selectedRole === 'For Scouts') {
+            dashboardPath = '/signin/scout/dashboard';
+        }
+        
+        console.log('Forcing navigation to:', dashboardPath);
+        
+        // Use window.location for guaranteed navigation
+        window.location.href = dashboardPath;
+    };
+
+    const handleBackToRoles = () => {
+        setShowLoginForm(false);
+        setSelectedRole(null);
+    };
+
+    if (showLoginForm && selectedRole) {
+        const role = roles.find(r => r.name === selectedRole);
+        if (role) {
+            return (
+                <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
+                    <div className="relative z-10 w-full max-w-md mx-auto">
+                        <LoginForm 
+                            selectedRole={role}
+                            onBack={handleBackToRoles}
+                            onLogin={handleLogin}
+                        />
+                    </div>
+                </div>
+            );
+        }
+    }
     
     return (
         <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
