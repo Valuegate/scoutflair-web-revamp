@@ -3,6 +3,8 @@ import { Home, User, Image, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ScoutFlairLogo from "@/app/ScoutflairLogo";
+
+
 export default function Sidebar() {
   const pathname = usePathname();
 
@@ -14,7 +16,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="bg-[#0A2342] text-white w-60 h-screen flex flex-col p-6">
+    <div className="bg-[#0A2342] text-white w-[366px] h-screen flex flex-col p-6">
       <div className="flex items-center gap-2 mb-8">
         {/* Logo SVG */}
        <ScoutFlairLogo/>

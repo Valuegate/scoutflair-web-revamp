@@ -1,13 +1,12 @@
 "use client"
-
 import { useState } from "react";
-import { FiFileText, FiImage } from "react-icons/fi";
+import { OutlinePhoto, CameraIcons, } from "./spotIcons";
 
 export default function PostBox() {
   const [text, setText] = useState("");
 
   return (
-    <div className="flex items-center bg-white shadow-md rounded-lg p-3 space-x-3 w-[730px] ">
+    <div className="flex h-auto items-center bg-white shadow-md rounded-[12] p-3 space-x-3 w-[724px] ">
       {/* Avatar */}
       <img
          src="/images/profile.jpeg"
@@ -27,10 +26,10 @@ export default function PostBox() {
 
         {/* Action Icons */}
         <button className="text-gray-500 hover:text-gray-700 p-2">
-          <FiFileText size={18} />
+           <CameraIcons/>
         </button>
         <button className="text-gray-500 hover:text-gray-700 p-2">
-          <FiImage size={18} />
+          <OutlinePhoto/>
         </button>
       </div>
 
