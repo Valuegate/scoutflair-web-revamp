@@ -16,7 +16,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="bg-[#0A2342] text-white w-[366px] h-screen flex flex-col p-6">
+    <div className="bg-[#0A2342]   text-white w-[366px] h-screen flex flex-col p-6">
       <div className="flex items-center gap-2 mb-8">
         {/* Logo SVG */}
        <ScoutFlairLogo/>
