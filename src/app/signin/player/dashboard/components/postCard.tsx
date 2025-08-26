@@ -24,7 +24,7 @@ const SocialFeed: React.FC = () => {
  
 
   const PostCard: React.FC<{ post: Post }> = ({ post }) => (
-    <div className=" mt-6 bg-white shadow-md rounded-[12] p-3 space-x-3 w-[724px]">
+    <div className=" mt-6 bg-white shadow-md rounded-[12] p-3 space-x-3 w-full">
       {/* Header */}
       <div className="flex items-start space-x-4 mb-4 ">
         <img 
@@ -50,7 +50,7 @@ const SocialFeed: React.FC = () => {
         <img 
           src={post.image}
           alt="Stadium view"
-          className="w-[692px] h-[180px] object-cover "
+          className="w-full h-[200px] object-cover "
         />
       </div>
 

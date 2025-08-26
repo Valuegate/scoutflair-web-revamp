@@ -45,7 +45,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="bg-white border-r border-gray-200" style={{ width: '326px' }}>
         <div className="p-4">
@@ -56,7 +56,7 @@ const SettingsPage = () => {
             </svg>
           </div>
           
-          <div className="bg-blue-900 text-white px-4 py-3 rounded-lg">
+          <div className="bg-blue-900   text-white px-4 py-3 ">
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -162,15 +162,30 @@ const SettingsPage = () => {
                   <p className="text-sm text-gray-600 mb-3">These are notifications about in app messages</p>
                   <div className="space-y-2">
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages.push} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages.push} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Push</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages.email} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages.email} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    }className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Email</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages.sms} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages.sms} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">SMS</span>
                     </label>
                   </div>
@@ -181,15 +196,30 @@ const SettingsPage = () => {
                   <p className="text-sm text-gray-600 mb-3">These are notifications about in app messages</p>
                   <div className="space-y-2">
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages2.push} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages2.push} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Push</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages2.email} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages2.email} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Email</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages2.sms} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages2.sms} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">SMS</span>
                     </label>
                   </div>
@@ -202,15 +232,30 @@ const SettingsPage = () => {
                   <p className="text-sm text-gray-600 mb-3">These are notifications about in app messages</p>
                   <div className="space-y-2">
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages3.push} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages3.push} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Push</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages3.email} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages3.email}onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Email</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={notifications.messages3.sms} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={notifications.messages3.sms}onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">SMS</span>
                     </label>
                   </div>
@@ -221,15 +266,30 @@ const SettingsPage = () => {
                   <p className="text-sm text-gray-600 mb-3">These are notifications about in app messages</p>
                   <div className="space-y-2">
                     <label className="flex items-center">
-                      <input type="checkbox" checked={true} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={true} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Push</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={true} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={true} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">Email</span>
                     </label>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={false} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                      <input type="checkbox" checked={false} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                       <span className="ml-2 text-sm text-gray-700">SMS</span>
                     </label>
                   </div>
@@ -246,15 +306,30 @@ const SettingsPage = () => {
               
               <div className="space-y-2">
                 <label className="flex items-center">
-                  <input type="checkbox" checked={language.english_uk} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" checked={language.english_uk} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                   <span className="ml-2 text-sm text-gray-700">English (UK)</span>
                 </label>
                 <label className="flex items-center">
-                  <input type="checkbox" checked={language.english_usa} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" checked={language.english_usa} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                   <span className="ml-2 text-sm text-gray-700">English (USA)</span>
                 </label>
                 <label className="flex items-center">
-                  <input type="checkbox" checked={language.others} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" checked={language.others} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                   <span className="ml-2 text-sm text-gray-700">Others</span>
                 </label>
               </div>
@@ -266,7 +341,12 @@ const SettingsPage = () => {
               
               <div className="space-y-2">
                 <label className="flex items-center">
-                  <input type="checkbox" checked={linkedAccounts.google} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" checked={linkedAccounts.google} onChange={(e) =>
+      setNotifications((prev) => ({
+        ...prev,
+        messages: { ...prev.messages, push: e.target.checked },
+      }))
+    } className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                   <span className="ml-2 text-sm text-gray-700">Google</span>
                 </label>
               </div>
