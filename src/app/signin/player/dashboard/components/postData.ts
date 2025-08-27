@@ -23,8 +23,8 @@ export const PostsData: Post[] = [
       avatar: "/images/dpone.png",
       timeAgo: 'August 12, 2024 | 8:31PM'
     },
-    content: 'In a world where every moment feels monetized, optimized, or squeezed for efficiency, doing nothing might seem like the ultimate waste of time. Yet, it’s in those quiet, unstructured moments that we often stumble upon the clarity we didn’t know we were missing.',
-    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&h=400&fit=crop',
+    content: 'In a world where every moment feels monetized, optimized, or squeezed for efficiency, doing nothing might seem like the ultimate waste of time. Yet, it’s in those quiet, unstructured moments that we often stumble upon the clarity we didn’t know we were missing.Think about it: some of your best ideas probably didn’t appear when you were hunched over your laptop trying to force productivity. They likely emerged while you were showering, staring out a bus window, or lying on the couch with no particular agenda.',
+    image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=400&fit=crop',
     likes: 0,
     comments: 2,
     shares: 5,
