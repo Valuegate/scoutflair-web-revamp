@@ -50,7 +50,7 @@ const SocialFeed: React.FC = () => {
         <img 
           src={post.image}
           alt="Stadium view"
-          className="w-full h-[200px] object-cover "
+          className="w-full h-[250px] object-cover "
         />
       </div>
 

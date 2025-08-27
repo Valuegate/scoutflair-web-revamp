@@ -16,7 +16,6 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
 
   return (
     <>
-      {/* Desktop Sidebar (pushes content) */}
    {/* Desktop Sidebar (pushes content) */}
 <div
   className={`hidden md:flex h-screen flex-col transition-all duration-300 overflow-hidden ${
