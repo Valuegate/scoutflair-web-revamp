@@ -6,7 +6,7 @@ export default function PostBox() {
   const [text, setText] = useState("");
 
   return (
-    <div className="flex h-auto items-center bg-white shadow-md rounded-xl p-3 space-x-2 sm:space-x-3 w-full">
+    <div className="flex h-auto items-center bg-white shadow-md rounded-xl p-3 space-x-2 sm:space-x-3 w-full max-w-[1350px] mx-auto">
       {/* Avatar */}
       <img
          src="/images/profile.jpeg"

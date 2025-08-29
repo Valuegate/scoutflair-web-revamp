@@ -85,7 +85,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
       {/* Desktop Sidebar (pushes content) */}
       <div
         className={`hidden md:flex h-screen flex-col transition-all duration-300 overflow-hidden ${
-          isOpen ? "w-[366px] bg-[#0A2342] p-6 text-white" : "w-0"
+          isOpen ? "w-[280px] bg-[#0A2342] p-6 text-white" : "w-0"
         }`}
       >
         {isOpen && (

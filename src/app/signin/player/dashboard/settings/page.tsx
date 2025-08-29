@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 
 const SettingsPage = () => {
   const [formData, setFormData] = useState({
-    fullName: 'Pete',
-    abbias: 'Abbias',
+    firstName: 'Pete',
+    lastName: 'Abbias',
     email: 'Joshfavomi@gmail.com',
-    phone: '08034*****'
+    phone: '08034*****',
+    address: ''
   });
 
   const [notifications, setNotifications] = useState({
@@ -112,36 +113,33 @@ const SettingsPage = () => {
               
               <div className="space-y-6">
                 {/* Name fields */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-                  <div className="lg:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-2 lg:mb-0">Full Name</label>
-                  </div>
-                  <div className="lg:col-span-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
                     <input 
                       type="text" 
-                      value={formData.fullName}
-                      onChange={(e) => handleInputChange('fullName', e.target.value)}
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Enter full name"
+                      placeholder="Enter first name"
                     />
                   </div>
-                  <div className="lg:col-span-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
                     <input 
                       type="text" 
-                      value={formData.abbias}
-                      onChange={(e) => handleInputChange('abbias', e.target.value)}
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Enter abbreviation"
+                      placeholder="Enter last name"
                     />
                   </div>
                 </div>
 
                 {/* Contact fields */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-                  <div className="lg:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-2 lg:mb-0">Contact</label>
-                  </div>
-                  <div className="lg:col-span-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input 
                       type="email" 
                       value={formData.email}
@@ -150,7 +148,8 @@ const SettingsPage = () => {
                       placeholder="Enter email"
                     />
                   </div>
-                  <div className="lg:col-span-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                     <input 
                       type="text" 
                       value={formData.phone}
@@ -161,11 +160,21 @@ const SettingsPage = () => {
                   </div>
                 </div>
 
+                {/* Address field */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                  <input 
+                    type="text" 
+                    value={formData.address}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter your address"
+                  />
+                </div>
+
                 {/* Avatar */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-                  <div className="lg:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-2 lg:mb-0">Avatar</label>
-                  </div>
+                 
                   <div className="lg:col-span-9">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
