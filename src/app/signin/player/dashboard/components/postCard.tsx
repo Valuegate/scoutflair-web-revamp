@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Heart, MessageCircle, Share2, Camera, Image, Smile } from 'lucide-react';
-
+import { SendIcon } from './spotIcons';
 // Type definitions
 interface User {
   name: string;
@@ -254,8 +254,11 @@ const SocialFeed: React.FC = () => {
             </button>
           </div>
         </div>
-        <div className="bg-blue-600 w-10 h-9 flex items-center justify-center rounded cursor-pointer hover:bg-blue-700 transition-colors">
-          <Send className="text-white w-5 h-5" />
+        <div className="bg-[rgba(10,40,80,1)]  w-10 h-9 flex items-center justify-center rounded cursor-pointer hover:bg-blue-700 transition-colors">
+          <button  className="  text-white w-5 h-5">
+            <SendIcon/>
+          </button>
+      
         </div>
       </div>
     </div>
