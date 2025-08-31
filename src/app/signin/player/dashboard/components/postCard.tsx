@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Send, Heart, MessageCircle, Share2, Camera, Image, Smile } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Heart, MessageCircle, Share2, Camera, Image, Smile } from 'lucide-react';
 import { SendIcon } from './spotIcons';
 import PostBox from './postBox';
 
@@ -124,6 +124,7 @@ const mockPosts: Post[] = [
 
 const SocialFeed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>(mockPosts);
+  const currentUserAvatar = "https://picsum.photos/24/24?random=999";
 
   // Handle new post creation from PostBox
   const handleCreatePost = async (newPost: Post) => {
@@ -131,146 +132,259 @@ const SocialFeed: React.FC = () => {
   };
 
   const handleLike = (postId: string): void => {
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { 
-            ...post, 
-            isLiked: !post.isLiked,
-            likes: post.isLiked ? post.likes - 1 : post.likes + 1
+    setPosts(posts.map(post => {
+      if (post.id === postId) {
+        const newIsLiked = !post.isLiked;
+        let newLikedBy = post.likedBy;
+        if (newIsLiked) {
+          if (!newLikedBy.includes(currentUserAvatar)) {
+            newLikedBy = [...newLikedBy, currentUserAvatar];
           }
-        : post
+        } else {
+          newLikedBy = newLikedBy.filter(av => av !== currentUserAvatar);
+        }
+        return {
+          ...post,
+          isLiked: newIsLiked,
+          likes: newIsLiked ? post.likes + 1 : post.likes - 1,
+          likedBy: newLikedBy
+        };
+      }
+      return post;
+    }));
+  };
+
+  const handleAddComment = (postId: string): void => {
+    setPosts(posts.map(post => 
+      post.id === postId ? { ...post, comments: post.comments + 1 } : post
     ));
   };
 
-  const PostCard: React.FC<{ post: Post }> = ({ post }) => (
-    <div className="mt-6 bg-white shadow-md rounded-xl p-3 w-full max-w-[1350px] mx-auto">
-      {/* Header */}
-      <div className="flex items-start space-x-4 mb-4">
-        <img 
-          src={post.user.avatar} 
-          alt={post.user.name}
-          className="w-9 h-9 rounded object-cover"
-        />
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 text-lg">{post.user.name}</h3>
-          <p className="text-sm text-gray-500">{post.user.timeAgo}</p>
-        </div>
-      </div>
+  const handleShare = (postId: string): void => {
+    setPosts(posts.map(post => 
+      post.id === postId ? { ...post, shares: post.shares + 1 } : post
+    ));
+  };
 
-      {/* Content */}
-      <div className="mb-6">
-        <p className="text-gray-700 leading-relaxed">
-          {post.content}
-        </p>
-      </div>
+  const PostCard: React.FC<{ post: Post }> = ({ post }) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [commentText, setCommentText] = useState('');
+    const [showComments, setShowComments] = useState(false);
+    const [postComments, setPostComments] = useState<Array<{id: string, user: string, avatar: string, text: string, timeAgo: string}>>([
+      {
+        id: '1',
+        user: 'John Doe',
+        avatar: 'https://picsum.photos/32/32?random=50',
+        text: 'Amazing post! Love the content.',
+        timeAgo: '1h'
+      },
+      {
+        id: '2',
+        user: 'Jane Smith',
+        avatar: 'https://picsum.photos/32/32?random=51',
+        text: 'This is exactly what I needed to see today!',
+        timeAgo: '30m'
+      }
+    ]);
 
-      {/* Images */}
-      {post.image && (
-        <div className="mb-4 w-full max-w-full overflow-hidden rounded">
-          {Array.isArray(post.image) ? (
-            <div className={`grid gap-1 w-full ${
-              post.image.length === 2 ? 'grid-cols-2 h-80' :
-              post.image.length === 3 ? 'grid-cols-2 grid-rows-2 h-80' :
-              post.image.length === 4 ? 'grid-cols-2 grid-rows-2 h-80' :
-              'grid-cols-1 h-96'
-            }`}>
-              {post.image.map((img: string, index: number) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Post image ${index + 1}`}
-                  className={`w-full h-full object-cover ${
-                    post.image.length === 3 && index === 0 ? 'row-span-2' : ''
-                  }`}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="w-full h-96 rounded overflow-hidden">
-              <img 
-                src={post.image}
-                alt="Post image"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-        </div>
-      )}
+    // Define handleSendComment inside PostCard component
+    const handleSendComment = () => {
+      if (commentText.trim()) {
+        const newComment = {
+          id: Date.now().toString(),
+          user: 'You',
+          avatar: 'https://picsum.photos/32/32?random=999',
+          text: commentText.trim(),
+          timeAgo: 'now'
+        };
+        setPostComments(prev => [...prev, newComment]);
+        handleAddComment(post.id);
+        setCommentText('');
+        setShowComments(true); // Automatically show comments when a new one is added
+        alert('Comment sent successfully!');
+      }
+    };
 
-      {/* Liked by section */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex -space-x-2">
-          {post.likedBy.map((avatar: string, index: number) => (
-            <img 
-              key={index}
-              src={avatar}
-              alt="User"
-              className="w-6 h-6 rounded-full border-2 border-white object-cover"
-            />
-          ))}
-        </div>
-        <div className="flex items-center space-x-6 text-sm text-gray-600">
-          <span>{post.comments} Comments</span>
-          <span>{post.shares} Shares</span>
-        </div>
-      </div>
+    const toggleComments = () => {
+      setShowComments(!showComments);
+    };
 
-      {/* Action Buttons */}
-      <div className="flex items-center pt-6 my-2 border-t border-gray-200 justify-between py-3 mb-4">
-        <button 
-          onClick={() => handleLike(post.id)}
-          className={`flex items-center space-x-2 transition-colors ${
-            post.isLiked ? 'text-red-500' : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          <HeartIcon />
-          <span>Like</span>
-        </button>
-        
-        <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
-          <CommentIcon />
-          <span>Comment</span>
-        </button>
-        
-        <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
-          <ShareIcon />
-          <span>Share</span>
-        </button>
-      </div>
+    // Handle Enter key press for comment submission
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSendComment();
+      }
+    };
 
-      {/* Comment Input */}
-      <div className="flex items-center space-x-3 pt-4 my-2 border-t border-gray-200">
-        <img 
-          src="https://picsum.photos/40/40?random=999"
-          alt="Your avatar"
-          className="w-10 h-10 rounded-full object-cover"
-        />
-        <div className="flex-1 relative h-10 rounded">
-          <input 
-            type="text"
-            placeholder="What's happening?"
-            className="bg-gray-100 w-full h-10 px-4 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    return (
+      <div className="mt-6 bg-white shadow-md rounded-xl p-3 w-full max-w-[1350px] mx-auto">
+        {/* Header */}
+        <div className="flex items-start space-x-4 mb-4">
+          <img 
+            src={post.user.avatar} 
+            alt={post.user.name}
+            className="w-9 h-9 rounded object-cover"
           />
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-            <button className="text-gray-400 hover:text-gray-600 p-1">
-              <CameraIcons />
-            </button>
-            <button className="text-gray-400 hover:text-gray-600 p-1">
-              <OutlinePhoto />
-            </button>
-            <button className="text-gray-400 hover:text-gray-600 p-1">
-              <EmojiPhoto />
-            </button>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 text-lg">{post.user.name}</h3>
+            <p className="text-sm text-gray-500">{post.user.timeAgo}</p>
           </div>
         </div>
-        <div className="bg-[rgba(10,40,80,1)] w-10 h-9 flex items-center justify-center rounded cursor-pointer hover:bg-blue-700 transition-colors">
-          <button className="text-white w-5 h-5">
+
+        {/* Content */}
+        <div className="mb-6">
+          <p className="text-gray-700 leading-relaxed">
+            {post.content}
+          </p>
+        </div>
+
+        {/* Images */}
+        {post.image && (
+          <div className="mb-4 w-full max-w-full overflow-hidden rounded">
+            {Array.isArray(post.image) ? (
+              <div className={`grid gap-1 w-full ${
+                post.image.length === 2 ? 'grid-cols-2 h-80' :
+                post.image.length === 3 ? 'grid-cols-2 grid-rows-2 h-80' :
+                post.image.length === 4 ? 'grid-cols-2 grid-rows-2 h-80' :
+                'grid-cols-1 h-96'
+              }`}>
+                {post.image.map((img: string, index: number) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`Post image ${index + 1}`}
+                    className={`w-full h-full object-cover ${
+                      post.image.length === 3 && index === 0 ? 'row-span-2' : ''
+                    }`}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="w-full h-96 rounded overflow-hidden">
+                <img 
+                  src={post.image}
+                  alt="Post image"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Liked by section */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex -space-x-2">
+            {post.likedBy.map((avatar: string, index: number) => (
+              <img 
+                key={index}
+                src={avatar}
+                alt="User"
+                className="w-6 h-6 rounded-full border-2 border-white object-cover"
+              />
+            ))}
+          </div>
+          <div className="flex items-center space-x-6 text-sm text-gray-600">
+            <span>{post.comments} Comments</span>
+            <span>{post.shares} Shares</span>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center pt-6 my-2 border-t border-gray-200 justify-between py-3 mb-4">
+          <button 
+            onClick={() => handleLike(post.id)}
+            className={`flex items-center space-x-2 transition-colors ${
+              post.isLiked ? 'text-red-500' : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            <HeartIcon />
+            <span>Like</span>
+          </button>
+          
+          <button 
+            onClick={toggleComments}
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <CommentIcon />
+            <span>Comment</span>
+          </button>
+          
+          <button 
+            onClick={() => handleShare(post.id)}
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <ShareIcon />
+            <span>Share</span>
+          </button>
+        </div>
+
+        {/* Comments Section */}
+        {showComments && (
+          <div className="border-t border-gray-200 pt-4 mb-4">
+            <div className="max-h-64 overflow-y-auto">
+              {postComments.map((comment) => (
+                <div key={comment.id} className="flex items-start space-x-3 mb-3">
+                  <img 
+                    src={comment.avatar}
+                    alt={comment.user}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <div className="bg-gray-100 rounded-lg px-3 py-2">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-medium text-sm text-gray-900">{comment.user}</span>
+                        <span className="text-xs text-gray-500">{comment.timeAgo}</span>
+                      </div>
+                      <p className="text-sm text-gray-700">{comment.text}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Comment Input */}
+        <div className="flex items-center space-x-3 pt-4 my-2 border-t border-gray-200">
+          <img 
+            src="https://picsum.photos/40/40?random=999"
+            alt="Your avatar"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div className="flex-1 relative h-10 rounded">
+            <input 
+              type="text"
+              placeholder="Write a comment..."
+              className="bg-gray-100 w-full h-10 px-4 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyPress={handleKeyPress}
+              ref={inputRef}
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+              <button className="text-gray-400 hover:text-gray-600 p-1">
+                <CameraIcons />
+              </button>
+              <button className="text-gray-400 hover:text-gray-600 p-1">
+                <OutlinePhoto />
+              </button>
+              <button className="text-gray-400 hover:text-gray-600 p-1">
+                <EmojiPhoto />
+              </button>
+            </div>
+          </div>
+          <button 
+            className="bg-[rgba(10,40,80,1)] w-10 h-9 flex items-center justify-center rounded cursor-pointer hover:bg-blue-700 transition-colors text-white"
+            onClick={handleSendComment}
+            type="button"
+          >
             <SendIcon/>
           </button>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="">
