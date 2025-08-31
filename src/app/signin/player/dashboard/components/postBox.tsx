@@ -21,30 +21,69 @@ const VideoIcon = () => (
   </svg>
 );
 
-export default function PostBox({ onCreatePost }) {
-  const [text, setText] = useState("");
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [selectedVideos, setSelectedVideos] = useState([]);
-  const [isPosting, setIsPosting] = useState(false);
-  const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
-  const videoInputRef = useRef(null);
+interface User {
+  name: string;
+  avatar: string;
+  timeAgo: string;
+}
+
+interface Post {
+  id: string;
+  user: User;
+  content: string;
+  image: string | string[];
+  likes: number;
+  isLiked: boolean;
+  comments: number;
+  shares: number;
+  likedBy: string[];
+}
+
+interface ImageItem {
+  id: number;
+  file: File;
+  url: string;
+  source: 'camera' | 'gallery';
+}
+
+interface VideoItem {
+  id: number;
+  file: File;
+  url: string;
+  name: string;
+}
+
+interface PostBoxProps {
+  onCreatePost?: (post: Post) => Promise<void>;
+}
+
+export default function PostBox({ onCreatePost }: PostBoxProps) {
+  const [text, setText] = useState<string>("");
+  const [selectedImages, setSelectedImages] = useState<ImageItem[]>([]);
+  const [selectedVideos, setSelectedVideos] = useState<VideoItem[]>([]);
+  const [isPosting, setIsPosting] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   // Handle image selection
-  const handleImageSelect = (event, source) => {
-    const files = Array.from(event.target.files);
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>, source: 'camera' | 'gallery') => {
+    const files = Array.from(event.target.files || []);
     
     files.forEach(file => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          const newImage = {
-            id: Date.now() + Math.random(),
-            file: file,
-            url: e.target.result,
-            source: source
-          };
-          setSelectedImages(prev => [...prev, newImage]);
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const url = e.target?.result;
+          if (typeof url === 'string') {
+            const newImage: ImageItem = {
+              id: Date.now() + Math.random(),
+              file: file,
+              url,
+              source
+            };
+            setSelectedImages(prev => [...prev, newImage]);
+          }
         };
         reader.readAsDataURL(file);
       }
@@ -54,20 +93,23 @@ export default function PostBox({ onCreatePost }) {
   };
 
   // Handle video selection
-  const handleVideoSelect = (event) => {
-    const files = Array.from(event.target.files);
+  const handleVideoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
     
     files.forEach(file => {
       if (file.type.startsWith('video/')) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          const newVideo = {
-            id: Date.now() + Math.random(),
-            file: file,
-            url: e.target.result,
-            name: file.name
-          };
-          setSelectedVideos(prev => [...prev, newVideo]);
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const url = e.target?.result;
+          if (typeof url === 'string') {
+            const newVideo: VideoItem = {
+              id: Date.now() + Math.random(),
+              file: file,
+              url,
+              name: file.name
+            };
+            setSelectedVideos(prev => [...prev, newVideo]);
+          }
         };
         reader.readAsDataURL(file);
       }
@@ -92,7 +134,7 @@ export default function PostBox({ onCreatePost }) {
       ];
 
       // Create post object that matches your PostCard format
-      const newPost = {
+      const newPost: Post = {
         id: Date.now().toString(),
         user: {
           name: "You", // You can make this dynamic
@@ -142,7 +184,7 @@ export default function PostBox({ onCreatePost }) {
           <input
             type="text"
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setText(e.target.value)}
             placeholder="What's happening?"
             className="flex-1 bg-transparent outline-none py-2 text-sm sm:text-base text-gray-700 placeholder-gray-500 min-w-0"
           />

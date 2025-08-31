@@ -10,13 +10,6 @@ interface User {
   timeAgo: string;
 }
 
-interface Comment {
-  id: string;
-  user: User;
-  content: string;
-  timeAgo: string;
-}
-
 interface Post {
   id: string;
   user: User;
@@ -27,8 +20,6 @@ interface Post {
   comments: number;
   shares: number;
   likedBy: string[];
-  postComments: Comment[];
-  isShared: boolean;
 }
 
 // Mock icons components
@@ -58,30 +49,7 @@ const mockPosts: Post[] = [
       "https://picsum.photos/24/24?random=100",
       "https://picsum.photos/24/24?random=101",
       "https://picsum.photos/24/24?random=102"
-    ],
-    postComments: [
-      {
-        id: "c1",
-        user: {
-          name: "John Doe",
-          avatar: "https://picsum.photos/32/32?random=50",
-          timeAgo: "1 hour ago"
-        },
-        content: "Absolutely beautiful! Which location is this?",
-        timeAgo: "1 hour ago"
-      },
-      {
-        id: "c2",
-        user: {
-          name: "Jane Smith",
-          avatar: "https://picsum.photos/32/32?random=51",
-          timeAgo: "30 mins ago"
-        },
-        content: "Love the scenery! 😍",
-        timeAgo: "30 mins ago"
-      }
-    ],
-    isShared: false
+    ]
   },
   {
     id: "2",
@@ -103,9 +71,7 @@ const mockPosts: Post[] = [
       "https://picsum.photos/24/24?random=103",
       "https://picsum.photos/24/24?random=104",
       "https://picsum.photos/24/24?random=105"
-    ],
-    postComments: [],
-    isShared: true
+    ]
   },
   {
     id: "3",
@@ -128,9 +94,7 @@ const mockPosts: Post[] = [
       "https://picsum.photos/24/24?random=106",
       "https://picsum.photos/24/24?random=107",
       "https://picsum.photos/24/24?random=108"
-    ],
-    postComments: [],
-    isShared: false
+    ]
   },
   {
     id: "4",
@@ -154,26 +118,16 @@ const mockPosts: Post[] = [
       "https://picsum.photos/24/24?random=109",
       "https://picsum.photos/24/24?random=110",
       "https://picsum.photos/24/24?random=111"
-    ],
-    postComments: [],
-    isShared: false
+    ]
   }
 ];
 
 const SocialFeed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>(mockPosts);
-  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
-  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
 
   // Handle new post creation from PostBox
-  const handleCreatePost = (newPost: Post) => {
-    // Add missing fields for new posts
-    const completePost = {
-      ...newPost,
-      postComments: [],
-      isShared: false
-    };
-    setPosts(prev => [completePost, ...prev]); // Add new post to top of feed
+  const handleCreatePost = async (newPost: Post) => {
+    setPosts(prev => [newPost, ...prev]); // Add new post to top of feed
   };
 
   const handleLike = (postId: string): void => {
@@ -186,55 +140,6 @@ const SocialFeed: React.FC = () => {
           }
         : post
     ));
-  };
-
-  const handleShare = (postId: string): void => {
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { 
-            ...post, 
-            isShared: !post.isShared,
-            shares: post.isShared ? post.shares - 1 : post.shares + 1
-          }
-        : post
-    ));
-  };
-
-  const handleCommentSubmit = (postId: string): void => {
-    const commentText = commentInputs[postId]?.trim();
-    if (!commentText) return;
-
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      user: {
-        name: "You",
-        avatar: "https://picsum.photos/40/40?random=999",
-        timeAgo: "Just now"
-      },
-      content: commentText,
-      timeAgo: "Just now"
-    };
-
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { 
-            ...post, 
-            postComments: [...post.postComments, newComment],
-            comments: post.comments + 1
-          }
-        : post
-    ));
-
-    // Clear comment input
-    setCommentInputs(prev => ({ ...prev, [postId]: '' }));
-  };
-
-  const toggleComments = (postId: string): void => {
-    setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
-  };
-
-  const handleCommentInputChange = (postId: string, value: string): void => {
-    setCommentInputs(prev => ({ ...prev, [postId]: value }));
   };
 
   const PostCard: React.FC<{ post: Post }> = ({ post }) => (
@@ -322,20 +227,12 @@ const SocialFeed: React.FC = () => {
           <span>Like</span>
         </button>
         
-        <button 
-          onClick={() => toggleComments(post.id)}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-        >
+        <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
           <CommentIcon />
           <span>Comment</span>
         </button>
         
-        <button 
-          onClick={() => handleShare(post.id)}
-          className={`flex items-center space-x-2 transition-colors ${
-            post.isShared ? 'text-green-500' : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
+        <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
           <ShareIcon />
           <span>Share</span>
         </button>
@@ -351,10 +248,7 @@ const SocialFeed: React.FC = () => {
         <div className="flex-1 relative h-10 rounded">
           <input 
             type="text"
-            placeholder="Write a comment..."
-            value={commentInputs[post.id] || ''}
-            onChange={(e) => handleCommentInputChange(post.id, e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleCommentSubmit(post.id)}
+            placeholder="What's happening?"
             className="bg-gray-100 w-full h-10 px-4 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
@@ -369,37 +263,12 @@ const SocialFeed: React.FC = () => {
             </button>
           </div>
         </div>
-        <div 
-          className="bg-[rgba(10,40,80,1)] w-10 h-9 flex items-center justify-center rounded cursor-pointer hover:bg-blue-700 transition-colors"
-          onClick={() => handleCommentSubmit(post.id)}
-        >
+        <div className="bg-[rgba(10,40,80,1)] w-10 h-9 flex items-center justify-center rounded cursor-pointer hover:bg-blue-700 transition-colors">
           <button className="text-white w-5 h-5">
             <SendIcon/>
           </button>
         </div>
       </div>
-
-      {/* Comments Section */}
-      {showComments[post.id] && (
-        <div className="mt-4 space-y-3">
-          {post.postComments.map((comment) => (
-            <div key={comment.id} className="flex items-start space-x-3 pl-4">
-              <img 
-                src={comment.user.avatar} 
-                alt={comment.user.name}
-                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-              />
-              <div className="flex-1">
-                <div className="bg-gray-100 rounded-lg px-3 py-2">
-                  <h4 className="font-medium text-gray-900 text-sm">{comment.user.name}</h4>
-                  <p className="text-gray-700 text-sm">{comment.content}</p>
-                </div>
-                <p className="text-xs text-gray-500 mt-1 ml-3">{comment.timeAgo}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 
