@@ -1,8 +1,41 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+}
+
+interface NotificationSection {
+  push: boolean;
+  email: boolean;
+  sms: boolean;
+}
+
+interface Notifications {
+  messages: NotificationSection;
+  messages2: NotificationSection;
+  messages3: NotificationSection;
+  marketing: NotificationSection;
+}
+
+interface Language {
+  english_uk: boolean;
+  english_usa: boolean;
+  others: boolean;
+}
+
+interface LinkedAccounts {
+  google: boolean;
+}
+
+const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
 
 const SettingsPage = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     firstName: 'Pete',
     lastName: 'Abbias',
     email: 'Joshfavomi@gmail.com',
@@ -10,7 +43,7 @@ const SettingsPage = () => {
     address: ''
   });
 
-  const [notifications, setNotifications] = useState({
+  const [notifications, setNotifications] = useState<Notifications>({
     messages: {
       push: true,
       email: true,
@@ -25,50 +58,114 @@ const SettingsPage = () => {
       push: true,
       email: true,
       sms: false
+    },
+    marketing: {
+      push: true,
+      email: true,
+      sms: false
     }
   });
 
-  const [language, setLanguage] = useState({
+  const [language, setLanguage] = useState<Language>({
     english_uk: true,
     english_usa: false,
     others: false
   });
 
-  const [linkedAccounts, setLinkedAccounts] = useState({
+  const [linkedAccounts, setLinkedAccounts] = useState<LinkedAccounts>({
     google: true
   });
 
+  const [avatarUrl, setAvatarUrl] = useState<string>(DEFAULT_AVATAR);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const savedData = localStorage.getItem('settingsData');
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      setFormData(parsed.formData || {
+        firstName: 'Pete',
+        lastName: 'Abbias',
+        email: 'Joshfavomi@gmail.com',
+        phone: '08034*****',
+        address: ''
+      });
+      setNotifications(parsed.notifications || {
+        messages: { push: true, email: true, sms: false },
+        messages2: { push: true, email: false, sms: false },
+        messages3: { push: true, email: true, sms: false },
+        marketing: { push: true, email: true, sms: false }
+      });
+      setLanguage(parsed.language || {
+        english_uk: true,
+        english_usa: false,
+        others: false
+      });
+      setLinkedAccounts(parsed.linkedAccounts || {
+        google: true
+      });
+      setAvatarUrl(parsed.avatarUrl || DEFAULT_AVATAR);
+    }
+  }, []);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleNotificationChange = (section: string, type: string, value: boolean) => {
+  const handleNotificationChange = (section: keyof Notifications, type: keyof NotificationSection, value: boolean) => {
     setNotifications(prev => ({
       ...prev,
       [section]: {
-        ...(prev as any)[section],
+        ...prev[section],
         [type]: value
       }
     }));
   };
 
-  const handleLanguageChange = (lang: string, value: boolean) => {
+  const handleLanguageChange = (lang: keyof Language, value: boolean) => {
     setLanguage(prev => ({
       ...prev,
       [lang]: value
     }));
   };
 
-  const handleLinkedAccountChange = (account: string, value: boolean) => {
+  const handleLinkedAccountChange = (account: keyof LinkedAccounts, value: boolean) => {
     setLinkedAccounts(prev => ({
       ...prev,
       [account]: value
     }));
+  };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result && typeof event.target.result === 'string') {
+          setAvatarUrl(event.target.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarRemove = () => {
+    setAvatarUrl(DEFAULT_AVATAR);
+  };
+
+  const handleSave = () => {
+    const data = {
+      formData,
+      notifications,
+      language,
+      linkedAccounts,
+      avatarUrl
+    };
+    localStorage.setItem('settingsData', JSON.stringify(data));
+    alert('Changes saved successfully!');
   };
 
   return (
@@ -179,16 +276,24 @@ const SettingsPage = () => {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                         <img 
-                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
+                          src={avatarUrl} 
                           alt="Avatar" 
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="flex flex-col sm:flex-row gap-2">
-                        <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button 
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
                           Upload
                         </button>
-                        <button className="px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50">
+                        <button 
+                          type="button"
+                          onClick={handleAvatarRemove}
+                          className="px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50"
+                        >
                           Remove
                         </button>
                       </div>
@@ -316,8 +421,8 @@ const SettingsPage = () => {
                       <label className="flex items-center">
                         <input 
                           type="checkbox" 
-                          checked={true} 
-                          onChange={() => {}}
+                          checked={notifications.marketing.push} 
+                          onChange={(e) => handleNotificationChange('marketing', 'push', e.target.checked)}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
                         />
                         <span className="ml-2 text-sm text-gray-700">Push</span>
@@ -325,8 +430,8 @@ const SettingsPage = () => {
                       <label className="flex items-center">
                         <input 
                           type="checkbox" 
-                          checked={true} 
-                          onChange={() => {}}
+                          checked={notifications.marketing.email} 
+                          onChange={(e) => handleNotificationChange('marketing', 'email', e.target.checked)}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
                         />
                         <span className="ml-2 text-sm text-gray-700">Email</span>
@@ -334,8 +439,8 @@ const SettingsPage = () => {
                       <label className="flex items-center">
                         <input 
                           type="checkbox" 
-                          checked={false} 
-                          onChange={() => {}}
+                          checked={notifications.marketing.sms} 
+                          onChange={(e) => handleNotificationChange('marketing', 'sms', e.target.checked)}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
                         />
                         <span className="ml-2 text-sm text-gray-700">SMS</span>
@@ -416,13 +521,22 @@ const SettingsPage = () => {
 
             {/* Save Changes Button */}
             <div className="flex justify-center">
-              <button className="w-full sm:w-auto px-8 py-3 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors">
+              <button onClick={handleSave} className="w-full sm:w-auto px-8 py-3 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors">
                 Save changes
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Hidden file input for avatar upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleAvatarUpload}
+        accept="image/*"
+        className="hidden"
+      />
     </div>
   );
 };
