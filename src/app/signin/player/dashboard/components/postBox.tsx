@@ -1,6 +1,6 @@
 "use client"
 import { useState, useRef } from "react";
-
+import { VideoIcon } from "./spotIcons";
 // Mock icon components - replace with your actual icons
 const OutlinePhoto = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,11 +15,7 @@ const CameraIcons = () => (
   </svg>
 );
 
-const VideoIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-  </svg>
-);
+
 
 interface User {
   name: string;
@@ -169,7 +165,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
   const canPost = (text.trim() || selectedImages.length > 0 || selectedVideos.length > 0) && !isPosting;
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-3 w-full max-w-[1350px] mx-auto">
+    <div className="bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
       {/* Original single-line layout */}
       <div className="flex h-auto items-center space-x-2 sm:space-x-3">
         {/* Avatar */}

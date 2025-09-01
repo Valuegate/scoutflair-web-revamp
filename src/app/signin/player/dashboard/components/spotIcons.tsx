@@ -2,9 +2,9 @@
 import React from "react"
 
 
- const CameraIcons = () => {
+ const VideoIcon = () => {
     return(
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fillRule="evenodd" clipRule="evenodd" d="M2.66667 3V4.33333H8V5H2C1.46957 5 0.960859 5.21071 0.585786 5.58579C0.210714 5.96086 0 6.46957 0 7L0 11C0 11.5304 0.210714 12.0391 0.585786 12.4142C0.960859 12.7893 1.46957 13 2 13H10C10.5017 13.0001
  10.9852 12.8115 11.3544 12.4718C11.7236 12.1321 11.9517 11.666 11.9933 11.166L16
   11.6667V6.33333L11.9933 6.834C11.9517 6.33399 11.7236 5.8679 11.3544 5.52819C10.9852 5.18847 10.5017 4.99994 10 
@@ -99,4 +99,4 @@ export  const ShareIcon = () => {
     )
 }
 
-export  { CameraIcons, CommentIcon, EmojiPhoto, OutlinePhoto, HeartIcon, SendIcon}
+export  { VideoIcon, CommentIcon, EmojiPhoto, OutlinePhoto, HeartIcon, SendIcon}

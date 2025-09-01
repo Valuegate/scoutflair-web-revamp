@@ -3,6 +3,58 @@ import { Heart, MessageCircle, Share2, Camera, Image, Smile } from 'lucide-react
 import { SendIcon } from './spotIcons';
 import PostBox from './postBox';
 
+// LazyImage Component with placeholder
+const LazyImage: React.FC<{
+  src: string;
+  alt: string;
+  className: string;
+}> = ({ src, alt, className }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  const handleLoad = () => {
+    setIsLoading(false);
+  };
+
+  const handleError = () => {
+    setIsLoading(false);
+    setHasError(true);
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* Skeleton/Placeholder */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+          <div className="text-gray-400">
+            <Image size={32} />
+          </div>
+        </div>
+      )}
+      
+      {/* Error state */}
+      {hasError && (
+        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+          <div className="text-gray-400 text-center">
+            <Image size={32} className="mx-auto mb-2" />
+            <span className="text-xs">Failed to load</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Actual Image */}
+      <img
+        src={src}
+        alt={alt}
+        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        onLoad={handleLoad}
+        onError={handleError}
+        loading="lazy"
+      />
+    </div>
+  );
+};
+
 // Type definitions
 interface User {
   name: string;
@@ -40,7 +92,7 @@ const mockPosts: Post[] = [
       timeAgo: "2 hours ago"
     },
     content: "Just visited this amazing place! The weather was perfect and the views were incredible. Can't wait to go back again soon! 🌅",
-    image: "https://picsum.photos/800/430?random=10", // Single image
+    image: "https://picsum.photos/800/430?random=10",
     likes: 24,
     isLiked: false,
     comments: 8,
@@ -62,7 +114,7 @@ const mockPosts: Post[] = [
     image: [
       "https://picsum.photos/400/430?random=20",
       "https://picsum.photos/400/430?random=21"
-    ], // Two images
+    ],
     likes: 56,
     isLiked: true,
     comments: 12,
@@ -85,7 +137,7 @@ const mockPosts: Post[] = [
       "https://picsum.photos/533/430?random=30",
       "https://picsum.photos/267/215?random=31",
       "https://picsum.photos/267/215?random=32"
-    ], // Three images
+    ],
     likes: 89,
     isLiked: false,
     comments: 23,
@@ -109,7 +161,7 @@ const mockPosts: Post[] = [
       "https://picsum.photos/400/215?random=41",
       "https://picsum.photos/400/215?random=42",
       "https://picsum.photos/400/215?random=43"
-    ], // Four images
+    ],
     likes: 134,
     isLiked: true,
     comments: 31,
@@ -132,7 +184,7 @@ const SocialFeed: React.FC = () => {
   };
 
   const handleLike = (postId: string): void => {
-    setPosts(posts.map(post => {
+    setPosts(posts => posts.map(post => {
       if (post.id === postId) {
         const newIsLiked = !post.isLiked;
         let newLikedBy = post.likedBy;
@@ -187,7 +239,6 @@ const SocialFeed: React.FC = () => {
       }
     ]);
 
-    // Define handleSendComment inside PostCard component
     const handleSendComment = () => {
       if (commentText.trim()) {
         const newComment = {
@@ -200,7 +251,7 @@ const SocialFeed: React.FC = () => {
         setPostComments(prev => [...prev, newComment]);
         handleAddComment(post.id);
         setCommentText('');
-        setShowComments(true); // Automatically show comments when a new one is added
+        setShowComments(true);
         alert('Comment sent successfully!');
       }
     };
@@ -209,7 +260,6 @@ const SocialFeed: React.FC = () => {
       setShowComments(!showComments);
     };
 
-    // Handle Enter key press for comment submission
     const handleKeyPress = (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -218,7 +268,7 @@ const SocialFeed: React.FC = () => {
     };
 
     return (
-      <div className="mt-6 bg-white shadow-md rounded-xl p-3 w-full max-w-[1350px] mx-auto">
+      <div className="mt-6 bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
         {/* Header */}
         <div className="flex items-start space-x-4 mb-4">
           <img 
@@ -239,18 +289,18 @@ const SocialFeed: React.FC = () => {
           </p>
         </div>
 
-        {/* Images */}
+        {/* Images with Lazy Loading */}
         {post.image && (
           <div className="mb-4 w-full max-w-full overflow-hidden rounded">
             {Array.isArray(post.image) ? (
               <div className={`grid gap-1 w-full ${
                 post.image.length === 2 ? 'grid-cols-2 h-80' :
                 post.image.length === 3 ? 'grid-cols-2 grid-rows-2 h-80' :
-                post.image.length === 4 ? 'grid-cols-2 grid-rows-2 h-80' :
+                post.image.length === 4 ? 'grid-cols-2 grid-rows-2 h-100' :
                 'grid-cols-1 h-96'
               }`}>
                 {post.image.map((img: string, index: number) => (
-                  <img
+                  <LazyImage
                     key={index}
                     src={img}
                     alt={`Post image ${index + 1}`}
@@ -262,7 +312,7 @@ const SocialFeed: React.FC = () => {
               </div>
             ) : (
               <div className="w-full h-96 rounded overflow-hidden">
-                <img 
+                <LazyImage 
                   src={post.image}
                   alt="Post image"
                   className="w-full h-full object-cover"
@@ -276,7 +326,7 @@ const SocialFeed: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex -space-x-2">
             {post.likedBy.map((avatar: string, index: number) => (
-              <img 
+              <LazyImage 
                 key={index}
                 src={avatar}
                 alt="User"
@@ -325,7 +375,7 @@ const SocialFeed: React.FC = () => {
             <div className="max-h-64 overflow-y-auto">
               {postComments.map((comment) => (
                 <div key={comment.id} className="flex items-start space-x-3 mb-3">
-                  <img 
+                  <LazyImage 
                     src={comment.avatar}
                     alt={comment.user}
                     className="w-8 h-8 rounded-full object-cover"
@@ -347,7 +397,7 @@ const SocialFeed: React.FC = () => {
 
         {/* Comment Input */}
         <div className="flex items-center space-x-3 pt-4 my-2 border-t border-gray-200">
-          <img 
+          <LazyImage 
             src="https://picsum.photos/40/40?random=999"
             alt="Your avatar"
             className="w-10 h-10 rounded-full object-cover"
