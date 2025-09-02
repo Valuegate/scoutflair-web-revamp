@@ -82,41 +82,36 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
         </div>
       </div>
 
-      {/* Desktop Sidebar (pushes content) */}
-      <div
-        className={`hidden md:flex h-screen flex-col transition-all duration-300 overflow-hidden ${
-          isOpen ? "w-[280px] bg-[#0A2342] p-6 text-white" : "w-0"
-        }`}
-      >
-        {isOpen && (
-          <>
-            <div className="flex items-center gap-2 mb-8">
-              <ScoutFlairLogo />
-              <h1 className="text-2xl font-bold">ScoutFlair</h1>
-            </div>
+      {/* Desktop Sidebar (always visible) */}
+      <div className="hidden md:flex h-screen w-[280px] bg-[#0A2342] p-6 text-white flex-col">
+        <div className="flex items-center gap-2 mb-8">
+          <ScoutFlairLogo />
+          <h1 className="text-2xl font-bold">ScoutFlair</h1>
+        </div>
 
-            <nav className="flex flex-col gap-4">
-              {links.map(({ href, label, icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-[#13315c] ${
-                    pathname === href ? "bg-[#13315c]" : ""
-                  }`}
-                >
-                  {icon} {label}
-                </Link>
-              ))}
+        <nav className="flex flex-col gap-4 flex-1">
+          {links.map(({ href, label, icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#13315c] transition-colors ${
+                pathname === href ? "bg-[#13315c]" : ""
+              }`}
+            >
+              {icon} 
+              <span className="text-sm font-medium">{label}</span>
+            </Link>
+          ))}
 
-              <Link
-                href="/"
-                className="flex items-center gap-2 mt-auto px-2 py-1 rounded hover:bg-[#13315c]"
-              >
-                <LogOut size={18} /> Log Out
-              </Link>
-            </nav>
-          </>
-        )}
+          {/* Logout at bottom */}
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#13315c] transition-colors mt-auto border-t border-[#13315c] pt-4"
+          >
+            <LogOut size={18} /> 
+            <span className="text-sm font-medium">Log Out</span>
+          </Link>
+        </nav>
       </div>
     </>
   );
