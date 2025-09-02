@@ -1,13 +1,12 @@
 // src/app/signin/page.tsx
 'use client';
-'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, Check, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const roles = [
@@ -169,9 +168,10 @@ const LoginForm = ({ selectedRole, onBack, onLogin }: {
 
             <button
                 onClick={onBack}
-                className="mt-6 w-full text-center font-lato text-sm text-black/70 hover:text-black/90"
+                className="mt-6 w-full text-center font-lato text-sm text-black/70 hover:text-black/90 flex items-center justify-center gap-2"
             >
-                ← Back to role selection
+                <ArrowLeft className="w-4 h-4" />
+                Back to role selection
             </button>
         </div>
     );
@@ -286,6 +286,10 @@ export default function SignInPage() {
         setSelectedRole(null);
     };
 
+    const handleGoBack = () => {
+        router.back(); // Goes back to the previous page
+    };
+
     if (showLoginForm && selectedRole) {
         const role = roles.find(r => r.name === selectedRole);
         if (role) {
@@ -306,7 +310,27 @@ export default function SignInPage() {
     return (
         <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
             <div className="relative z-10 w-full max-w-6xl mx-auto rounded-2xl bg-cover bg-center bg-[#192B4D]/90 bg-[url('/images/Color_frame_1736_1900.png')] p-6 md:p-12 lg:p-16">
-                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
+                
+                {/* Back Button */}
+                <button
+                    onClick={handleGoBack}
+                    className="mb-6 flex items-center gap-2 text-white hover:text-white/80 transition-colors font-lato text-sm"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                </button>
+
+                {/* Role Selection Title */}
+                <div className="text-center mb-8">
+                    <h1 className="font-manrope text-3xl md:text-4xl font-bold text-white mb-4">
+                        Choose Your Role
+                    </h1>
+                    <p className="font-lato text-white/80 text-lg">
+                        Select how you want to sign in to ScoutFlair
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
                     {roles.map((role) => (
                         <RoleCard
                             key={role.name}

@@ -82,101 +82,103 @@ const CameraIcons = () => <Camera size={16} />;
 const OutlinePhoto = () => <Image size={16} />;
 const EmojiPhoto = () => <Smile size={16} />;
 
-// Mock data with different image configurations
+// Football player avatars
+const footballAvatars = [
+  "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=36&h=36&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=36&h=36&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1617620082378-1d5f2d9df3aa?w=36&h=36&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=36&h=36&fit=crop&crop=face"
+];
+
+// Football-themed liked by avatars
+const footballLikedByAvatars = [
+  "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=24&h=24&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=24&h=24&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1617620082378-1d5f2d9df3aa?w=24&h=24&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=24&h=24&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=24&h=24&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1609440778862-7a64b8ed66cc?w=24&h=24&fit=crop&crop=face"
+];
+
+// Mock data with football-related images and content
 const mockPosts: Post[] = [
   {
     id: "1",
     user: {
       name: "Anthony Martial",
-      avatar: "https://picsum.photos/36/36?random=1",
+      avatar: footballAvatars[0],
       timeAgo: "2 hours ago"
     },
-    content: "Just visited this amazing place! The weather was perfect and the views were incredible. Can't wait to go back again soon! 🌅",
-    image: "https://picsum.photos/800/430?random=10",
-    likes: 24,
+    content: "Great training session today! Working on my finishing and ball control. The team is looking strong for next week's match! ⚽️🔥",
+    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=430&fit=crop",
+    likes: 124,
     isLiked: false,
-    comments: 8,
-    shares: 3,
-    likedBy: [
-      "https://picsum.photos/24/24?random=100",
-      "https://picsum.photos/24/24?random=101",
-      "https://picsum.photos/24/24?random=102"
-    ]
+    comments: 18,
+    shares: 7,
+    likedBy: [footballLikedByAvatars[0], footballLikedByAvatars[1], footballLikedByAvatars[2]]
   },
   {
     id: "2",
     user: {
       name: "Sarah Wilson",
-      avatar: "https://picsum.photos/36/36?random=2",
+      avatar: footballAvatars[1],
       timeAgo: "4 hours ago"
     },
-    content: "Beautiful sunset and morning views from my weekend getaway! Nature never fails to amaze me. 🌄✨",
+    content: "Match day vibes! Nothing beats the atmosphere of a packed stadium. Ready to give everything for the team and our amazing fans! 🏟️⚽️",
     image: [
-      "https://picsum.photos/400/430?random=20",
-      "https://picsum.photos/400/430?random=21"
+      "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=430&fit=crop",
+      "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?w=400&h=430&fit=crop"
     ],
-    likes: 56,
+    likes: 256,
     isLiked: true,
-    comments: 12,
-    shares: 7,
-    likedBy: [
-      "https://picsum.photos/24/24?random=103",
-      "https://picsum.photos/24/24?random=104",
-      "https://picsum.photos/24/24?random=105"
-    ]
+    comments: 42,
+    shares: 19,
+    likedBy: [footballLikedByAvatars[3], footballLikedByAvatars[4], footballLikedByAvatars[5]]
   },
   {
     id: "3",
     user: {
-      name: "David Beckam",
-      avatar: "https://picsum.photos/36/36?random=3",
+      name: "David Beckham",
+      avatar: footballAvatars[2],
       timeAgo: "6 hours ago"
     },
-    content: "City life vs nature - can't decide which one I love more! Each has its own beauty and charm. What's your preference? 🏙️🌲",
+    content: "From grassroots to the big stage - football brings us all together! Proud to support youth development and see the next generation shine. ⭐️",
     image: [
-      "https://picsum.photos/533/430?random=30",
-      "https://picsum.photos/267/215?random=31",
-      "https://picsum.photos/267/215?random=32"
+      "https://images.unsplash.com/photo-1606103816053-4ef0ea5f4d7c?w=533&h=430&fit=crop",
+      "https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=267&h=215&fit=crop",
+      "https://images.unsplash.com/photo-1587385789097-0197a7fbd179?w=267&h=215&fit=crop"
     ],
-    likes: 89,
+    likes: 489,
     isLiked: false,
-    comments: 23,
-    shares: 15,
-    likedBy: [
-      "https://picsum.photos/24/24?random=106",
-      "https://picsum.photos/24/24?random=107",
-      "https://picsum.photos/24/24?random=108"
-    ]
+    comments: 73,
+    shares: 35,
+    likedBy: [footballLikedByAvatars[0], footballLikedByAvatars[2], footballLikedByAvatars[4]]
   },
   {
     id: "4",
     user: {
       name: "Emma Taylor",
-      avatar: "https://picsum.photos/36/36?random=4",
+      avatar: footballAvatars[3],
       timeAgo: "8 hours ago"
     },
-    content: "Perfect day for photography! Captured some amazing moments today. The lighting was just perfect for every shot! 📸",
+    content: "Championship memories! These are the moments that make all the hard work worth it. Team spirit, dedication, and pure joy! 🏆⚽️",
     image: [
-      "https://picsum.photos/400/215?random=40",
-      "https://picsum.photos/400/215?random=41",
-      "https://picsum.photos/400/215?random=42",
-      "https://picsum.photos/400/215?random=43"
+      "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=215&fit=crop",
+      "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=215&fit=crop",
+      "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=400&h=215&fit=crop",
+      "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=215&fit=crop"
     ],
-    likes: 134,
+    likes: 834,
     isLiked: true,
-    comments: 31,
-    shares: 22,
-    likedBy: [
-      "https://picsum.photos/24/24?random=109",
-      "https://picsum.photos/24/24?random=110",
-      "https://picsum.photos/24/24?random=111"
-    ]
+    comments: 91,
+    shares: 67,
+    likedBy: [footballLikedByAvatars[1], footballLikedByAvatars[3], footballLikedByAvatars[5]]
   }
 ];
 
 const SocialFeed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>(mockPosts);
-  const currentUserAvatar = "https://picsum.photos/24/24?random=999";
+  const currentUserAvatar = "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=24&h=24&fit=crop&crop=face";
 
   // Handle new post creation from PostBox
   const handleCreatePost = async (newPost: Post) => {
@@ -225,16 +227,16 @@ const SocialFeed: React.FC = () => {
     const [postComments, setPostComments] = useState<Array<{id: string, user: string, avatar: string, text: string, timeAgo: string}>>([
       {
         id: '1',
-        user: 'John Doe',
-        avatar: 'https://picsum.photos/32/32?random=50',
-        text: 'Amazing post! Love the content.',
+        user: 'Marcus Johnson',
+        avatar: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=32&h=32&fit=crop&crop=face',
+        text: 'Incredible performance! Keep pushing the boundaries! ⚽️',
         timeAgo: '1h'
       },
       {
         id: '2',
-        user: 'Jane Smith',
-        avatar: 'https://picsum.photos/32/32?random=51',
-        text: 'This is exactly what I needed to see today!',
+        user: 'Coach Smith',
+        avatar: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=32&h=32&fit=crop&crop=face',
+        text: 'This is the mentality we need in every training session!',
         timeAgo: '30m'
       }
     ]);
@@ -244,7 +246,7 @@ const SocialFeed: React.FC = () => {
         const newComment = {
           id: Date.now().toString(),
           user: 'You',
-          avatar: 'https://picsum.photos/32/32?random=999',
+          avatar: 'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=32&h=32&fit=crop&crop=face',
           text: commentText.trim(),
           timeAgo: 'now'
         };
@@ -303,7 +305,7 @@ const SocialFeed: React.FC = () => {
                   <LazyImage
                     key={index}
                     src={img}
-                    alt={`Post image ${index + 1}`}
+                    alt={`Football post image ${index + 1}`}
                     className={`w-full h-full object-cover ${
                       post.image.length === 3 && index === 0 ? 'row-span-2' : ''
                     }`}
@@ -314,7 +316,7 @@ const SocialFeed: React.FC = () => {
               <div className="w-full h-96 rounded overflow-hidden">
                 <LazyImage 
                   src={post.image}
-                  alt="Post image"
+                  alt="Football post image"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -329,7 +331,7 @@ const SocialFeed: React.FC = () => {
               <LazyImage 
                 key={index}
                 src={avatar}
-                alt="User"
+                alt="Football fan"
                 className="w-6 h-6 rounded-full border-2 border-white object-cover"
               />
             ))}
@@ -398,7 +400,7 @@ const SocialFeed: React.FC = () => {
         {/* Comment Input */}
         <div className="flex items-center space-x-3 pt-4 my-2 border-t border-gray-200">
           <LazyImage 
-            src="https://picsum.photos/40/40?random=999"
+            src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=40&h=40&fit=crop&crop=face"
             alt="Your avatar"
             className="w-10 h-10 rounded-full object-cover"
           />
