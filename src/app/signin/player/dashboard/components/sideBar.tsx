@@ -33,7 +33,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
 
       {/* Mobile Sidebar (overlay) */}
       <div
-        className={`md:hidden fixed left-0 top-0 h-full w-[280px] bg-[#0A2342] text-white z-50 transform transition-transform duration-300 ${
+        className={`md:hidden fixed left-0 top-0 h-full w-[366px] bg-[#0A2342] text-white z-50 transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
