@@ -312,13 +312,13 @@ export default function SignInPage() {
             <div className="relative z-10 w-full max-w-6xl mx-auto rounded-2xl bg-cover bg-center bg-[#192B4D]/90 bg-[url('/images/Color_frame_1736_1900.png')] p-6 md:p-12 lg:p-16">
                 
                 {/* Back Button */}
-                <button
-                    onClick={handleGoBack}
-                    className="mb-6 flex items-center gap-2 text-white hover:text-white/80 transition-colors font-lato text-sm"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                </button>
+               <button
+              onClick={handleGoBack}
+           className="mb-6 flex items-center gap-2 text-white hover:text-white/80 transition-colors font-lato text-sm font-[600]"
+>
+  <ArrowLeft className="w-4 h-4 stroke-[4]" />
+  Back
+</button>
 
                 {/* Role Selection Title */}
                 <div className="text-center mb-8">
