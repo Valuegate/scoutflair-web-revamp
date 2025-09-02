@@ -1,7 +1,7 @@
 // src/app/signup/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -73,11 +73,9 @@ const RoleCard = ({ role, className, isSelected, onClick }: {
             </p>
         </div>
         <div className="mt-8 flex flex-col items-center gap-2">
-            <Button asChild className="rounded-full bg-[#041931] hover:bg-[#041931]/90 h-11 px-8 font-poppins text-base font-semibold flex items-center justify-center gap-2">
-                <Link href={role.href}>
-                    <span>Dive In</span>
-                    <ArrowRight className="w-4 h-4" />
-                </Link>
+            <Button className="rounded-full bg-[#041931] hover:bg-[#041931]/90 h-11 px-8 font-poppins text-base font-semibold flex items-center justify-center gap-2">
+                <span>Dive In</span>
+                <ArrowRight className="w-4 h-4" />
             </Button>
             <p className="font-lato text-xs text-black/70">Step Into Your Story</p>
         </div>
@@ -87,16 +85,8 @@ const RoleCard = ({ role, className, isSelected, onClick }: {
 export default function SignUpPage() {
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
-    useEffect(() => {
-        const storedRole = localStorage.getItem('selectedSignUpRole');
-        if (storedRole && roles.some(r => r.name === storedRole)) {
-            setSelectedRole(storedRole);
-        }
-    }, []);
-
     const handleRoleClick = (roleName: string) => {
         setSelectedRole(roleName);
-        localStorage.setItem('selectedSignUpRole', roleName);
     };
     
     return (

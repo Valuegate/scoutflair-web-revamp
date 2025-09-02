@@ -151,15 +151,20 @@ const LoginForm = ({ selectedRole, onBack, onLogin }: {
                 >
                     Quick Login (Demo)
                 </Button>
-
+                  <Link href='/signup'>
                 <div className="text-center">
                     <p className="font-lato text-sm text-black/70">
                         Don't have an account?{' '}
-                        <button type="button" className="text-[#192B4D] hover:underline font-semibold">
+                       
+                         <button type="button" className="text-[#192B4D] hover:underline font-semibold">
                             Sign up
                         </button>
+                        
+                        
+                       
                     </p>
                 </div>
+                </Link>
             </form>
 
             <button
