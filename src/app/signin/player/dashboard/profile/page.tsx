@@ -1,6 +1,6 @@
 export default function ProfilePage() {
   return (
-  <div className="w-full flex justify-center px-4 flex-col items-center" style={{ maxWidth: '1400px', margin: '0 auto' }}>
+  <div className="w-full flex justify-center px-4 flex-col items-center" style={{ maxWidth: '1200px', margin: '0 auto' }}>
   {/* Main Profile Card */}
   <div
     className="relative"
@@ -94,8 +94,8 @@ export default function ProfilePage() {
         <div
           className="mt-6"
           style={{
-            width: 380,
-            height: 931,
+            width: 460,
+            height: 871,
             borderRadius: 12,
             boxShadow: '0px 4px 12px 0px #0000001A',
             background: '#FFFFFF',
@@ -373,7 +373,7 @@ export default function ProfilePage() {
                           fontSize: '14px',
                           color: '#000000',
                           marginTop: '-30px',
-                          marginBottom: '10px'
+                          marginBottom: '-6px'
                         }}
                       >
                         Social Media
@@ -563,7 +563,7 @@ export default function ProfilePage() {
 {/* Activity Feed Container */}
 <div
   style={{
-    width: 694,
+    width: 594,
     gap: 24,
     display: 'flex',
     flexDirection: 'column',
