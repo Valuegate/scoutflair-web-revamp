@@ -33,14 +33,14 @@ const LazyImage: React.FC<{
       )}
       
       {/* Error state */}
-      {hasError && (
+      {/*hasError && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
           <div className="text-gray-400 text-center">
             <Image size={32} className="mx-auto mb-2" />
             <span className="text-xs">Failed to load</span>
           </div>
         </div>
-      )}
+    )}
       
       {/* Actual Image */}
       <img
