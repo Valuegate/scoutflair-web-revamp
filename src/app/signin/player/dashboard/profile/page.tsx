@@ -16,7 +16,7 @@ export default function ProfilePage() {
             <img
               src="/images/round.png"
               alt="Player"
-              className="w-16 h-16 mt-[-30] sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover border-3 border-[#0A2A56] rounded-full bg-white"
+              className="w-16 h-16 mt-[-30px] sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover border-3 border-[#0A2A56] rounded-full bg-white"
             />
           </div>
         </div>

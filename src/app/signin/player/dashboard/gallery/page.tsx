@@ -4,7 +4,7 @@ export default function GalleryPage() {
   return (
     <div className="flex flex-col px-4 py-8 md:ml-[-18px]">
       {/* Search Bar Container - Mobile Optimized */}
-      <div className="w-full mt-[-20] md:max-w-[724px] h-auto md:h-16 rounded-xl bg-white shadow-md px-3 md:px-4 py-3 md:py-0 mt-0 md:mt-[-35px] flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0">
+      <div className="w-full mt-[-20px] md:max-w-[724px] h-auto md:h-16 rounded-xl bg-white shadow-md px-3 md:px-4 py-3 md:py-0  md:mt-[-35px] flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0">
         <div className="w-full max-w-[692px] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-0">
           
           {/* Search Box */}
