@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 interface PlayerSignupData {
@@ -81,59 +82,71 @@ export default function PlayerSignupPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
 
-  if (!validateForm()) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+    
+    try {
+      console.log('Submitting form data:', formData); // Debug log
+      
+      const response = await fetch('/api/signup/player', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-  setIsLoading(true);
+      console.log('Response status:', response.status); // Debug log
+      console.log('Response ok:', response.ok); // Debug log
 
-  try {
-    const payload = {
-      fullName: formData.fullName,
-      email: formData.email,
-      username: formData.email, // ✅ using email as username
-      password: formData.password,
-      dob: formData.dob,
-      position: formData.position,
-      preferredFoot: formData.preferredFoot,
-      currentTeam: formData.currentTeam,
-      experience: formData.experience,
-      usertype: "player",
-      licenceNumber: ""
-    };
-
-    const response = await fetch("https://scoutflair.top/scoutflair/v1/signup", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(formData),
-});
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Signup response:", data);
-
-      // ✅ Check if backend sends a token
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
-        console.log("Token saved to localStorage:", data.token);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Success response:', data); // Debug log
+        // Handle successful signup - backend returns { message: "string", success: true }
+        alert(`Success: ${data.message}`); // Show success message
+        router.push('/signup'); // Redirect back to role selection
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.log('Full error response:', errorData); // Debug log
+        
+        // Handle specific error status codes
+        let errorMessage = 'Signup failed. Please try again.';
+        
+        switch (response.status) {
+          case 400:
+            errorMessage = errorData.error || 'Invalid form data. Please check your inputs.';
+            break;
+          case 401:
+            errorMessage = 'Unauthorized access. Please try again.';
+            break;
+          case 403:
+            errorMessage = 'Access forbidden. Please contact support.';
+            break;
+          case 404:
+            errorMessage = 'Service not available. Please try again later.';
+            break;
+          case 500:
+            errorMessage = 'Server error. Please try again later.';
+            break;
+          default:
+            errorMessage = errorData.error || errorData.message || `Error ${response.status}: Please try again.`;
+        }
+        
+        console.error('Signup failed:', errorMessage);
+        alert(errorMessage); // Temporary - you can replace with toast notification
       }
-
-      alert(`✅ Account created: ${data.message || "Success!"}`);
-      router.push("/signin"); 
-    } else {
-      const errorData = await response.json().catch(() => ({}));
-      let errorMessage = errorData.error || errorData.message || "Signup failed.";
-      alert(`❌ ${errorMessage}`);
+    } catch (error) {
+      console.error('Network/API error:', error);
+      alert('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("Network/API error:", error);
-    alert("Network error. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
@@ -143,13 +156,13 @@ const handleSubmit = async (e: React.FormEvent) => {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link 
-            href="/signup"
+            href="/player/signup"
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <ArrowLeft className="w-6 h-6 text-gray-600" />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-[#192B4D] font-manrope">Player Registration</h1>
+            <h1 className="text-3xl font-bold text-[#192B4D] font-manrope">Pkklayer Registration</h1>
             <p className="text-gray-600 font-lato">Join the community of talented players</p>
           </div>
         </div>
