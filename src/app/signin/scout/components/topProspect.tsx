@@ -2,34 +2,59 @@ import { CupStarIcon, ProspectsIcon } from "../ScoutIcons";
 
 export default function TopProspects() {
   const prospects = [
-    { name: "Tobi Irefin", details: "10 G/A", image: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=150&h=150&fit=crop&crop=face" },
-    { name: "Tobi Irefin", details: "10 G/A", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" },
-    { name: "Tobi Irefin", details: "10 G/A", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face" },
+    { name: "Tobi Irefin", details: "10 G/A", image: "/images/prosimgone.png" },
+    { name: "Tobi Irefin", details: "10 G/A", image: "/images/prosimgtwo.png" },
+    { name: "Tobi Irefin", details: "10 G/A", image: "/images/prosimgthree.png" },
   ];
 
   return (
-    <div className="bg-white rounded-xl w-[350px] h-[145px] shadow-md p-4">
+    <div className="bg-white rounded-[12px] w-[350px] h-[145px] shadow-md p-4">
       {/* Header with title and icon */}
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg font-semibold text-gray-800">Top Prospects</h3>
-        
-          <ProspectsIcon/>
-      
+        <ProspectsIcon/>
       </div>
       
-      {/* Prospects grid */}
+      {/* Prospects container */}
       <div className="flex justify-between px-4">
-        {prospects.map((prospect, i) => (
-          <div key={i} className="text-center flex-1">
-            <img
-              src={prospect.image}
-              alt={prospect.name}
-              className="rounded-full mx-auto mb-1 w-12 h-12 object-cover"
-            />
-            <p className="text-xs font-medium text-gray-800 leading-tight whitespace-nowrap">{prospect.name}</p>
-            <p className="text-xs text-gray-500">{prospect.details}</p>
-          </div>
-        ))}
+        {/* Prospect 1 Container */}
+        <div className="text-center  bg-[rgba(255,250,250,1)] flex-1">
+          <img  
+            width={44}
+            height={40}
+            src={prospects[0].image}
+            alt={prospects[0].name}
+            className="rounded-full mx-auto mb-1 w-12 h-12 object-cover"
+          />
+          <p className="text-xs font-medium text-gray-800 leading-tight whitespace-nowrap">{prospects[0].name}</p>
+          <p className="text-xs text-gray-500">{prospects[0].details}</p>
+        </div>
+
+        {/* Prospect 2 Container */}
+        <div className="text-center  bg-[rgba(255,250,250,1)] flex-1">
+          <img  
+            width={44}
+            height={40}
+            src={prospects[1].image}
+            alt={prospects[1].name}
+            className="rounded-full mx-auto mb-1 w-12 h-12 object-cover"
+          />
+          <p className="text-xs font-medium text-gray-800 leading-tight whitespace-nowrap">{prospects[1].name}</p>
+          <p className="text-xs text-gray-500">{prospects[1].details}</p>
+        </div>
+
+        {/* Prospect 3 Container */}
+        <div className="text-center bg-[rgba(255,250,250,1)] flex-1">
+          <img  
+            width={44}
+            height={40}
+            src={prospects[2].image}
+            alt={prospects[2].name}
+            className="rounded-full mx-auto mb-1 w-12 h-12 object-cover"
+          />
+          <p className="text-xs font-medium text-gray-800 leading-tight whitespace-nowrap">{prospects[2].name}</p>
+          <p className="text-xs text-gray-500">{prospects[2].details}</p>
+        </div>
       </div>
     </div>
   );

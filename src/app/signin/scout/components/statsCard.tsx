@@ -2,7 +2,7 @@ import { CupStarIcon, StarsIcon, StarsIconOutline } from "../ScoutIcons";
 
 export default function StatsCard() {
   return (
-    <div className="bg-white w-[350px] h-[145px]   rounded-xl shadow-md p-4 relative">
+    <div className="bg-white w-[350px] h-[145px]  p-3 rounded-[12px] shadow-md  relative">
       {/* Header with title and icon */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold text-gray-800">Total Players Scouted</h3>
@@ -12,13 +12,13 @@ export default function StatsCard() {
       </div>
       
       {/* Main content area */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between ">
         {/* Player avatars */}
         <div className="flex">
-          <img src="https://placehold.co/40x40/8B4513/FFF?text=👤" alt="Player 1" className="rounded-full -mr-2 border-2 border-white"  />
-          <img src="https://placehold.co/40x40/D2B48C/FFF?text=👤" alt="Player 2" className="rounded-full -mr-2 border-2 border-white" />
-          <img src="https://placehold.co/40x40/F5DEB3/FFF?text=👤" alt="Player 3" className="rounded-full -mr-2 border-2 border-white" />
-          <img src="https://placehold.co/40x40/654321/FFF?text=👤" alt="Player 4" className="rounded-full border-2 border-white" />
+          <img src="/images/scoutlayerone.png" alt="Player 1" className="rounded-full -mr-2 border-2 border-white" width={32} height={32} />
+          <img src="/images/scoutplayertwo.png" alt="Player 2" className="rounded-full -mr-2 border-2 border-white" width={32} height={32}/>
+          <img src="/images/scoutplayertwo.png" alt="Player 3" className="rounded-full -mr-2 border-2 border-white" width={32} height={32} />
+          <img src="/images/scoutlayerone.png" alt="Player 4" className="rounded-full border-2 border-white" width={32} height={32}/>
         </div>
         
         {/* Large number */}
@@ -26,7 +26,7 @@ export default function StatsCard() {
       </div>
       
       {/* Bottom section with stars and text */}
-      <div className="flex items-center  px-4 justify-between">
+      <div className="flex items-center   justify-between">
         <div className="flex">
           {[...Array(4)].map((_, i) => (
             <StarsIcon/>
