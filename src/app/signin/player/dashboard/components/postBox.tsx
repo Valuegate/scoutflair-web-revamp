@@ -1,6 +1,7 @@
 "use client"
 import { useState, useRef } from "react";
 import { VideoIcon } from "./spotIcons";
+
 // Mock icon components - replace with your actual icons
 const OutlinePhoto = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,8 +15,6 @@ const CameraIcons = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
   </svg>
 );
-
-
 
 interface User {
   name: string;
@@ -51,9 +50,62 @@ interface VideoItem {
 
 interface PostBoxProps {
   onCreatePost?: (post: Post) => Promise<void>;
+  apiBaseUrl?: string; // Make API URL configurable
 }
 
-export default function PostBox({ onCreatePost }: PostBoxProps) {
+// Backend API service
+const createSpotLightPost = async (postData: any, apiBaseUrl: string = 'https://scoutflair.top') => {
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/spot-lights`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add authorization header if you have authentication
+        // 'Authorization': `Bearer ${yourAuthToken}`,
+      },
+      body: JSON.stringify(postData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error creating post:', error);
+    throw error;
+  }
+};
+
+// Helper function to upload files (if your backend supports file upload)
+const uploadFile = async (file: File, apiBaseUrl: string = 'https://scoutflair.top') => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/upload`, {
+      method: 'POST',
+      body: formData,
+      // Add authorization header if needed
+      // headers: {
+      //   'Authorization': `Bearer ${yourAuthToken}`,
+      // },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload failed! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.data?.url || result.url; // Adjust based on your API response structure
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
+export default function PostBox({ onCreatePost, apiBaseUrl = 'https://scoutflair.top' }: PostBoxProps) {
   const [text, setText] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<ImageItem[]>([]);
   const [selectedVideos, setSelectedVideos] = useState<VideoItem[]>([]);
@@ -114,49 +166,60 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
     event.target.value = '';
   };
 
-  // Handle post creation
+  // Handle post creation using proxy to avoid CSP issues
   const handlePost = async () => {
     if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) {
       return;
     }
 
     setIsPosting(true);
+    console.log('📝 Starting post creation...');
 
     try {
-      // Combine images and videos into a single media array (for PostCard compatibility)
-      const allMedia = [
-        ...selectedImages.map(img => img.url),
-        ...selectedVideos.map(vid => vid.url)
-      ];
-
-      // Create post object that matches your PostCard format
-      const newPost: Post = {
-        id: Date.now().toString(),
-        user: {
-          name: "You", // You can make this dynamic
-          avatar: "/images/profile.jpeg",
-          timeAgo: "Just now"
-        },
+      // Prepare post data for backend
+      const postData = {
         content: text.trim(),
-        image: allMedia.length === 1 ? allMedia[0] : allMedia, // Single string or array
-        likes: 0,
-        isLiked: false,
-        comments: 0,
-        shares: 0,
-        likedBy: []
       };
 
+      console.log('📦 Sending post data:', postData);
+
+      // Send to backend via proxy
+      const backendResponse = await createSpotLightPost(postData);
+      
+      console.log('🎉 Backend response:', backendResponse);
+
+      // Create local post object for UI update (if onCreatePost is provided)
       if (onCreatePost) {
+        const newPost: Post = {
+          id: backendResponse.data?.obj?.id || backendResponse.data?.id || Date.now().toString(),
+          user: {
+            name: "You",
+            avatar: "/images/profile.jpeg",
+            timeAgo: "Just now"
+          },
+          content: text.trim(),
+          image: [],
+          likes: 0,
+          isLiked: false,
+          comments: 0,
+          shares: 0,
+          likedBy: []
+        };
+
         await onCreatePost(newPost);
       }
 
-      // Reset form
+      // Reset form on success
       setText("");
       setSelectedImages([]);
       setSelectedVideos([]);
       
+      console.log('✅ Post created successfully!');
+      alert('Post created successfully!');
+      
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error('❌ Error creating post:', error);
+      alert(`Failed to create post. Error: ${error.message}`);
     } finally {
       setIsPosting(false);
     }
@@ -191,6 +254,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
               onClick={() => cameraInputRef.current?.click()}
               className="text-gray-500 hover:text-gray-700 p-1 sm:p-2"
               title="Take photo"
+              disabled={isPosting}
             >
               <CameraIcons/>
             </button>
@@ -198,6 +262,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
               onClick={() => fileInputRef.current?.click()}
               className="text-gray-500 hover:text-gray-700 p-1 sm:p-2"
               title="Upload photo"
+              disabled={isPosting}
             >
               <OutlinePhoto/>
             </button>
@@ -205,6 +270,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
               onClick={() => videoInputRef.current?.click()}
               className="text-gray-500 hover:text-gray-700 p-1 sm:p-2"
               title="Upload video"
+              disabled={isPosting}
             >
               <VideoIcon/>
             </button>
@@ -240,6 +306,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
                 <button
                   onClick={() => setSelectedImages(prev => prev.filter(img => img.id !== image.id))}
                   className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                  disabled={isPosting}
                 >
                   ×
                 </button>
@@ -262,6 +329,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
                 <button
                   onClick={() => setSelectedVideos(prev => prev.filter(vid => vid.id !== video.id))}
                   className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                  disabled={isPosting}
                 >
                   ×
                 </button>
@@ -279,6 +347,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
         multiple
         onChange={(e) => handleImageSelect(e, 'gallery')}
         className="hidden"
+        disabled={isPosting}
       />
       <input
         ref={cameraInputRef}
@@ -287,6 +356,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
         capture="environment"
         onChange={(e) => handleImageSelect(e, 'camera')}
         className="hidden"
+        disabled={isPosting}
       />
       <input
         ref={videoInputRef}
@@ -295,6 +365,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
         multiple
         onChange={handleVideoSelect}
         className="hidden"
+        disabled={isPosting}
       />
     </div>
   );
