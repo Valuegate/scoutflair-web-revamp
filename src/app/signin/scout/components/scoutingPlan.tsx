@@ -15,15 +15,15 @@ export default function ScoutingPlan() {
   );
 
   const topPlayers = [
-    { name: "Denis Chuksons", position: "Midfielder" , image:"/images/topone.png"},
-    { name: "Abubakar Mansoor", position: "Midfielder" , image:"/images/toptwo.png"},
-    { name: "Abubakar Mansoor", position: "Midfielder", image:"/images/topthree.png" },
+    { name: "Denis Wills", position: "Midfielder" , image:"/images/topone.png"},
+    { name: "Lookman Adamson", position: "Midfielder" , image:"/images/toptwo.png"},
+    { name: "Abubakar Man", position: "Midfielder", image:"/images/topthree.png" },
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+    <div className="bg-white rounded-xl shadow-md   p-4 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+      <div className="flex flex-col sm:flex-row   justify-between items-start sm:items-center mb-6 gap-3">
         <h3 className="text-lg font-semibold text-gray-800 flex items-center">
           <span className="mr-2">
             {/* Icon */}
@@ -48,8 +48,8 @@ export default function ScoutingPlan() {
       {/* Player Cards */}
       <div className="grid justify-center sm:justify-start grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
         {players.map((player, i) => (
-          <div key={i} className="bg-[rgba(255,250,250,1)] w-[160px] rounded-lg p-3 text-center border border-gray-300">
-            <div className="flex justify-center items-center gap- text-xs font-medium text-green-600 mb-2">
+          <div key={i} className="bg-[rgba(255,250,250,1)] max-w-[151px] rounded-lg p-3 text-center border border-gray-300">
+            <div className="flex justify-center items-center gap-2 text-xs font-medium text-green-600 mb-2">
               {player.club} <NaijaImg/>
             </div>
             <img
@@ -77,16 +77,16 @@ export default function ScoutingPlan() {
 
       {/* Top 3 Players */}
       <h4 className="text-md font-semibold mb-3 text-gray-800">Top 3 Players</h4>
-      <div className="flex flex-wrap sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex flex-wrap sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-2 ">
         {topPlayers.map((top, i) => (
-          <div key={i} className="bg-[rgba(255,250,250,1)] w-[211px] h-[56px] rounded-lg gap-2 p-0 flex items-center border border-gray-300">
+          <div key={i} className="bg-[rgba(255,250,250,1)] gap-1 py-8 max-w-[211px] max-h-[56px] rounded-lg  flex items-center border border-gray-300">
             <img
               src={top.image}
               alt={top.name}
               className="rounded-full w-8 h-8 object-cover mr-2"
             />
             <NaijaImg/>
-            <div className="ml-2">
+            <div className="ml-2 ">
               <p className="text-sm font-semibold text-gray-900">{top.name}</p>
               <p className="text-xs text-gray-700">{top.position}</p>
             </div>

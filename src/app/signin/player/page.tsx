@@ -32,9 +32,10 @@ export default function SignInPage() {
         const data = await response.json();
 
         // ✅ Save token for later requests
-        if (data.token) {
-          localStorage.setItem("authToken", data.token);
-        }
+       if (data.jwtToken) {
+  localStorage.setItem("authToken", data.jwtToken);
+  console.log("Saved token:", data.jwtToken);
+}
 
         router.push("/signin/player/dashboard");
       } else if (response.status === 401) {

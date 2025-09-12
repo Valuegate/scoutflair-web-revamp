@@ -76,17 +76,14 @@ const createSpotLightPost = async (
   authToken?: string
 ) => {
   try {
-    const response = await fetch(
-      `${apiBaseUrl}/api/v1/spotLights/addPost`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-        },
-        body: JSON.stringify(postData),
-      }
-    );
+    const response = await fetch(`${apiBaseUrl}/api/v1/spotLights/addPost`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
+      body: JSON.stringify(postData),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -110,7 +107,8 @@ const uploadFile = async (
   formData.append("file", file);
 
   try {
-    const response = await fetch(`${apiBaseUrl}/api/upload`, {
+    const response = await fetch(`${apiBaseUrl}/api/v1/upload`, {
+      // 👆 confirm in Swagger if this is correct
       method: "POST",
       body: formData,
       headers: {
@@ -196,11 +194,7 @@ export default function PostBox({
 
   // ✅ Create post
   const handlePost = async () => {
-    if (
-      !text.trim() &&
-      selectedImages.length === 0 &&
-      selectedVideos.length === 0
-    ) {
+    if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) {
       return;
     }
 
@@ -233,13 +227,9 @@ export default function PostBox({
         mediaUrls: uploadedUrls,
       };
 
-      const backendResponse = await createSpotLightPost(
-        postData,
-        apiBaseUrl,
-        authToken
-      );
+      const backendResponse = await createSpotLightPost(postData, apiBaseUrl, authToken);
 
-      if (onCreatePost && backendResponse.code === "200") {
+      if (onCreatePost && (backendResponse.code === 200 || backendResponse.code === "200")) {
         const newPost: Post = {
           id: backendResponse.data?.obj?.id || Date.now().toString(),
           user: {
@@ -347,9 +337,7 @@ export default function PostBox({
                 />
                 <button
                   onClick={() =>
-                    setSelectedImages((prev) =>
-                      prev.filter((img) => img.id !== image.id)
-                    )
+                    setSelectedImages((prev) => prev.filter((img) => img.id !== image.id))
                   }
                   className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                   disabled={isPosting}
@@ -377,9 +365,7 @@ export default function PostBox({
                 </div>
                 <button
                   onClick={() =>
-                    setSelectedVideos((prev) =>
-                      prev.filter((vid) => vid.id !== video.id)
-                    )
+                    setSelectedVideos((prev) => prev.filter((vid) => vid.id !== video.id))
                   }
                   className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                   disabled={isPosting}

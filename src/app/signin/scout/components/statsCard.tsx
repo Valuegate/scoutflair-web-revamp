@@ -2,7 +2,7 @@ import { CupStarIcon, StarsIcon, StarsIconOutline } from "../ScoutIcons";
 
 export default function StatsCard() {
   return (
-    <div className="bg-white w-[350px] h-[145px]  p-3 rounded-[12px] shadow-md  relative">
+    <div className="bg-white max-w-[350px] max-h-[145px]  p-2 rounded-[12px] shadow-md  ">
       {/* Header with title and icon */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold text-gray-800">Total Players Scouted</h3>

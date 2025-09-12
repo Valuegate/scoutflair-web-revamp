@@ -1,6 +1,9 @@
-import React, { useState, useRef } from 'react';
+"use client"
+
+import React, { useState, useRef, useEffect } from 'react';
 import { Heart, MessageCircle, Share2, Camera, Image, Smile } from 'lucide-react';
 import { SendIcon } from './spotIcons';
+import { useRouter } from "next/navigation";
 import PostBox from './postBox';
 
 // LazyImage Component with placeholder
@@ -178,6 +181,17 @@ const mockPosts: Post[] = [
 
 const SocialFeed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>(mockPosts);
+ const router = useRouter();
+  useEffect(() => {
+    const savedToken = localStorage.getItem("authToken");
+    if (!savedToken) {
+      router.push("/signin/player");
+    } else {
+      console.log("JWT loadedworks:", savedToken);
+      setToken(savedToken);
+    }
+  }, [router]);
+  const [token, setToken] = useState<string | null>(null);
   const currentUserAvatar = "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=24&h=24&fit=crop&crop=face";
 
   // Handle new post creation from PostBox
@@ -441,7 +455,8 @@ const SocialFeed: React.FC = () => {
   return (
     <div className="">
       {/* PostBox at the top */}
-      <PostBox onCreatePost={handleCreatePost} />
+    {token && <PostBox onCreatePost={handleCreatePost} authToken={token} />}
+
       
       {/* Posts feed */}
       {posts.map(post => (

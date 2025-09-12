@@ -8,7 +8,7 @@ export default function TopProspects() {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-2 max-w-[350px] max-w-sm sm:max-w-md lg:max-w-lg h-[145px]">
+    <div className="bg-white rounded-xl shadow-md p-2 max-w-[350px] max-w-sm sm:max-w-md lg:max-w-lg max-h-[145px]">
       {/* Header with title and icon */}
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-lg font-semibold text-gray-800">Top Prospects</h3>

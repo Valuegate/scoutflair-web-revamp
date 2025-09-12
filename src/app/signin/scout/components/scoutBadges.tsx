@@ -2,7 +2,7 @@
 
 export default function ScoutsBadges() {
   return (
-    <div className="bg-white rounded-[12px] w-[350px] h-[145px] shadow-md p-2">
+    <div className="bg-white rounded-[12px] max-w-[350px] h-[145px] shadow-md p-2">
       <h3 className="text-lg font-semibold mb-3 text-gray-800">Scout's Badges</h3>
       <div className="flex justify-between   gap-2">
         <div className="bg-white rounded-[4px] h-[84px] flex-1 shadow-md flex flex-col justify-center items-center">
