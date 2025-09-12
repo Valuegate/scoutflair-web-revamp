@@ -49,7 +49,7 @@ export default function ScoutingPlan() {
       <div className="grid justify-center sm:justify-start grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
         {players.map((player, i) => (
           <div key={i} className="bg-[rgba(255,250,250,1)] w-[160px] rounded-lg p-3 text-center border border-gray-300">
-            <div className="flex justify-center items-center gap-2 text-xs font-medium text-green-600 mb-2">
+            <div className="flex justify-center items-center gap- text-xs font-medium text-green-600 mb-2">
               {player.club} <NaijaImg/>
             </div>
             <img
@@ -79,7 +79,7 @@ export default function ScoutingPlan() {
       <h4 className="text-md font-semibold mb-3 text-gray-800">Top 3 Players</h4>
       <div className="flex flex-wrap sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {topPlayers.map((top, i) => (
-          <div key={i} className="bg-[rgba(255,250,250,1)] w-[211px] h-[56px] rounded-lg p-2 flex items-center border border-gray-300">
+          <div key={i} className="bg-[rgba(255,250,250,1)] w-[211px] h-[56px] rounded-lg gap-2 p-0 flex items-center border border-gray-300">
             <img
               src={top.image}
               alt={top.name}
