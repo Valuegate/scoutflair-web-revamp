@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { VideoIcon } from "./spotIcons";
 
-// Mock icon components - replace with your actual icons
+// Mock icon components - replace with your actual icons if needed
 const OutlinePhoto = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
@@ -65,78 +65,22 @@ interface VideoItem {
 
 interface PostBoxProps {
   onCreatePost?: (post: Post) => Promise<void>;
-  apiBaseUrl?: string;
-  authToken?: string; // ✅ new: authorization token
+  cloudName: string;
+  uploadPreset: string;
+  authToken?: string;
 }
-
-// ✅ Backend: create spotlight post
-const createSpotLightPost = async (
-  postData: any,
-  apiBaseUrl: string = "https://scoutflair.top",
-  authToken?: string
-) => {
-  try {
-    const response = await fetch(`${apiBaseUrl}/api/v1/spotLights/addPost`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      },
-      body: JSON.stringify(postData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error("Error creating post:", error);
-    throw error;
-  }
-};
-
-// ✅ Helper: upload file to backend
-const uploadFile = async (
-  file: File,
-  apiBaseUrl: string = "https://scoutflair.top",
-  authToken?: string
-) => {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  try {
-    const response = await fetch(`${apiBaseUrl}/api/v1/upload`, {
-      // 👆 confirm in Swagger if this is correct
-      method: "POST",
-      body: formData,
-      headers: {
-        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Upload failed! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result.data?.url || result.url;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    throw error;
-  }
-};
 
 export default function PostBox({
   onCreatePost,
-  apiBaseUrl = "https://scoutflair.top",
+  cloudName,
+  uploadPreset,
   authToken,
 }: PostBoxProps) {
   const [text, setText] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<ImageItem[]>([]);
   const [selectedVideos, setSelectedVideos] = useState<VideoItem[]>([]);
   const [isPosting, setIsPosting] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -192,71 +136,60 @@ export default function PostBox({
     event.target.value = "";
   };
 
-  // ✅ Create post
+  // Cloudinary upload helper
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error("Cloudinary upload failed");
+    const data = await res.json();
+    return data.secure_url;
+  };
+
+  // Handle post creation
   const handlePost = async () => {
-    if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) {
-      return;
-    }
+    if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) return;
 
     setIsPosting(true);
-
     try {
       const uploadedUrls: string[] = [];
 
       for (const image of selectedImages) {
-        try {
-          const uploadedUrl = await uploadFile(image.file, apiBaseUrl, authToken);
-          uploadedUrls.push(uploadedUrl);
-        } catch (error) {
-          console.error("Failed to upload image:", error);
-        }
+        const url = await uploadToCloudinary(image.file);
+        uploadedUrls.push(url);
       }
 
       for (const video of selectedVideos) {
-        try {
-          const uploadedUrl = await uploadFile(video.file, apiBaseUrl, authToken);
-          uploadedUrls.push(uploadedUrl);
-        } catch (error) {
-          console.error("Failed to upload video:", error);
-        }
+        const url = await uploadToCloudinary(video.file);
+        uploadedUrls.push(url);
       }
 
-      // ✅ Backend requires { text, mediaUrls }
-      const postData = {
-        text: text.trim(),
-        mediaUrls: uploadedUrls,
+      const newPost: Post = {
+        id: Date.now().toString(),
+        user: { name: "You", avatar: "/images/profile.jpeg", timeAgo: "Just now" },
+        content: text.trim(),
+        image: uploadedUrls.length === 1 ? uploadedUrls[0] : uploadedUrls,
+        likes: 0,
+        isLiked: false,
+        comments: 0,
+        shares: 0,
+        likedBy: [],
       };
 
-      const backendResponse = await createSpotLightPost(postData, apiBaseUrl, authToken);
+      if (onCreatePost) await onCreatePost(newPost);
 
-      if (onCreatePost && (backendResponse.code === 200 || backendResponse.code === "200")) {
-        const newPost: Post = {
-          id: backendResponse.data?.obj?.id || Date.now().toString(),
-          user: {
-            name: "You",
-            avatar: "/images/profile.jpeg",
-            timeAgo: "Just now",
-          },
-          content: text.trim(),
-          image: uploadedUrls.length === 1 ? uploadedUrls[0] : uploadedUrls,
-          likes: 0,
-          isLiked: false,
-          comments: 0,
-          shares: 0,
-          likedBy: [],
-        };
-
-        await onCreatePost(newPost);
-      }
-
-      // Reset
       setText("");
       setSelectedImages([]);
       setSelectedVideos([]);
-      console.log("✅ Post created successfully!", backendResponse);
     } catch (error) {
-      console.error("❌ Error creating post:", error);
-      alert("Failed to create post. Please try again.");
+      console.error(error);
+      alert("Failed to upload files to Cloudinary.");
     } finally {
       setIsPosting(false);
     }
