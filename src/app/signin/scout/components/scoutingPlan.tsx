@@ -42,7 +42,7 @@ export default function ScoutingPlan() {
       {/* Scout Profile */}
       <div className="flex items-center mb-6">
         <img src="/images/scdp.png" alt="Joshua Fayomi" className="rounded-full mr-3 w-10 h-10 object-cover" />
-        <p className="text-sm font-medium text-gray-800">Joshua Fayomi</p>
+        <p className="text-sm font-medium text-gray-800">Dave Ishmael</p>
       </div>
 
       {/* Player Cards */}

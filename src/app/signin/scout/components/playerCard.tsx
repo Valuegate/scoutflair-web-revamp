@@ -23,21 +23,26 @@ const PlayerCard: FC<PlayerCardProps> = ({
   image,
 }) => {
   return (
-    <div className="max-w-[337px] bg-white rounded-2xl shadow-md flex overflow-hidden">
+    <div className="max-w-[350px] bg-white  gap-1 rounded-2xl border border-1 shadow-md flex overflow-hidden">
       {/* Player Image */}
-      <div className="relative p-2 w-[122px] h-[133px] ">
+      <div className="relative top  mt-4 w-[122px] h-[145px] rounded-[8px] mx-2">
         <Image
+       fill
+       
           src={image}
           alt={`${surname} ${name}`}
-          fill
+        
+         
           className="object-cover"
+
+       
         />
       </div>
 
       {/* Right Side - Player Info */}
-      <div className="flex-1   p-4 flex flex-col justify-between">
+      <div className="flex-1  p-4 flex flex-col justify-between max-w-[140px]  ">
         {/* Name and Number */}
-        <div className="flex justify-between items-start">
+        <div className="flex gap-16">
           <div>
             <h2 className="text-sm text-gray-700">{name}</h2>
             <h1 className="text-lg font-bold uppercase">{surname}</h1>
@@ -46,7 +51,7 @@ const PlayerCard: FC<PlayerCardProps> = ({
         </div>
 
         {/* Info Section */}
-        <div className="mt-2 text-xs text-gray-700 space-y-1">
+        <div className="mt-2 text-xs  text-gray-700 ">
           <p>
             <span className="font-medium">Age</span> {age}
           </p>
@@ -60,14 +65,16 @@ const PlayerCard: FC<PlayerCardProps> = ({
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 mt-3">
-          <button className="px-5 py-1 border border-orange-400 text-orange-400 rounded-full text-sm hover:bg-orange-400 hover:text-white transition">
-            Reports
-          </button>
-          <button className="px-5 py-1 border border-orange-400 text-orange-400 rounded-full text-sm hover:bg-orange-400 hover:text-white transition">
-            Statistics
-          </button>
-        </div>
+<div className="flex gap-3 mt-3 justify-start">
+  <button className="flex items-start px-1 py-1 border border-orange-400 rounded-full text-sm hover:bg-orange-400 hover:text-white transition">
+    Reports
+  </button>
+  <button className="flex items-start px-1 py-1 border border-orange-400  rounded-full text-sm hover:bg-orange-400 hover:text-white transition">
+    Statistics
+  </button>
+</div>
+
+
       </div>
     </div>
   );

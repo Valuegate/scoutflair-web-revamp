@@ -1,3 +1,5 @@
+
+import { AllPlayersIcon, FilterIcon } from "../ScoutIcons";
 import PlayerCard from "./playerCard";
 
 export default function AllPlayers() {
@@ -9,7 +11,8 @@ export default function AllPlayers() {
     flag: "🇳🇬",
     position: "Midfielder",
     number: 3,
-    image: "/player.png", // place the image inside public/player.png
+    image: "/images/allpone.png",
+    
   });
 
   return (
@@ -17,15 +20,20 @@ export default function AllPlayers() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-semibold flex items-center gap-2">
-          <span>👥</span> All Players
+          <span><AllPlayersIcon/></span> All Players
         </h1>
-        <button className="px-4 py-2 border rounded-lg shadow-sm hover:bg-gray-100">
-          Filter
-        </button>
+      <div>
+  <button className="flex items-center gap-2 px-4 py-2 border rounded-lg shadow-sm hover:bg-gray-100">
+    <FilterIcon  />
+    <span className="text-gray-500">Filter</span>
+  </button>
+</div>
+
+       
       </div>
 
       {/* Grid of Players */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 xl:grid-cols-2 gap-6">
         {players.map((player, idx) => (
           <PlayerCard key={idx} {...player} />
         ))}
