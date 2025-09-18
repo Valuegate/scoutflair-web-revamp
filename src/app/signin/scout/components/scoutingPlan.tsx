@@ -51,6 +51,7 @@ export default function ScoutingPlan() {
           <div key={i} className="bg-[rgba(255,250,250,1)] max-w-[151px] rounded-lg p-3 text-center border border-gray-300">
             <div className="flex justify-center items-center gap-2 text-xs font-medium text-green-600 mb-2">
               {player.club} <NaijaImg/>
+              
             </div>
             <img
               src={player.image}
