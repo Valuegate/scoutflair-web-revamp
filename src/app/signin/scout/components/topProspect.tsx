@@ -1,43 +1,41 @@
 import { ProspectsIcon } from "../ScoutIcons";
 
-export default function TopProspects() {
-  const prospects = [
+
+const prospects = [
     { name: "Tobi Irefin", details: "10 G/A", image: "/images/prosimgone.png" },
     { name: "Tobi Irefin", details: "10 G/A", image: "/images/prosimgtwo.png" },
     { name: "Tobi Irefin", details: "10 G/A", image: "/images/prosimgthree.png" },
   ];
-
+  export default function TopProspects() {
   return (
-    <div className="bg-white rounded-xl shadow-md p-2 max-w-[350px] max-w-sm sm:max-w-md lg:max-w-lg max-h-[145px]">
-      {/* Header with title and icon */}
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold text-gray-800">Top Prospects</h3>
-        <ProspectsIcon />
+    <div className="bg-white rounded-[12px] shadow-md p-3 w-full sm:max-w-[350px] h-[145px]">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-sm sm:text-base font-semibold text-gray-800">
+          Top Prospects
+        </h3>
+        <ProspectsIcon  />
       </div>
 
-      {/* Prospects container */}
-      <div className="flex flex-row sm:flex-row justify-between items-center  gap-3 sm:gap-0">
+      {/* Prospects */}
+      <div className="flex justify-between items-center gap-2">
         {prospects.map((prospect, i) => (
           <div
             key={i}
-            className="text-center bg-[rgba(255,250,250,1)] flex-1  rounded-md"
+            className="flex-1 text-center bg-[rgba(255,250,250,1)] rounded-md py-2"
           >
             <img
               src={prospect.image}
               alt={prospect.name}
-              className="rounded-full mx-auto mb-1 w-12 h-12 object-cover"
+              className="rounded-full mx-auto mb-1 w-9 h-9 object-cover"
             />
-            <p className="text-xs font-medium text-gray-800 leading-tight whitespace-nowrap">
+            <p className="text-xs font-medium text-gray-800 leading-tight truncate">
               {prospect.name}
             </p>
-            <p className="text-xs text-gray-500">{prospect.details}</p>
+            <p className="text-[10px] text-gray-500">{prospect.details}</p>
           </div>
         ))}
       </div>
     </div>
   );
 }
-
-
-
-

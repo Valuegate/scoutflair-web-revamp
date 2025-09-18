@@ -1,4 +1,3 @@
-import { Image } from "lucide-react"
 import { NaijaImg } from "../ScoutIcons"
 
 
@@ -11,7 +10,7 @@ interface PlayerData  {
     cm:number,
     lb:string,
     image:string,
-    id:string
+    id:string,
 }
 
 const playersData : PlayerData [] = [
@@ -35,7 +34,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200",
-         image:"/images/avaplone.png",
+         image:"/images/avaptwo.png",
           id:"2"
 
     },
@@ -47,7 +46,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapthree.png",
         id:"3"
 
     },
@@ -59,7 +58,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapfour.png",
         id:"3"
 
     },
@@ -71,7 +70,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapsix.png",
         id:"3"
 
     },
@@ -83,7 +82,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapfive.png",
         id:"3"
 
     },
@@ -107,7 +106,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200",
-         image:"/images/avaplone.png",
+         image:"/images/avaptwo.png",
           id:"2"
 
     },
@@ -119,7 +118,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapthree.png",
         id:"3"
 
     },
@@ -131,7 +130,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avaptwo.png",
         id:"3"
 
     },
@@ -143,7 +142,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapseven.png",
         id:"3"
 
     },
@@ -155,7 +154,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapsix.png",
         id:"3"
 
     },
@@ -179,7 +178,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200",
-         image:"/images/avaplone.png",
+         image:"/images/two.png",
           id:"2"
 
     },
@@ -191,7 +190,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapthree.png",
         id:"3"
 
     },
@@ -203,7 +202,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapfour.png",
         id:"3"
 
     },
@@ -215,7 +214,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapseven.png",
         id:"3"
 
     },
@@ -239,7 +238,7 @@ const playersData : PlayerData [] = [
         countryFlag: "naij",
         cm:64,
         lb:"200 ",
-         image:"/images/avaplone.png",
+         image:"/images/avaptwo.png",
           id:"1"
 
     },
@@ -251,7 +250,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200",
-         image:"/images/avaplone.png",
+         image:"/images/avapthree.png",
           id:"2"
 
     },
@@ -263,7 +262,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"",
+        image:"/images/avapfour.png",
         id:"3"
 
     },
@@ -275,7 +274,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapfive.png",
         id:"3"
 
     },
@@ -287,7 +286,7 @@ const playersData : PlayerData [] = [
         countryFlag: "",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapthree.png",
         id:"3"
 
     },
@@ -296,64 +295,60 @@ const playersData : PlayerData [] = [
         position:"SadManutdFan",
         number: 23,
         AGE:"34 years",
-        countryFlag: "",
+        countryFlag:"",
         cm:64,
         lb:"200 ",
-        image:"/images/avaplone.png",
+        image:"/images/avapfour.png",
         id:"3"
 
     },
 ]
 
 
+export default function Players() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+      {playersData.map((player, i) => (
+        <div
+          key={i}
+          className="bg-white shadow rounded-[8px] flex gap-4 p-4 items-center"
+        >
+          {/* img container */}
+          <div className="flex-shrink-0">
+            <img
+              src={player.image}
+              alt={player.name}
+              className="rounded-full w-24 h-24 object-cover border-2 border-orange-300"
+            />
+          </div>
 
-export default function Players(){
-    return(
-        <div className=" grid grid-cols-3  "> 
-         {playersData.map((player, i) => (
-            <div key={i} className="  gap-8  ">
-               <div  className="bg-white gap-8 m-2 p-2 shadow w-[350px] h-[160px] rounded-[8px] m-2 flex  justify-between "> 
-                {/* img container */}
-                <div className="w-[140px] h-[120px]   ">
-                <img
-                src={player.image}
-                alt={player.name}
-                className="rounded-[100px] w-[120px]  h-[120px] object-cover  ml-3 mt-3 border-2 border-orange-300 "
-                />
-                </div>
-                  {/* player details container */}
-                <div className="bg-gray-purple-300  w-[160px] h-[120px]   mt-4">
-                <div  className="flex   justify-between">  
-                    <h1 className="text-lg font-bold">{player.name}</h1>
-                    <div className="pt-2 pr-2">
-                        <NaijaImg/>
-                    </div>
-                   
-                </div>
-                  <div  className="flex  gap-1">  
-                    <h1 className="text-gray-600 text-xs">{player.position},</h1>
-                    <h1 className="text-gray-600 text-xs"> No. {player.number}</h1>
-                </div>
-                <div>
-                  <h1 className="text-gray-700 ">AGE: {player.AGE}</h1>  
-                </div>
-                <div className="flex gap-1">
-                  <h1 className="text-gray-600 text-xs ">{player.cm}cm</h1>  
-                    <h1 className="text-gray-600 text-xs ">{player.lb}lb</h1>  
-                </div>
-                <div className=" border border-2 rounded-[20px] border-orange-300 w-[110px] h-[30px] mt-2">
-                  <button className="">
-                    <h1 className="text-gray-600  text-sm pl-3">
-                      View profile
-                    </h1>
-                    </button>  
-                </div>
-                </div>
-               
-               </div>
-               
-                 </div> 
-         ))}
+          {/* player details container */}
+          <div className="flex-1">
+            <div className="flex justify-between items-start">
+              <h1 className="text-base sm:text-lg font-bold">{player.name}</h1>
+              <div className="pt-1">
+                <NaijaImg />
+              </div>
+            </div>
+
+            <div className="flex gap-1 flex-wrap text-xs text-gray-600">
+              <span>{player.position},</span>
+              <span>No. {player.number}</span>
+            </div>
+
+            <p className="text-sm text-gray-700">AGE: {player.AGE}</p>
+
+            <div className="flex gap-2 text-xs text-gray-600">
+              <span>{player.cm}cm</span>
+              <span>{player.lb}lb</span>
+            </div>
+
+            <button className="mt-2 border border-orange-300 rounded-full px-3 py-1 text-xs text-gray-600 hover:bg-orange-50 transition">
+              View profile
+            </button>
+          </div>
         </div>
-    )
+      ))}
+    </div>
+  );
 }

@@ -3,7 +3,6 @@ import AllPlayers from "../../components/allPlayers";
 import StatsCard from "../../components/statsCard";
 import TopProspects from "../../components/topProspect";
 import ScoutsBadges from "../../components/scoutBadges";
-import Updates from "../../components/updates";
 import ActivityFeed from "../../components/activityFeed";
 
 export default function Evaluation() {

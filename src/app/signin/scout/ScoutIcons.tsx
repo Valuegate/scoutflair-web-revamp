@@ -228,8 +228,15 @@ const AllPlayersFilter = () => {
       <path d="M2.8125 0.3125C0.948656 0.3125 0 1.69766 0 3.40625V9.59375C0 11.3023 0.948656 12.6875 2.8125 12.6875H6.1875V0.3125H2.8125ZM15.1875 0.3125H11.8125V12.6875H15.1875C17.0513 12.6875 18 11.3023 18 9.59375V3.40625C18 1.69766 17.0513 0.3125 15.1875 0.3125Z" fill="#128807"/>
     </svg>
   );
+ const ArrowBack = () => {
+    return(
+        <svg width="22" height="22" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6.888 4.18442L6.888 6.7085L12.2051 6.7085L12.2051 7.29183L6.88799 7.29183L6.88799 9.81592L2.457 7.00017L6.888 4.18442Z" fill="#222222"/>
+</svg>
 
+    )
+ }
 export {AcademiesIcon, LocalPitchIcon, LogOutIcons, SettingsIcon,
          MatchesIcon, PlayersIcon, EvaluationIcons,
          OverViewIcon, UpdatesIcon, ScoutplanIcon, StarsIcon,
-         ProspectsIcon, CupStarIcon, EmojiPhoto, StarsIconOutline, AllPlayersIcon,FilterIcon, AllPlayersFilter, NaijaImg};
+         ProspectsIcon, CupStarIcon, EmojiPhoto, StarsIconOutline, AllPlayersIcon,FilterIcon, AllPlayersFilter, NaijaImg, ArrowBack};

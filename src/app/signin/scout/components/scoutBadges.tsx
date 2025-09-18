@@ -1,25 +1,27 @@
 
-
 export default function ScoutsBadges() {
   return (
-    <div className="bg-white rounded-[12px] max-w-[350px] h-[145px] shadow-md p-2">
-      <h3 className="text-lg font-semibold mb-3 text-gray-800">Scout's Badges</h3>
-      <div className="flex justify-between   gap-2">
-        <div className="bg-white rounded-[4px] h-[84px] flex-1 shadow-md flex flex-col justify-center items-center">
-          <p className="text-xs text-gray-600 mb-1">Experience</p>
-          <p className="text-2xl font-bold text-gray-900 mb-1">00</p>
-          <p className="text-xs text-red-500 font-medium">Professional</p>
-        </div>
-        <div className="bg-white rounded-[4px] h-[84px] flex-1 shadow-md flex flex-col justify-center items-center">
-          <p className="text-xs text-gray-600 mb-1">Transfers</p>
-          <p className="text-2xl font-bold text-gray-900 mb-1">00</p>
-          <p className="text-xs text-green-500 font-medium">Successful</p>
-        </div>
-        <div className="bg-white rounded-[4px] h-[84px] flex-1 shadow-md  flex flex-col justify-center items-center">
-          <p className="text-xs text-gray-600 mb-1">Accuracy</p>
-          <p className="text-2xl font-bold text-gray-900 mb-1">00</p>
-          <p className="text-xs text-blue-500 font-medium">Scouting</p>
-        </div>
+    <div className="bg-white rounded-[12px] shadow-md p-3 w-full sm:max-w-[350px] h-[145px]">
+      <h3 className="text-sm sm:text-base font-semibold mb-2 text-gray-800">
+        Scout&apos;s Badges
+      </h3>
+
+      <div className="flex justify-between gap-2 h-[calc(100%-32px)]">
+        {/* Each Badge */}
+        {[
+          { label: "Experience", value: "00", status: "Professional", color: "text-red-500" },
+          { label: "Transfers", value: "00", status: "Successful", color: "text-green-500" },
+          { label: "Accuracy", value: "00", status: "Scouting", color: "text-blue-500" },
+        ].map((badge, i) => (
+          <div
+            key={i}
+            className="bg-white rounded-md flex-1 shadow-md flex flex-col justify-center items-center py-2"
+          >
+            <p className="text-[11px] text-gray-600">{badge.label}</p>
+            <p className="text-lg sm:text-xl font-bold text-gray-900">{badge.value}</p>
+            <p className={`text-[11px] font-medium ${badge.color}`}>{badge.status}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
