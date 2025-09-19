@@ -1,5 +1,26 @@
+
+import AddTaskForm from './addNewTask';
 import { Star } from "lucide-react";
+import { useState } from 'react';
+
 export default function ScoutingPlan() {
+   const [showModal, setShowModal] = useState(false);
+
+  const handleAddTaskClick = () => {
+    setShowModal(true);
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+  };
+
+  const handleSave = (formData : any) => {
+    // Handle the saved data here
+    console.log('Saved data:', formData);
+    // You can make API calls, update state, etc.
+    setShowModal(false);
+  };
+
   const players = [
     { club: "Scoutflair FC", name: "Denis Chuks", position: "Midfielder", height: 178, weight: 69, games: 50, assists: 15, goals: 5, image:"/images/scoutplanone.png"},
     { club: "Scoutflair FC", name: "Abubakar Kabir", position: "Midfielder", height: 178, weight: 69, games: 50, assists: 15, goals: 5 , image:"/images/scoutplantwo.png"},
@@ -33,9 +54,18 @@ export default function ScoutingPlan() {
           </span>
           Scouting Plan
         </h3>
-        <button className="text-gray-900 border border-black font-semibold px-3 py-2 rounded-md text-xs sm:text-sm hover:bg-blue-700 hover:text-white transition">
+       
+       
+        <button    onClick={handleAddTaskClick} className="text-gray-900 border border-black font-semibold px-3 py-2 rounded-md text-xs sm:text-sm hover:bg-blue-700 hover:text-white transition">
           Add Task
         </button>
+        
+         {showModal && (
+        <AddTaskForm 
+          onCancel={handleCancel}
+          onSave={handleSave}
+        />
+      )}
       </div>
 
       {/* Scout Profile */}
@@ -48,7 +78,7 @@ export default function ScoutingPlan() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
         {players.map((player, i) => (
           <div key={i} className="bg-[rgba(255,250,250,1)] w-full sm:max-w-[151px] rounded-lg p-2 sm:p-3 text-center border border-gray-300">
-            <div className="flex justify-center items-center gap-1 text-[10px] sm:text-xs font-medium text-green-600 mb-2">
+            <div key={i} className="flex justify-center items-center gap-1 text-[10px] sm:text-xs font-medium text-green-600 mb-2">
               {player.club} <NaijaImg/>
             </div>
             <img
