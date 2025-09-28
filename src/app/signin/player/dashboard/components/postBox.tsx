@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef } from "react";
 import { VideoIcon } from "./spotIcons";
+import { uploadFileToR2 } from "@/lib/utils";
 
-// Mock icon components - replace with your actual icons if needed
 const OutlinePhoto = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
@@ -65,17 +65,9 @@ interface VideoItem {
 
 interface PostBoxProps {
   onCreatePost?: (post: Post) => Promise<void>;
-  cloudName: string;
-  uploadPreset: string;
-  authToken?: string;
 }
 
-export default function PostBox({
-  onCreatePost,
-  cloudName,
-  uploadPreset,
-  authToken,
-}: PostBoxProps) {
+export default function PostBox({ onCreatePost }: PostBoxProps) {
   const [text, setText] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<ImageItem[]>([]);
   const [selectedVideos, setSelectedVideos] = useState<VideoItem[]>([]);
@@ -99,7 +91,7 @@ export default function PostBox({
           if (typeof url === "string") {
             const newImage: ImageItem = {
               id: Date.now() + Math.random(),
-              file: file,
+              file,
               url,
               source,
             };
@@ -123,7 +115,7 @@ export default function PostBox({
           if (typeof url === "string") {
             const newVideo: VideoItem = {
               id: Date.now() + Math.random(),
-              file: file,
+              file,
               url,
               name: file.name,
             };
@@ -136,22 +128,6 @@ export default function PostBox({
     event.target.value = "";
   };
 
-  // Cloudinary upload helper
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) throw new Error("Cloudinary upload failed");
-    const data = await res.json();
-    return data.secure_url;
-  };
-
   // Handle post creation
   const handlePost = async () => {
     if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) return;
@@ -161,12 +137,12 @@ export default function PostBox({
       const uploadedUrls: string[] = [];
 
       for (const image of selectedImages) {
-        const url = await uploadToCloudinary(image.file);
+        const { url } = await uploadFileToR2(image.file);
         uploadedUrls.push(url);
       }
 
       for (const video of selectedVideos) {
-        const url = await uploadToCloudinary(video.file);
+        const { url } = await uploadFileToR2(video.file);
         uploadedUrls.push(url);
       }
 
@@ -189,7 +165,7 @@ export default function PostBox({
       setSelectedVideos([]);
     } catch (error) {
       console.error(error);
-      alert("Failed to upload files to Cloudinary.");
+      alert("Failed to upload files to R2.");
     } finally {
       setIsPosting(false);
     }
@@ -201,13 +177,13 @@ export default function PostBox({
 
   return (
     <div className="bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
+      {/* ✅ UI unchanged */}
       <div className="flex h-auto items-center space-x-2 sm:space-x-3">
         <img
           src="/images/profile.jpeg"
           alt="User avatar"
           className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
         />
-
         <div className="flex-1 flex items-center bg-gray-100 rounded-lg px-2 sm:px-3 min-w-0">
           <input
             type="text"
@@ -216,7 +192,6 @@ export default function PostBox({
             placeholder="What's happening?"
             className="flex-1 bg-transparent outline-none py-2 text-sm sm:text-base text-gray-700 placeholder-gray-500 min-w-0"
           />
-
           <div className="flex items-center flex-shrink-0">
             <button
               onClick={() => cameraInputRef.current?.click()}
@@ -244,7 +219,6 @@ export default function PostBox({
             </button>
           </div>
         </div>
-
         <button
           onClick={handlePost}
           disabled={!canPost}
@@ -258,6 +232,7 @@ export default function PostBox({
         </button>
       </div>
 
+      {/* ✅ Preview selected media stays same */}
       {(selectedImages.length > 0 || selectedVideos.length > 0) && (
         <div className="mt-3 ml-10 sm:ml-12">
           <div className="flex flex-wrap gap-2">
