@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export async function uploadFileToR2(file: File): Promise<{ url: string; fileKey: string }> {
   // Get token using the correct key that matches your other components
   const token = localStorage.getItem("authToken");
-  console.log("Token exists:", !!token);
+
   
   if (!token) {
     console.error("No authToken found in localStorage");
@@ -36,9 +36,7 @@ export async function uploadFileToR2(file: File): Promise<{ url: string; fileKey
       body: JSON.stringify(body),
     });
 
-    console.log("Response status:", res.status);
-    console.log("Response statusText:", res.statusText);
-    console.log("Response headers:", Object.fromEntries(res.headers.entries()));
+    
 
     if (!res.ok) {
       console.error("=== PRESIGNED URL FAILED ===");
