@@ -167,7 +167,7 @@ const SocialFeed: React.FC = () => {
     setPosts(posts.map(post => post.id === postId ? { ...post, shares: post.shares + 1 } : post));
   };
 
-  // PostCard component
+
 // PostCard component
 const PostCard: React.FC<{ post: Post }> = ({ post }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -239,13 +239,13 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
         <video
           src={media[0]}
           controls
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
       ) : (
         <LazyImage
           src={media[0]}
           alt="Post media"
-          className="w-full h-full object-cover rounded"
+          className="w-full h-full object-contain rounded"
         />
       )}
     </div>
@@ -268,7 +268,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
             key={`${post.id}-media-${idx}`}
             src={url}
             controls
-            className={`w-full h-full object-cover ${
+            className={`w-full h-full object-contain ${
               media.length === 3 && idx === 0 ? "row-span-2" : ""
             }`}
           />
@@ -277,7 +277,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
             key={`${post.id}-media-${idx}`}
             src={url}
             alt={`Post media ${idx + 1}`}
-            className={`w-full h-full object-cover ${
+            className={`w-full h-full object-contain ${
               media.length === 3 && idx === 0 ? "row-span-2" : ""
             }`}
           />
@@ -296,7 +296,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
               key={`${post.id}-liked-${i}`}
               src={av}
               alt="Liked by"
-              className="w-6 h-6 rounded-full border-2 border-white object-cover"
+              className="w-6 h-6 rounded-full border-2 border-white object-contain"
             />
           ))}
         </div>
