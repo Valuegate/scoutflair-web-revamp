@@ -6,10 +6,6 @@ import { SendIcon } from './spotIcons';
 import { useRouter } from "next/navigation";
 import PostBox from './postBox';
 
-
-
-
-
 // LazyImage Component
 const LazyImage: React.FC<{ src: string; alt: string; className: string }> = ({ src, alt, className }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +18,7 @@ const LazyImage: React.FC<{ src: string; alt: string; className: string }> = ({ 
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative overflow-hidden rounded-lg ${className}`}>
       {isLoading && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
           <div className="text-gray-400">
@@ -33,7 +29,7 @@ const LazyImage: React.FC<{ src: string; alt: string; className: string }> = ({ 
       <img
         src={src}
         alt={alt}
-        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 ${className}`}
         onLoad={handleLoad}
         onError={handleError}
         loading="lazy"
@@ -56,7 +52,6 @@ interface Post {
   likedBy: string[];
 }
 
-
 // Mock icons
 const HeartIcon = () => <Heart size={20} />;
 const CommentIcon = () => <MessageCircle size={20} />;
@@ -66,15 +61,8 @@ const OutlinePhoto = () => <Image size={16} />;
 const EmojiPhoto = () => <Smile size={16} />;
 
 const SocialFeed: React.FC = () => {
-
-
-
-
   const [posts, setPosts] = useState<Post[]>([]);
   const [token, setToken] = useState<string | null>(null);
-  const [isAddingComment, setIsAddingComment] = useState(false);
-
-
   
   const router = useRouter();
   const currentUserAvatar = "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=24&h=24&fit=crop&crop=face";
@@ -167,15 +155,24 @@ const SocialFeed: React.FC = () => {
     setPosts(posts.map(post => post.id === postId ? { ...post, shares: post.shares + 1 } : post));
   };
 
+  return (
+    <div>
+      {token && <PostBox onCreatePost={handleCreatePost}   />}
+      {posts.map(post => <PostCard key={post.id} post={post} currentUserAvatar={currentUserAvatar} handleAddComment={handleAddComment} handleLike={handleLike} handleShare={handleShare} />)}
+    </div>
+  );
+};
 
 // PostCard component
-const PostCard: React.FC<{ post: Post }> = ({ post }) => {
+const PostCard: React.FC<{ post: Post; currentUserAvatar: string; handleAddComment: (postId: string) => void; handleLike: (postId: string) => void; handleShare: (postId: string) => void }> = ({ post, currentUserAvatar, handleAddComment, handleLike, handleShare }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [commentText, setCommentText] = useState('');
   const [showComments, setShowComments] = useState(false);
   const [postComments, setPostComments] = useState<
     Array<{ id: string; user: string; avatar: string; text: string; timeAgo: string }>
   >([]);
+  const [isAddingComment, setIsAddingComment] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const handleSendComment = () => {
     if (commentText.trim()) {
@@ -190,12 +187,14 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
       handleAddComment(post.id);
       setCommentText('');
       setShowComments(true);
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000); // Hide message after 3 seconds
     }
   };
 
   const toggleComments = () => setShowComments(!showComments);
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendComment();
     }
@@ -215,7 +214,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
         <img
           src={post.user.avatar}
           alt={post.user.name}
-          className="w-9 h-9 rounded object-cover"
+          className="w-9 h-9 rounded-full object-cover"
         />
         <div className="flex-1">
           <h3 className="font-semibold text-gray-900 text-lg">
@@ -245,42 +244,41 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
         <LazyImage
           src={media[0]}
           alt="Post media"
-          className="w-full h-full object-contain rounded"
+          className="w-full h-full object-contain"
         />
       )}
     </div>
   ) : (
     <div
-      className={`grid gap-1 w-full ${
+      className={`grid gap-0.5 w-full ${
         media.length === 2
-          ? "grid-cols-2 h-80"
+          ? "grid-cols-2 h-96"
           : media.length === 3
-          ? "grid-cols-2 grid-rows-2 h-80"
+          ? "grid-cols-2 grid-rows-2 h-96"
           : media.length === 4
-          ? "grid-cols-2 grid-rows-2 h-100"
+          ? "grid-cols-2 grid-rows-2 h-96"
           : "grid-cols-1 h-96"
       }`}
     >
       {media.map((url, idx) => {
         const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
-        return isVideo ? (
-          <video
-            key={`${post.id}-media-${idx}`}
-            src={url}
-            controls
-            className={`w-full h-full object-contain ${
-              media.length === 3 && idx === 0 ? "row-span-2" : ""
-            }`}
-          />
-        ) : (
-          <LazyImage
-            key={`${post.id}-media-${idx}`}
-            src={url}
-            alt={`Post media ${idx + 1}`}
-            className={`w-full h-full object-contain ${
-              media.length === 3 && idx === 0 ? "row-span-2" : ""
-            }`}
-          />
+        const spanClass = media.length === 3 && idx === 0 ? "row-span-2" : "";
+        return (
+          <div key={`${post.id}-media-${idx}`} className={`relative overflow-hidden rounded-lg ${spanClass}`}>
+            {isVideo ? (
+              <video
+                src={url}
+                controls
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <LazyImage
+                src={url}
+                alt={`Post media ${idx + 1}`}
+                className="w-full h-full object-contain"
+              />
+            )}
+          </div>
         );
       })}
     </div>
@@ -296,7 +294,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
               key={`${post.id}-liked-${i}`}
               src={av}
               alt="Liked by"
-              className="w-6 h-6 rounded-full border-2 border-white object-contain"
+              className="w-6 h-6 rounded-full border-2 border-white object-cover"
             />
           ))}
         </div>
@@ -373,7 +371,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
             className="bg-gray-100 w-full h-10 px-4 py-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             ref={inputRef}
           />
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
@@ -390,7 +388,10 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
         </div>
         <button
           className="bg-[rgba(10,40,80,1)] w-10 h-9 flex items-center justify-center rounded hover:bg-blue-700 transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={handleSendComment}
+          onClick={(e) => {
+            e.preventDefault();
+            handleSendComment();
+          }}
           type="button"
           disabled={isAddingComment || !commentText.trim()}
         >
@@ -401,14 +402,9 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
           )}
         </button>
       </div>
-    </div>
-  );
-};
-
-  return (
-    <div>
-      {token && <PostBox onCreatePost={handleCreatePost}   />}
-      {posts.map(post => <PostCard key={post.id} post={post} />)}
+      {showSuccessMessage && (
+        <p className="text-green-500 text-sm mt-2 text-center">Comment sent!</p>
+      )}
     </div>
   );
 };

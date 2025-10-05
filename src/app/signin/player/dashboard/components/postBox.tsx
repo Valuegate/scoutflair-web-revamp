@@ -130,46 +130,72 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
 
   // Handle post creation
   const handlePost = async () => {
-    if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) return;
+  if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) return;
 
-    setIsPosting(true);
-    try {
-      const uploadedUrls: string[] = [];
+  setIsPosting(true);
+  try {
+    const fileKeys: string[] = [];
+    const mediaUrls: string[] = [];
 
-      for (const image of selectedImages) {
-        const { url } = await uploadFileToR2(image.file);
-        uploadedUrls.push(url);
-      }
-
-      for (const video of selectedVideos) {
-        const { url } = await uploadFileToR2(video.file);
-        uploadedUrls.push(url);
-      }
-
-      const newPost: Post = {
-        id: Date.now().toString(),
-        user: { name: "You", avatar: "/images/profile.jpeg", timeAgo: "Just now" },
-        content: text.trim(),
-        image: uploadedUrls.length === 1 ? uploadedUrls[0] : uploadedUrls,
-        likes: 0,
-        isLiked: false,
-        comments: 0,
-        shares: 0,
-        likedBy: [],
-      };
-
-      if (onCreatePost) await onCreatePost(newPost);
-
-      setText("");
-      setSelectedImages([]);
-      setSelectedVideos([]);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to upload files to R2.");
-    } finally {
-      setIsPosting(false);
+    for (const image of selectedImages) {
+      const { url, fileKey } = await uploadFileToR2(image.file);
+      fileKeys.push(fileKey);
+      mediaUrls.push(url); // for displaying immediately in UI
     }
-  };
+
+    for (const video of selectedVideos) {
+      const { url, fileKey } = await uploadFileToR2(video.file);
+      fileKeys.push(fileKey);
+      mediaUrls.push(url);
+    }
+
+    const token = localStorage.getItem("authToken");
+    if (!token) throw new Error("No token found, please login again");
+
+    // ✅ Create the post in backend
+    const res = await fetch("https://scoutflair.top/api/v1/spotLights/addPost", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        text: text.trim(),
+        mediaFileKeys: fileKeys,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Failed to create post: ${errText}`);
+    }
+
+    const response = await res.json();
+    const savedPost = {
+      id: response.data?.obj?.id ?? Date.now().toString(), // use backend id if available
+      user: { name: "You", avatar: "/images/profile.jpeg", timeAgo: "Just now" },
+      content: text.trim(),
+      image: mediaUrls.length === 1 ? mediaUrls[0] : mediaUrls,
+      likes: 0,
+      isLiked: false,
+      comments: 0,
+      shares: 0,
+      likedBy: [],
+    };
+
+    if (onCreatePost) await onCreatePost(savedPost);
+
+    setText("");
+    setSelectedImages([]);
+    setSelectedVideos([]);
+  } catch (error) {
+    console.error(error);
+    alert("Failed to create post.");
+  } finally {
+    setIsPosting(false);
+  }
+};
+
 
   const canPost =
     (text.trim() || selectedImages.length > 0 || selectedVideos.length > 0) &&
