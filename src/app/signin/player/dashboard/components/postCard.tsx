@@ -173,6 +173,7 @@ const PostCard: React.FC<{ post: Post; currentUserAvatar: string; handleAddComme
   >([]);
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleSendComment = () => {
     if (commentText.trim()) {
@@ -206,6 +207,69 @@ const PostCard: React.FC<{ post: Post; currentUserAvatar: string; handleAddComme
   : post.image
   ? [post.image]
   : [];
+
+  // Share handling
+  const rawId = post.id.split('-')[1]; // Extract backend ID
+  const shareUrl = `https://scoutflair.top/post/${rawId}`; // Adjust this to your actual post URL structure
+  const shareText = post.content ? `${post.content.substring(0, 100)}...` : 'Check out this post!';
+
+  const handleShareClick = async () => {
+    const shareData = {
+      title: 'Check out this post!',
+      text: shareText,
+      url: shareUrl,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        handleShare(post.id);
+      } catch (err) {
+        console.error('Share failed:', err);
+        setShowShareModal(true); // Fallback to modal if native share fails
+      }
+    } else {
+      setShowShareModal(true); // Show modal if Web Share API not supported
+    }
+  };
+
+  const shareToFacebook = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+    handleShare(post.id);
+    setShowShareModal(false);
+  };
+
+  const shareToTwitter = () => {
+    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+    handleShare(post.id);
+    setShowShareModal(false);
+  };
+
+  const shareToWhatsApp = () => {
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank');
+    handleShare(post.id);
+    setShowShareModal(false);
+  };
+
+  const shareToTikTok = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Link copied! Open TikTok to paste and share.');
+      handleShare(post.id);
+      setShowShareModal(false);
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  };
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Link copied to clipboard!');
+      handleShare(post.id);
+      setShowShareModal(false);
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  };
 
   return (
     <div className="mt-6 bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
@@ -325,7 +389,7 @@ const PostCard: React.FC<{ post: Post; currentUserAvatar: string; handleAddComme
           <span>Comment</span>
         </button>
         <button
-          onClick={() => handleShare(post.id)}
+          onClick={handleShareClick}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
         >
           <ShareIcon />
@@ -404,6 +468,53 @@ const PostCard: React.FC<{ post: Post; currentUserAvatar: string; handleAddComme
       </div>
       {showSuccessMessage && (
         <p className="text-green-500 text-sm mt-2 text-center">Comment sent!</p>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-80 max-w-full">
+            <h3 className="text-lg font-semibold mb-4">Share to...</h3>
+            <div className="flex flex-col space-y-3">
+              <button
+                onClick={shareToFacebook}
+                className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              >
+                Facebook
+              </button>
+              <button
+                onClick={shareToTwitter}
+                className="bg-black text-white py-2 rounded hover:bg-gray-800"
+              >
+                X (Twitter)
+              </button>
+              <button
+                onClick={shareToWhatsApp}
+                className="bg-green-500 text-white py-2 rounded hover:bg-green-600"
+              >
+                WhatsApp
+              </button>
+              <button
+                onClick={shareToTikTok}
+                className="bg-black text-white py-2 rounded hover:bg-gray-800"
+              >
+                TikTok (Copy Link)
+              </button>
+              <button
+                onClick={copyLink}
+                className="bg-gray-500 text-white py-2 rounded hover:bg-gray-600"
+              >
+                Copy Link
+              </button>
+            </div>
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="mt-4 text-gray-500 hover:text-gray-700 w-full"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
