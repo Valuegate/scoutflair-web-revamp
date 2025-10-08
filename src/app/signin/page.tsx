@@ -13,7 +13,7 @@ const roles = [
   {
     name: 'For Players',
     description: 'Access your profile, track your progress, and connect with scouts.',
-    image: '/images/Frame_2121457625_I1737_2116;1737_2020.png',
+    image: '/images/scoutplayertwo.png',
     hint: 'football player portrait',
     href: '/signin/player',
     dashboardRoute: '/signin/player/dashboard',
@@ -21,7 +21,7 @@ const roles = [
   {
     name: 'For Coaches',
     description: 'Manage your prospects, review talent, and build your winning team.',
-    image: '/images/Frame_2121457625_I1741_2667;1737_2039.png',
+    image: '/images/scdp.png',
     hint: 'football coach portrait',
     href: '/signin/coach',
     dashboardRoute: '/signin/coach/dashboard',
@@ -29,7 +29,7 @@ const roles = [
   {
     name: 'For Scouts',
     description: 'Continue your search for the next soccer star and manage your watchlist.',
-    image: '/images/Frame_2121457625_I1741_2700;1737_2058.png',
+    image: '/images/avapfive.png',
     hint: 'football scout portrait',
     href: '/signin/scout',
     dashboardRoute: '/signin/scout/dashboard',
