@@ -44,17 +44,49 @@ interface Post { id: string; user: User; content: string; image: string | string
 interface ImageItem { id: number; file: File; url: string; source: "camera" | "gallery"; }
 interface VideoItem { id: number; file: File; url: string; name: string; }
 interface PostBoxProps { onCreatePost?: (post: Post) => Promise<void>; }
-
 interface ImageEditorModalProps {
   image: ImageItem;
   onSave: (id: number, newUrl: string, newFile: File) => void;
   onClose: () => void;
 }
 
+interface TextOverlay {
+  id: number;
+  text: string;
+  x: number;
+  y: number;
+  fontSize: number;
+  color: string;
+  fontFamily: string;
+}
+
+interface EmojiOverlay {
+  id: number;
+  emoji: string;
+  x: number;
+  y: number;
+  size: number;
+}
+
 // --- Image Editor Modal ---
 const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onClose }) => {
   const cropperRef: RefObject<ReactCropperElement> = createRef<ReactCropperElement>();
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string>("");
+  const [rotation, setRotation] = useState<number>(0);
+  const [brightness, setBrightness] = useState<number>(100);
+  const [contrast, setContrast] = useState<number>(100);
+  const [saturation, setSaturation] = useState<number>(100);
+  const [blur, setBlur] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<'crop' | 'filter' | 'adjust' | 'text' | 'emoji'>('crop');
+  const [textOverlays, setTextOverlays] = useState<TextOverlay[]>([]);
+  const [emojiOverlays, setEmojiOverlays] = useState<EmojiOverlay[]>([]);
+  const [newText, setNewText] = useState<string>("");
+  const [textColor, setTextColor] = useState<string>("#ffffff");
+  const [fontSize, setFontSize] = useState<number>(32);
+  const [fontFamily, setFontFamily] = useState<string>("Arial");
+  const [selectedTextId, setSelectedTextId] = useState<number | null>(null);
+  const [selectedEmojiId, setSelectedEmojiId] = useState<number | null>(null);
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -71,9 +103,67 @@ const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onCl
     { name: 'Grayscale', value: 'grayscale(100%)' },
     { name: 'Sepia', value: 'sepia(100%)' },
     { name: 'Invert', value: 'invert(100%)' },
-    { name: 'Contrast', value: 'contrast(200%)' },
-    { name: 'Saturate', value: 'saturate(2)' },
+    { name: 'Vintage', value: 'sepia(50%) contrast(120%)' },
+    { name: 'Cool', value: 'hue-rotate(180deg) saturate(150%)' },
   ];
+
+  const emojis = ['😀', '😂', '❤️', '🔥', '👍', '🎉', '😍', '🤔', '👏', '💯', '✨', '🌟', '💪', '🙌', '🎊', '🌈'];
+
+  const handleRotate = (degrees: number) => {
+    const newRotation = (rotation + degrees) % 360;
+    setRotation(newRotation);
+    const cropper = cropperRef.current?.cropper;
+    if (cropper) {
+      cropper.rotateTo(newRotation);
+    }
+  };
+
+  const addTextOverlay = () => {
+    if (newText.trim()) {
+      const newOverlay: TextOverlay = {
+        id: Date.now(),
+        text: newText,
+        x: 50,
+        y: 50,
+        fontSize,
+        color: textColor,
+        fontFamily,
+      };
+      setTextOverlays([...textOverlays, newOverlay]);
+      setNewText("");
+    }
+  };
+
+  const addEmojiOverlay = (emoji: string) => {
+    const newEmoji: EmojiOverlay = {
+      id: Date.now(),
+      emoji,
+      x: 50,
+      y: 50,
+      size: 48,
+    };
+    setEmojiOverlays([...emojiOverlays, newEmoji]);
+  };
+
+  const removeTextOverlay = (id: number) => {
+    setTextOverlays(textOverlays.filter(t => t.id !== id));
+    if (selectedTextId === id) setSelectedTextId(null);
+  };
+
+  const removeEmojiOverlay = (id: number) => {
+    setEmojiOverlays(emojiOverlays.filter(e => e.id !== id));
+    if (selectedEmojiId === id) setSelectedEmojiId(null);
+  };
+
+  const getCombinedFilter = () => {
+    const filters = [];
+    if (currentFilter) filters.push(currentFilter);
+    if (brightness !== 100) filters.push(`brightness(${brightness}%)`);
+    if (contrast !== 100) filters.push(`contrast(${contrast}%)`);
+    if (saturation !== 100) filters.push(`saturate(${saturation}%)`);
+    if (blur > 0) filters.push(`blur(${blur}px)`);
+    return filters.join(' ');
+  };
 
   const handleSave = () => {
     const cropper = cropperRef.current?.cropper;
@@ -87,8 +177,24 @@ const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onCl
       const tempCtx = tempCanvas.getContext('2d');
 
       if (tempCtx) {
-        tempCtx.filter = currentFilter;
+        const combinedFilter = getCombinedFilter();
+        tempCtx.filter = combinedFilter;
         tempCtx.drawImage(croppedCanvas, 0, 0);
+        tempCtx.filter = 'none';
+
+        textOverlays.forEach(overlay => {
+          tempCtx.font = `${overlay.fontSize}px ${overlay.fontFamily}`;
+          tempCtx.fillStyle = overlay.color;
+          tempCtx.strokeStyle = '#000000';
+          tempCtx.lineWidth = 2;
+          tempCtx.strokeText(overlay.text, overlay.x, overlay.y);
+          tempCtx.fillText(overlay.text, overlay.x, overlay.y);
+        });
+
+        emojiOverlays.forEach(overlay => {
+          tempCtx.font = `${overlay.size}px Arial`;
+          tempCtx.fillText(overlay.emoji, overlay.x, overlay.y);
+        });
       }
 
       const newUrl = tempCanvas.toDataURL(image.file.type);
@@ -100,40 +206,212 @@ const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onCl
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
-        <h2 className="text-xl font-bold mb-4 text-gray-800">Edit Image</h2>
-        <div className="mb-4">
-          <Cropper
-            ref={cropperRef}
-            src={image.url}
-            style={{ height: 400, width: '100%', filter: currentFilter }}
-            initialAspectRatio={1}
-            viewMode={1}
-            guides={true}
-            background={false}
-            checkOrientation={false}
-          />
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-800">Edit Image</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
         </div>
 
-        <div className="mb-4">
-          <h3 className="text-md font-semibold mb-2 text-gray-700">Filters</h3>
-          <div className="flex flex-wrap gap-2">
-            {filters.map(filter => (
+        <div className="p-6">
+          <div className="mb-4 flex flex-wrap gap-2 border-b pb-3">
+            {(['crop', 'filter', 'adjust', 'text', 'emoji'] as const).map(tab => (
               <button
-                key={filter.name}
-                onClick={() => setCurrentFilter(filter.value)}
-                className={`px-3 py-1 text-sm rounded-md transition ${currentFilter === filter.value ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-md font-medium transition ${
+                  activeTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
               >
-                {filter.name}
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="flex justify-end space-x-3">
-          <button onClick={onClose} className="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 font-semibold">Cancel</button>
-          <button onClick={handleSave} className="px-4 py-2 rounded-md bg-[rgba(10,40,80,1)] text-white hover:bg-blue-800 font-semibold">Save Changes</button>
+          <div className="mb-4 relative">
+            <Cropper
+              ref={cropperRef}
+              src={image.url}
+              style={{ height: 400, width: '100%', filter: getCombinedFilter() }}
+              initialAspectRatio={1}
+              viewMode={1}
+              guides={true}
+              background={false}
+              checkOrientation={false}
+              rotatable={true}
+            />
+            {textOverlays.map(overlay => (
+              <div
+                key={overlay.id}
+                style={{
+                  position: 'absolute',
+                  left: `${overlay.x}px`,
+                  top: `${overlay.y}px`,
+                  fontSize: `${overlay.fontSize}px`,
+                  color: overlay.color,
+                  fontFamily: overlay.fontFamily,
+                  cursor: 'move',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                  userSelect: 'none',
+                }}
+                draggable
+                onDragEnd={(e) => {
+                  const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+                  if (rect) {
+                    setTextOverlays(textOverlays.map(t =>
+                      t.id === overlay.id ? { ...t, x: e.clientX - rect.left, y: e.clientY - rect.top } : t
+                    ));
+                  }
+                }}
+              >
+                {overlay.text}
+                <button
+                  onClick={() => removeTextOverlay(overlay.id)}
+                  className="ml-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {emojiOverlays.map(overlay => (
+              <div
+                key={overlay.id}
+                style={{
+                  position: 'absolute',
+                  left: `${overlay.x}px`,
+                  top: `${overlay.y}px`,
+                  fontSize: `${overlay.size}px`,
+                  cursor: 'move',
+                  userSelect: 'none',
+                }}
+                draggable
+                onDragEnd={(e) => {
+                  const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+                  if (rect) {
+                    setEmojiOverlays(emojiOverlays.map(em =>
+                      em.id === overlay.id ? { ...em, x: e.clientX - rect.left, y: e.clientY - rect.top } : em
+                    ));
+                  }
+                }}
+              >
+                {overlay.emoji}
+                <button
+                  onClick={() => removeEmojiOverlay(overlay.id)}
+                  className="ml-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {activeTab === 'crop' && (
+            <div>
+              <h3 className="text-md font-semibold mb-3 text-gray-700">Crop & Rotate</h3>
+              <div className="flex gap-2 mb-3">
+                <button onClick={() => handleRotate(-90)} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">↶ 90°</button>
+                <button onClick={() => handleRotate(90)} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">↷ 90°</button>
+                <button onClick={() => handleRotate(180)} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">180°</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'filter' && (
+            <div>
+              <h3 className="text-md font-semibold mb-3 text-gray-700">Filters</h3>
+              <div className="flex flex-wrap gap-2">
+                {filters.map(filter => (
+                  <button
+                    key={filter.name}
+                    onClick={() => setCurrentFilter(filter.value)}
+                    className={`px-3 py-2 rounded-md transition ${
+                      currentFilter === filter.value ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {filter.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'adjust' && (
+            <div>
+              <h3 className="text-md font-semibold mb-3 text-gray-700">Adjustments</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Brightness: {brightness}%</label>
+                  <input type="range" min="0" max="200" value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} className="w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Contrast: {contrast}%</label>
+                  <input type="range" min="0" max="200" value={contrast} onChange={(e) => setContrast(Number(e.target.value))} className="w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Saturation: {saturation}%</label>
+                  <input type="range" min="0" max="200" value={saturation} onChange={(e) => setSaturation(Number(e.target.value))} className="w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Blur: {blur}px</label>
+                  <input type="range" min="0" max="10" value={blur} onChange={(e) => setBlur(Number(e.target.value))} className="w-full" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'text' && (
+            <div>
+              <h3 className="text-md font-semibold mb-3 text-gray-700">Add Text</h3>
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={newText}
+                  onChange={(e) => setNewText(e.target.value)}
+                  placeholder="Enter text..."
+                  className="w-full px-3 py-2 border rounded-md"
+                  onKeyPress={(e) => e.key === 'Enter' && addTextOverlay()}
+                />
+                <div className="flex gap-3 items-center">
+                  <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="w-12 h-10" />
+                  <select value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="px-3 py-2 border rounded-md">
+                    <option value={16}>Small</option>
+                    <option value={32}>Medium</option>
+                    <option value={48}>Large</option>
+                    <option value={64}>X-Large</option>
+                  </select>
+                  <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} className="px-3 py-2 border rounded-md">
+                    <option value="Arial">Arial</option>
+                    <option value="Impact">Impact</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Courier New">Courier</option>
+                  </select>
+                  <button onClick={addTextOverlay} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Text</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'emoji' && (
+            <div>
+              <h3 className="text-md font-semibold mb-3 text-gray-700">Add Emoji</h3>
+              <div className="flex flex-wrap gap-2">
+                {emojis.map((emoji, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => addEmojiOverlay(emoji)}
+                    className="text-3xl hover:bg-gray-100 p-2 rounded-md transition"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-3 mt-6 pt-4 border-t">
+            <button onClick={onClose} className="px-6 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 font-semibold">Cancel</button>
+            <button onClick={handleSave} className="px-6 py-2 rounded-md bg-[rgba(10,40,80,1)] text-white hover:bg-blue-800 font-semibold">Save Changes</button>
+          </div>
         </div>
       </div>
     </div>
