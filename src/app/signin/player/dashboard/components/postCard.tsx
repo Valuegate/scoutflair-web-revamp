@@ -70,17 +70,15 @@ const SocialFeed: React.FC = () => {
   // Fetch both global and user posts
   const fetchPosts = async (token: string) => {
     try {
-     const [postsRes, userRes] = await Promise.all([
-  fetch(`https://scoutflair.top/api/v1/spotLights/getPosts?limit=10&offset=0`, {
-    headers: { Authorization: `Bearer ${token}` },
-  }),
+     const [postsRes, ] = await Promise.all([
+ 
   fetch(`https://scoutflair.top/api/v1/spotLights/getUserPosts?limit=10&offset=0`, {
     headers: { Authorization: `Bearer ${token}` },
   })
 ]);
 
-      const postsData = await postsRes.json();
-      const userData = await userRes.json();
+    
+
 
       const mapToPost = (p: any, source: string): Post => ({
         id: `${source}-${p.id}`, // Add source prefix to ensure unique keys
@@ -98,10 +96,7 @@ const SocialFeed: React.FC = () => {
         likedBy: p.likedBy || []
       });
 
-      const globalPosts = postsData.data.obj.map((p: any) => mapToPost(p, 'global'));
-      const userPosts = userData.data.obj.map((p: any) => mapToPost(p, 'user'));
-
-      setPosts([...userPosts, ...globalPosts]);
+     
     } catch (err) {
       console.error("Failed to fetch posts:", err);
     }
