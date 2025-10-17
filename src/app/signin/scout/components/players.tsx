@@ -42,7 +42,8 @@ export default function Players() {
               <span>{player.lb}lb</span>
             </div>
             
-            <Link href={`/profile${player.id}`}>
+           
+            <Link href={`/signin/player/dashboard/profile/${player.id}`}>
               <button className="mt-2 border border-orange-300 rounded-full px-3 py-1 text-xs text-gray-600 hover:bg-orange-50 transition">
                 View profile
               </button>
