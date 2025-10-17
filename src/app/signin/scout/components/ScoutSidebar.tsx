@@ -16,6 +16,8 @@ export default function SideBar({ isOpen, onClose }: { isOpen: boolean; onClose:
     { href: "/signin/scout/dashboard/academies", label: "Academies", icon: <AcademiesIcon /> },
     { href: "/signin/scout/dashboard/localpitches", label: "Local Pitches", icon: <LocalPitchIcon /> },
     { href: "/signin/scout/dashboard/settings", label: "Settings", icon: <SettingsIcon/> },
+   
+    
   ];
 
   const handleLinkClick = () => {
