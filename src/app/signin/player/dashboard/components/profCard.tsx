@@ -1,10 +1,10 @@
 "use client";
 
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Repeat } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { links } from "./links";
+import { links } from "./links"; // Assuming 'links' is the correct import for this component
 
 export const ProfileCard = () => {
   const [imgError, setImgError] = useState(false);
@@ -13,7 +13,7 @@ export const ProfileCard = () => {
   const router = useRouter();
 
   const name = "Denis Ojua";
-  const role = "Player";
+  const role = "Player"; // Role is now Player
 
   const initials = name
     .split(" ")
@@ -62,14 +62,13 @@ export const ProfileCard = () => {
               {initials}
             </div>
           )}
-          {/* Small indicator dot to show it's clickable */}
           <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
             <ChevronDown className={`w-2 h-2 text-white transition-transform ${open ? 'rotate-180' : ''}`} />
           </div>
         </button>
       </div>
 
-      {/* Desktop: Full profile card - make entire card clickable */}
+      {/* Desktop: Full profile card */}
       <button
         onClick={() => setOpen(!open)}
         className="hidden sm:flex items-center gap-3 p-2 rounded-lg bg-white hover:bg-gray-50 transition-colors w-full"
@@ -89,13 +88,11 @@ export const ProfileCard = () => {
               {initials}
             </div>
           )}
-
           <div className="hidden md:block text-left">
             <p className="font-semibold text-sm text-gray-800 truncate max-w-[100px]">{name}</p>
             <p className="text-xs text-gray-500">{role}</p>
           </div>
         </div>
-
         <div className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 bg-gray-50">
           <ChevronDown className={`text-gray-600 w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
         </div>
@@ -104,16 +101,24 @@ export const ProfileCard = () => {
       {/* Dropdown menu */}
       {open && (
         <div className="absolute right-0 top-12 sm:top-14 bg-white border rounded-lg shadow-lg w-48 py-2 z-50">
-          {/* Mobile: Show name and role in dropdown */}
           <div className="sm:hidden px-4 py-3 border-b border-gray-100">
             <p className="font-semibold text-gray-800">{name}</p>
             <p className="text-sm text-gray-500">{role}</p>
           </div>
 
-          {/* Menu items with better spacing for mobile */}
           <div className="py-1">
+            {/* "Switch to Scout" button added */}
+            <button
+              onClick={() => handleNavigate("/signin/scout/dashboard")}
+              className="flex items-center gap-3 w-full text-left px-4 py-3 sm:py-2 hover:bg-gray-100 transition-colors text-gray-700"
+            >
+              <Repeat size={18} />
+              <span className="text-sm font-medium">Switch to Scout</span>
+            </button>
+
+            {/* Filter updated to remove "Profile" */}
             {links
-              .filter((link) => link.label === "Profile" || link.label === "Settings")
+              .filter((link) => link.label === "Settings")
               .map((link) => (
                 <button
                   key={link.href}
