@@ -565,7 +565,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
       <div className="bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
         <div className="flex h-auto items-center space-x-2 sm:space-x-3">
           <img
-            src="https://placehold.co/40x40/EFEFEF/333?text=AV"
+            src="/images/profile.jpeg"
             alt="User avatar"
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
           />

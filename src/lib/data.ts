@@ -1,17 +1,25 @@
-interface PlayerData  {
-    name:string,
-    position:string,
-    number:number,
-    AGE:string,
-    countryFlag:string,
-    cm:number,
-    lb:string,
-    image:string,
-    id:string,
+// lib/data.ts
+
+// 1. Add all the new properties to the interface
+export interface PlayerData {
+  id: string;
+  name: string;
+  position: string;
+  number: number;
+  AGE: string;
+  countryFlag: string;
+  cm: number;
+  lb: string;
+  image: string;
+  bio: string;
+  dateOfBirth: string; // New
+  nationality: string; // New
+  preferredFoot: string; // New
+  status: string; // New
 }
 
-
-export const playersData : PlayerData [] =[
+// 2. Add the corresponding data for each player
+export const playersData: PlayerData[] = [
   {
     "id": "1",
     "name": "Emeka Nwosu",
@@ -21,7 +29,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ng",
     "cm": 172,
     "lb": "150",
-    "image": "/images/avaplone.png"
+    "image": "/images/avaplone.png",
+    "bio": "A pacy winger with dazzling footwork, Emeka Nwosu rose through the ranks of the Nigerian youth system. Known for his ability to cut inside and deliver killer crosses, he has become a fan favorite for his relentless work rate and spectacular goals.",
+    "dateOfBirth": "May 14, 2000",
+    "nationality": "Nigerian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "2",
@@ -32,7 +45,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "gh",
     "cm": 185,
     "lb": "180",
-    "image": "/images/avaptwo.png"
+    "image": "/images/avaptwo.png",
+    "bio": "An old-school, no-nonsense defender, Kofi Mensah is a rock at the heart of the defense. His leadership qualities and aerial dominance make him an invaluable asset. He is respected for his tactical intelligence and commanding presence on the pitch.",
+    "dateOfBirth": "March 2, 1996",
+    "nationality": "Ghanaian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "3",
@@ -43,7 +61,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "pt",
     "cm": 177,
     "lb": "165",
-    "image": "/images/avapthree.png"
+    "image": "/images/avapthree.png",
+    "bio": "A creative maestro from Portugal, Miguel Santos possesses exceptional vision and passing range. As the team's primary playmaker, he excels at unlocking defenses with incisive through balls and is a constant threat from set-pieces.",
+    "dateOfBirth": "July 21, 1998",
+    "nationality": "Portuguese",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "4",
@@ -54,7 +77,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "sn",
     "cm": 193,
     "lb": "200",
-    "image": "/images/avapfour.png"
+    "image": "/images/avapfour.png",
+    "bio": "With incredible reflexes and a commanding penalty area presence, Ibrahim Diallo is a world-class shot-stopper. The Senegalese keeper's experience and calm demeanor provide a solid foundation for the entire team.",
+    "dateOfBirth": "September 16, 1994",
+    "nationality": "Senegalese",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "5",
@@ -65,7 +93,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "us",
     "cm": 178,
     "lb": "165",
-    "image": "/images/avapsix.png"
+    "image": "/images/avapsix.png",
+    "bio": "A modern, athletic fullback from the USA, Denis Ojua is known for his overlapping runs and pinpoint crosses. He balances his attacking duties with solid defensive contributions, making him a key player in both phases of the game.",
+    "dateOfBirth": "November 30, 2000",
+    "nationality": "American",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "6",
@@ -76,9 +109,14 @@ export const playersData : PlayerData [] =[
     "countryFlag": "eg",
     "cm": 180,
     "lb": "172",
-    "image": "/images/avapfive.png"
+    "image": "/images/avapfive.png",
+    "bio": "The Egyptian anchor in midfield, Ahmed Al-Tamimi is a master of breaking up opposition attacks. His tireless energy, precise tackling, and ability to shield the back four are crucial to the team's defensive structure.",
+    "dateOfBirth": "January 10, 1995",
+    "nationality": "Egyptian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
-  {
+   {
     "id": "7",
     "name": "Daniel Okon",
     "position": "Centre Forward",
@@ -87,7 +125,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ng",
     "cm": 183,
     "lb": "175",
-    "image": "/images/avaplone.png"
+    "image": "/images/avaplone.png",
+    "bio": "A prodigious young talent from Nigeria, Daniel Okon is a natural goalscorer with a powerful shot and intelligent movement. At just 22, he has already shown immense potential and is tipped for a great future in the sport.",
+    "dateOfBirth": "June 5, 2003",
+    "nationality": "Nigerian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "8",
@@ -98,7 +141,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ng",
     "cm": 176,
     "lb": "168",
-    "image": "/images/avaptwo.png"
+    "image": "/images/avaptwo.png",
+    "bio": "A versatile and reliable full-back, Samuel Akinbiyi is comfortable on either flank. His consistent performances and tactical discipline have made him a manager's dream, capable of shutting down opposing wingers effectively.",
+    "dateOfBirth": "December 1, 1996",
+    "nationality": "Nigerian",
+    "preferredFoot": "Left",
+    "status": "Active"
   },
   {
     "id": "9",
@@ -109,7 +157,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "es",
     "cm": 174,
     "lb": "160",
-    "image": "/images/avapthree.png"
+    "image": "/images/avapthree.png",
+    "bio": "Embodying Spanish flair, Pedro Álvarez is a tricky winger who loves to take on defenders. His low center of gravity and technical skill allow him to navigate tight spaces, creating chances for himself and his teammates.",
+    "dateOfBirth": "February 22, 1999",
+    "nationality": "Spanish",
+    "preferredFoot": "Left",
+    "status": "Active"
   },
   {
     "id": "10",
@@ -120,7 +173,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "us",
     "cm": 181,
     "lb": "170",
-    "image": "/images/avaptwo.png"
+    "image": "/images/avaptwo.png",
+    "bio": "Nolan Price is the engine room of the midfield. The American international covers every blade of grass, contributing heavily in both attack and defense. His stamina and determination make him a formidable opponent.",
+    "dateOfBirth": "April 18, 2002",
+    "nationality": "American",
+    "preferredFoot": "Right",
+    "status": "Independent"
   },
   {
     "id": "11",
@@ -131,7 +189,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "sn",
     "cm": 179,
     "lb": "168",
-    "image": "/images/avapseven.png"
+    "image": "/images/avapseven.png",
+    "bio": "Named after a legend, Zinedine Mbaye plays with elegance and strength. The Senegalese left-back is known for his powerful forward surges and solid one-on-one defending, offering a balanced threat on the flank.",
+    "dateOfBirth": "August 8, 1996",
+    "nationality": "Senegalese",
+    "preferredFoot": "Left",
+    "status": "Active"
   },
   {
     "id": "12",
@@ -142,7 +205,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ng",
     "cm": 186,
     "lb": "182",
-    "image": "/images/avapsix.png"
+    "image": "/images/avapsix.png",
+    "bio": "A classic target man, Ola Brown uses his strength to hold up play and bring others into the game. The Nigerian striker is a dominant force in the air and a clinical finisher inside the penalty box.",
+    "dateOfBirth": "October 25, 1994",
+    "nationality": "Nigerian",
+    "preferredFoot": "Right",
+    "status": "Free Agent"
   },
   {
     "id": "13",
@@ -153,7 +221,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "br",
     "cm": 175,
     "lb": "163",
-    "image": "/images/avaplone.png"
+    "image": "/images/avaplone.png",
+    "bio": "With Brazilian samba in his veins, Rafael Costa is a joy to watch. His creativity, close control, and ability to score from long range make him a constant danger to any opposition defense.",
+    "dateOfBirth": "March 15, 1997",
+    "nationality": "Brazilian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "14",
@@ -164,7 +237,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "tr",
     "cm": 178,
     "lb": "170",
-    "image": "/images/avapsix.png"
+    "image": "/images/avapsix.png",
+    "bio": "A dynamic Turkish wingback, Ismail Özkan has a phenomenal engine that allows him to patrol the entire flank for 90 minutes. He is tactically astute, providing width in attack and diligence in defense.",
+    "dateOfBirth": "July 12, 1998",
+    "nationality": "Turkish",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "15",
@@ -175,7 +253,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "hr",
     "cm": 188,
     "lb": "185",
-    "image": "/images/avapthree.png"
+    "image": "/images/avapthree.png",
+    "bio": "A composed and elegant ball-playing defender from Croatia, Luka Ivanov is known for his ability to start attacks from the back. His excellent reading of the game and calm distribution are his greatest strengths.",
+    "dateOfBirth": "May 3, 1994",
+    "nationality": "Croatian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "16",
@@ -186,7 +269,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "de",
     "cm": 192,
     "lb": "210",
-    "image": "/images/avapfour.png"
+    "image": "/images/avapfour.png",
+    "bio": "A veteran German goalkeeper, Felix Müller brings a wealth of experience and professionalism to the squad. A reliable and vocal presence, he is an excellent mentor for the younger players and a dependable option when called upon.",
+    "dateOfBirth": "January 27, 1991",
+    "nationality": "German",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "17",
@@ -197,7 +285,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "gh",
     "cm": 177,
     "lb": "168",
-    "image": "/images/avapseven.png"
+    "image": "/images/avapseven.png",
+    "bio": "Kwaku Addo is a tenacious ball-winner from Ghana who excels at breaking up play. His aggressive pressing and intelligent positioning make him a vital cog in the team's midfield, providing security for the more creative players.",
+    "dateOfBirth": "August 20, 1999",
+    "nationality": "Ghanaian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "18",
@@ -208,7 +301,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ng",
     "cm": 173,
     "lb": "160",
-    "image": "/images/avaplone.png"
+    "image": "/images/avaplone.png",
+    "bio": "Chinedu Eze is a lightning-fast Nigerian winger who terrifies defenders with his explosive pace. He is at his best when running at fullbacks, delivering dangerous balls into the box or cutting in to unleash a powerful shot.",
+    "dateOfBirth": "November 11, 2000",
+    "nationality": "Nigerian",
+    "preferredFoot": "Right",
+    "status": "Independent"
   },
   {
     "id": "19",
@@ -219,7 +317,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "br",
     "cm": 182,
     "lb": "176",
-    "image": "/images/avaptwo.png"
+    "image": "/images/avaptwo.png",
+    "bio": "A versatile Brazilian forward, Thiago Ribeiro is capable of playing anywhere across the front line. His clever movement off the ball and clinical finishing have earned him a reputation as a consistent and reliable goalscorer.",
+    "dateOfBirth": "February 28, 1996",
+    "nationality": "Brazilian",
+    "preferredFoot": "Left",
+    "status": "Active"
   },
   {
     "id": "20",
@@ -230,7 +333,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "eg",
     "cm": 176,
     "lb": "163",
-    "image": "/images/avapthree.png"
+    "image": "/images/avapthree.png",
+    "bio": "Omar Farouk is a technically gifted Egyptian midfielder who dictates the tempo of the game. His precise passing and ability to retain possession under pressure make him the heartbeat of the team's midfield.",
+    "dateOfBirth": "May 23, 2000",
+    "nationality": "Egyptian",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "21",
@@ -241,7 +349,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "pt",
     "cm": 174,
     "lb": "162",
-    "image": "/images/avapfour.png"
+    "image": "/images/avapfour.png",
+    "bio": "A hard-working Portuguese midfielder, Gabriel Silva provides excellent balance to the team. He combines his defensive duties with intelligent runs into the final third, contributing with both assists and crucial goals.",
+    "dateOfBirth": "April 4, 1997",
+    "nationality": "Portuguese",
+    "preferredFoot": "Left",
+    "status": "Free Agent"
   },
   {
     "id": "22",
@@ -252,7 +365,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ie",
     "cm": 181,
     "lb": "175",
-    "image": "/images/avapfive.png"
+    "image": "/images/avapfive.png",
+    "bio": "A rugged and determined Irish defender, Brian O'Connor is known for his fighting spirit and tough tackling. His experience and leadership at the back are vital, and he is a constant source of motivation for his teammates.",
+    "dateOfBirth": "June 19, 1992",
+    "nationality": "Irish",
+    "preferredFoot": "Right",
+    "status": "Active"
   },
   {
     "id": "23",
@@ -263,7 +381,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ar",
     "cm": 170,
     "lb": "150",
-    "image": "/images/avapthree.png"
+    "image": "/images/avapthree.png",
+    "bio": "An exciting young Argentine winger, Santiago Pérez is a prodigious dribbler with immense talent. At just 21, he plays with a fearlessness that makes him unpredictable and a constant threat to opposition defenses.",
+    "dateOfBirth": "August 1, 2004",
+    "nationality": "Argentine",
+    "preferredFoot": "Left",
+    "status": "Active"
   },
   {
     "id": "24",
@@ -274,7 +397,12 @@ export const playersData : PlayerData [] =[
     "countryFlag": "ng",
     "cm": 179,
     "lb": "172",
-    "image": "/images/avapfour.png"
+    "image": "/images/avapfour.png",
+    "bio": "The veteran Nigerian midfielder Moses Kalu brings composure and experience to the center of the park. His intelligent positioning and calm head under pressure are key to controlling the flow and tempo of the game.",
+    "dateOfBirth": "December 12, 1992",
+    "nationality": "Nigerian",
+    "preferredFoot": "Right",
+    "status": "Active"
   }
-]
+];
 
