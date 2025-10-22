@@ -213,7 +213,7 @@ const FilterIcon = () => {
     )
 }
 
-const AllPlayersFilter = () => {
+const AllPlayersFilterIcon = () => {
     return(
         <svg width="40" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="40" height="42" rx="4" fill="#0A2A56"/>
@@ -239,4 +239,4 @@ const AllPlayersFilter = () => {
 export {AcademiesIcon, LocalPitchIcon, LogOutIcons, SettingsIcon,
          MatchesIcon, PlayersIcon, EvaluationIcons,
          OverViewIcon, UpdatesIcon, ScoutplanIcon, StarsIcon,
-         ProspectsIcon, CupStarIcon, EmojiPhoto, StarsIconOutline, AllPlayersIcon,FilterIcon, AllPlayersFilter, NaijaImg, ArrowBack};
+         ProspectsIcon, CupStarIcon, EmojiPhoto, StarsIconOutline, AllPlayersIcon,FilterIcon, AllPlayersFilterIcon, NaijaImg, ArrowBack};

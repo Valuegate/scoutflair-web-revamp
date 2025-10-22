@@ -1,5 +1,5 @@
 
-import { AllPlayersFilter } from "../ScoutIcons";
+import { AllPlayersFilterIcon } from "../ScoutIcons";
 import { Search } from "lucide-react";
 
 
@@ -25,7 +25,7 @@ export default function AvailablePlayers(){
           <div className="flex items-center justify-between gap-2">
   <SearchContainer />
   <button className="mr-2">
-    <AllPlayersFilter />
+    <AllPlayersFilterIcon />
   </button>
 </div>
 
