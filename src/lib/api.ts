@@ -3,11 +3,17 @@
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
 
+  // Clean token if stored as "Bearer xyz"
+  const cleanToken = token?.replace(/^Bearer\s+/i, "");
+
   const headers = {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(cleanToken ? { Authorization: `Bearer ${cleanToken}` } : {}),
     ...options.headers,
   };
+
+  console.log("Requesting:", `https://scoutflair.top/api/v1/${endpoint}`);
+  console.log("Auth header:", headers.Authorization);
 
   const res = await fetch(`https://scoutflair.top/api/v1/${endpoint}`, {
     ...options,
@@ -29,12 +35,14 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 const API_BASE = '/api/v1/spotLights';
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('token');
+
+  const token = localStorage.getItem('authToken'); 
   const res = await fetch(`${API_BASE}${url}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      // Ensure token exists before adding header
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   });
@@ -83,3 +91,4 @@ export async function increaseShare(postId: number) {
     body: JSON.stringify({ spotLightPostId: postId }),
   });
 }
+

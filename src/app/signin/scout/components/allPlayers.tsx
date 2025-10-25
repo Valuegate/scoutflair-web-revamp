@@ -1,7 +1,7 @@
 
 import { AllPlayersIcon, FilterIcon } from "../ScoutIcons";
 import PlayerCard from "./playerCard";
-
+import Link from "next/link";
 export default function AllPlayers() {
   const players = Array(8).fill({
     name: "Adams",
@@ -41,9 +41,15 @@ export default function AllPlayers() {
 
       {/* Footer */}
       <div className="flex justify-center mt-10">
-        <button className="px-6 py-2 border rounded-lg shadow-sm hover:bg-gray-100">
+        <Link
+        href={"/signin/scout/dashboard"}>
+          <button className="px-6 py-2 border rounded-lg shadow-sm hover:bg-gray-100">
           ← Return to Menu
         </button>
+        </Link>
+        
+        
+        
       </div>
     </div>
   );

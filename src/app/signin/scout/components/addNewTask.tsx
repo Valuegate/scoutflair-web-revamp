@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Loader2 } from 'lucide-react';
 
 interface FormData {
   academyClubName: string;
@@ -19,10 +19,17 @@ interface FormData {
 
 interface AddTaskFormProps {
   onCancel?: () => void;
-  onSave?: (formData: FormData) => void;
+  onSave?: (formData: any) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
+const AddTaskForm: React.FC<AddTaskFormProps> = ({ 
+  onCancel, 
+  onSave,
+  isLoading = false,
+  error = null 
+}) => {
   const [formData, setFormData] = useState<FormData>({
     academyClubName: '',
     playerName: '',
@@ -38,6 +45,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
   });
 
   const [dragActive, setDragActive] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleInputChange = (field: keyof FormData, value: string | number | File) => {
     setFormData(prev => ({
@@ -72,6 +80,11 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith('image/')) {
         handleInputChange('image', file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
       }
     }
   };
@@ -81,34 +94,61 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
       const file = e.target.files[0];
       if (file.type.startsWith('image/')) {
         handleInputChange('image', file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
       }
     }
   };
 
   const handleCancel = () => {
-    // Call the onCancel callback if provided
     if (onCancel) {
       onCancel();
     } else {
-      // Fallback: try to go back using window.history
       if (typeof window !== 'undefined') {
         window.history.back();
       }
     }
   };
 
-  const handleAddTask = () => {
-    // Handle form submission
-    console.log('Form Data:', formData);
-    
-    // Show success alert
-    alert('Saved!');
-    
-    // Call the onSave callback if provided
+  const handleAddTask = async () => {
+    if (!formData.academyClubName || !formData.playerName || !formData.position) {
+      alert('Please fill in all required fields (Academy/Club Name, Player Name, Position)');
+      return;
+    }
+
+    if (formData.games < 0 || formData.goals < 0 || formData.assists < 0) {
+      alert('Games, Goals, and Assists cannot be negative numbers');
+      return;
+    }
+
+    // --- THIS IS THE FIX ---
+    // We create the object to send to the parent, but we
+    // DO NOT include the image or imagePreview.
+    const apiData = {
+      academyClubName: formData.academyClubName,
+      playerName: formData.playerName,
+      position: formData.position,
+      height: formData.height,
+      weight: formData.weight,
+      rating: formData.rating,
+      nationality: formData.nationality,
+      games: Math.max(0, formData.games),
+      goals: Math.max(0, formData.goals),
+      assists: Math.max(0, formData.assists),
+      // The 'image' property is now completely removed.
+    };
+    // ----------------------
+
+    console.log('Submitting data to parent:', apiData);
+
     if (onSave) {
-      onSave(formData);
+      await onSave(apiData);
     } else {
-      // Fallback: try to go back using window.history
+      console.log('Form Data:', apiData);
+      alert('Saved!');
       if (typeof window !== 'undefined') {
         window.history.back();
       }
@@ -124,11 +164,18 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
           <button 
             onClick={handleCancel}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            disabled={isLoading}
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
-          
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
 
         {/* Form Content */}
         <div className="p-6 space-y-6">
@@ -136,27 +183,29 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Academy / Club Name:
+                Academy / Club Name: <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 placeholder="Type here....."
                 value={formData.academyClubName}
                 onChange={(e) => handleInputChange('academyClubName', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Player Name:
+                Player Name: <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 placeholder="Type here....."
                 value={formData.playerName}
                 onChange={(e) => handleInputChange('playerName', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -165,14 +214,15 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Position:
+                Position: <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 placeholder="Type here....."
                 value={formData.position}
                 onChange={(e) => handleInputChange('position', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
             
@@ -185,7 +235,8 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
                 placeholder="Type here....."
                 value={formData.height}
                 onChange={(e) => handleInputChange('height', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -201,7 +252,8 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
                 placeholder="Type here....."
                 value={formData.weight}
                 onChange={(e) => handleInputChange('weight', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
             
@@ -215,11 +267,12 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
                     key={star}
                     type="button"
                     onClick={() => handleStarClick(star)}
+                    disabled={isLoading}
                     className={`w-8 h-8 rounded transition-colors ${
                       star <= formData.rating 
                         ? 'bg-yellow-400 text-white' 
                         : 'bg-gray-200 text-gray-400 hover:bg-yellow-100'
-                    }`}
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     ★
                   </button>
@@ -237,40 +290,37 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
               <div className="relative">
                 <input
                   type="number"
+                  min="0"
                   placeholder="Games"
                   value={formData.games || ''}
-                  onChange={(e) => handleInputChange('games', parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  onChange={(e) => handleInputChange('games', Math.max(0, parseInt(e.target.value) || 0))}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
-                  00
-                </span>
               </div>
               
               <div className="relative">
                 <input
                   type="number"
+                  min="0"
                   placeholder="Goals"
                   value={formData.goals || ''}
-                  onChange={(e) => handleInputChange('goals', parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  onChange={(e) => handleInputChange('goals', Math.max(0, parseInt(e.target.value) || 0))}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
-                  00
-                </span>
               </div>
               
               <div className="relative">
                 <input
                   type="number"
+                  min="0"
                   placeholder="Assists"
                   value={formData.assists || ''}
-                  onChange={(e) => handleInputChange('assists', parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  onChange={(e) => handleInputChange('assists', Math.max(0, parseInt(e.target.value) || 0))}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
-                  00
-                </span>
               </div>
             </div>
           </div>
@@ -285,7 +335,8 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
                 <select
                   value={formData.nationality}
                   onChange={(e) => handleInputChange('nationality', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors appearance-none bg-white"
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors appearance-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   <option value="Nigeria">Nigeria</option>
                   <option value="Ghana">Ghana</option>
@@ -305,33 +356,44 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
                 Upload Image
               </label>
               <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                   dragActive 
                     ? 'border-blue-400 bg-blue-50' 
                     : 'border-gray-300 hover:border-gray-400'
-                }`}
+                } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
               >
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 mb-2">
-                  Drag & drop your files here or{' '}
-                  <label className="text-blue-500 hover:text-blue-600 cursor-pointer underline">
-                    choose file
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileSelect}
-                      className="hidden"
+                {imagePreview ? (
+                  <div className="relative">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-full h-32 object-cover rounded-lg mb-2"
                     />
-                  </label>
-                </p>
-                {formData.image && (
-                  <p className="text-xs text-green-600 mt-2">
-                    {formData.image.name}
-                  </p>
+                    <p className="text-xs text-green-600">
+                      {formData.image?.name}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500 mb-2">
+                      Drag & drop your files here or{' '}
+                      <label className="text-blue-500 hover:text-blue-600 cursor-pointer underline">
+                        choose file
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          disabled={isLoading}
+                          className="hidden"
+                        />
+                      </label>
+                    </p>
+                  </>
                 )}
               </div>
             </div>
@@ -342,15 +404,24 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
         <div className="flex justify-end gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
           <button
             onClick={handleCancel}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            disabled={isLoading}
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={handleAddTask}
-            className="px-6 py-3 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-colors font-medium"
+            disabled={isLoading}
+            className="px-6 py-3 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Add Task
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              'Add Task'
+            )}
           </button>
         </div>
       </div>
@@ -359,3 +430,4 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onCancel, onSave }) => {
 };
 
 export default AddTaskForm;
+
