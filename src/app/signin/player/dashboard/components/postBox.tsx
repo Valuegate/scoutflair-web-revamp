@@ -2,6 +2,11 @@
 import React, { useState, useRef, createRef, useEffect, RefObject } from "react";
 import { Cropper } from "react-cropper";
 
+// --- Import your real API functions ---
+// Make sure these paths are correct for your project structure
+import { addPost } from "@/lib/api";
+import { uploadFileToR2 } from "@/lib/utils"; // Import from the utils file
+
 import type { ReactCropperElement } from "react-cropper";
 
 // Helper: convert Data URL to File
@@ -49,7 +54,6 @@ interface ImageEditorModalProps {
   onSave: (id: number, newUrl: string, newFile: File) => void;
   onClose: () => void;
 }
-
 interface TextOverlay {
   id: number;
   text: string;
@@ -67,6 +71,7 @@ interface EmojiOverlay {
   y: number;
   size: number;
 }
+
 
 // --- Image Editor Modal ---
 const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onClose }) => {
@@ -418,6 +423,7 @@ const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onCl
   );
 };
 
+
 // --- Main PostBox Component ---
 export default function PostBox({ onCreatePost }: PostBoxProps) {
   const [text, setText] = useState<string>("");
@@ -425,20 +431,12 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
   const [selectedVideos, setSelectedVideos] = useState<VideoItem[]>([]);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [editingImage, setEditingImage] = useState<ImageItem | null>(null);
+  const [postError, setPostError] = useState<string | null>(null); // For showing errors
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
 
-
-  const uploadFileToR2 = async (file: File): Promise<{ url: string; fileKey: string }> => {
-    console.log(`Uploading ${file.name}...`);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const url = URL.createObjectURL(file);
-    const fileKey = `uploads/${Date.now()}-${file.name}`;
-    console.log(`Upload complete: ${url}`);
-    return { url, fileKey };
-  };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>, source: "camera" | "gallery") => {
     const files = Array.from(event.target.files || []);
@@ -460,7 +458,6 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
         reader.readAsDataURL(file);
       }
     });
-    // Reset input so same file can be re-selected
     event.currentTarget.value = "";
   };
 
@@ -487,46 +484,45 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
     event.currentTarget.value = "";
   };
 
+  // --- UPDATED handlePost FUNCTION ---
   const handlePost = async () => {
     if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) return;
 
     setIsPosting(true);
+    setPostError(null); // Clear previous errors
+    
     try {
       const fileKeys: string[] = [];
-      const mediaUrls: string[] = [];
+      const mediaUrls: string[] = []; // To display the post immediately
 
+      // Upload all images
       for (const image of selectedImages) {
+        // We use 'image.file' which is the edited or original file
         const { url, fileKey } = await uploadFileToR2(image.file);
         fileKeys.push(fileKey);
-        mediaUrls.push(url);
+        mediaUrls.push(url); // 'url' here is the publicUrl
       }
 
+      // Upload all videos
       for (const video of selectedVideos) {
         const { url, fileKey } = await uploadFileToR2(video.file);
         fileKeys.push(fileKey);
-        mediaUrls.push(url);
+        mediaUrls.push(url); // 'url' here is the publicUrl
       }
-
-      const token = localStorage.getItem("authToken");
-      const demoToken = token || "fake-jwt-for-demo";
 
       console.log("Creating post with data:", {
         text: text.trim(),
         mediaFileKeys: fileKeys,
       });
 
-      // Simulate API call
-      await new Promise(res => setTimeout(res, 1000));
-      const mockResponse = {
-        ok: true,
-        json: async () => ({ data: { obj: { id: `post_${Date.now()}` } } }),
-      };
+      // --- REAL API CALL ---
+      // 'addPost' is imported from 'lib/api.ts'
+      const response = await addPost(text.trim(), fileKeys);
 
-      if (!mockResponse.ok) throw new Error("Failed to create post");
-
-      const response = await mockResponse.json();
+      // Create a new post object for the UI
       const savedPost: Post = {
-        id: response.data?.obj?.id ?? Date.now().toString(),
+        // --- Use optional chaining to safely access nested properties ---
+        id: response?.data?.obj?.id ?? Date.now().toString(), // Use real ID or fallback
         user: { name: "You", avatar: "/images/profile.jpeg", timeAgo: "Just now" },
         content: text.trim(),
         image: mediaUrls.length === 1 ? mediaUrls[0] : mediaUrls,
@@ -537,13 +533,23 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
         likedBy: [],
       };
 
-      if (onCreatePost) await onCreatePost(savedPost);
+      // Call the parent's onCreatePost function to update the feed
+      if (onCreatePost) {
+        await onCreatePost(savedPost);
+      }
 
+      // Reset the form
       setText("");
       setSelectedImages([]);
       setSelectedVideos([]);
+
     } catch (error) {
-      console.error(error);
+      console.error("Failed to create post:", error);
+      if (error instanceof Error) {
+        setPostError(`Failed to create post: ${error.message}`);
+      } else {
+        setPostError("An unknown error occurred while posting.");
+      }
     } finally {
       setIsPosting(false);
     }
@@ -602,6 +608,13 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
           </button>
         </div>
 
+        {/* --- Display Post Error --- */}
+        {postError && (
+          <div className="mt-2 ml-10 sm:ml-12 text-red-600 text-sm">
+            {postError}
+          </div>
+        )}
+
         {(selectedImages.length > 0 || selectedVideos.length > 0) && (
           <div className="mt-3 ml-10 sm:ml-12">
             <div className="flex flex-wrap gap-4">
@@ -655,3 +668,4 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
     </>
   );
 }
+
