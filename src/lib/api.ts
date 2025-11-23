@@ -1,7 +1,11 @@
 // src/lib/api.ts
 
+// --- Define the FULL BASE URL for ALL endpoints ---
+// We assume all API calls should go directly to the production backend
+const API_BASE_URL = 'https://scoutflair.top/api/v1';
+
 // --- apiFetch ---
-// Uses relative path, assuming next.config.js rewrites handle it for profile endpoints
+// Now uses the absolute URL
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
 
@@ -11,8 +15,11 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     ...options.headers,
   };
 
-  // Keep this relative - relies on next.config.js rewrite for /api/v1/profile/*
-  const res = await fetch(`/api/v1/${endpoint}`, {
+  // Construct the full URL using the base URL
+  const fullUrl = `${API_BASE_URL}/${endpoint}`;
+  console.log(`apiFetch Request: ${options.method || 'GET'} ${fullUrl}`); // Log the full URL
+
+  const res = await fetch(fullUrl, { // Use the absolute URL
     ...options,
     headers,
   });
@@ -23,7 +30,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
       const errData = await res.json();
       errorMessage = errData.message || errorMessage;
     } catch {}
-    console.error(`apiFetch Error for ${endpoint}: ${errorMessage}`); // Added more specific logging
+    console.error(`apiFetch Error for ${endpoint}: ${errorMessage}`);
     throw new Error(errorMessage);
   }
 
@@ -32,25 +39,22 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
 
 // --- fetchWithAuth ---
-// Define the FULL BASE URL for spotlights endpoints
-const API_BASE_SPOTLIGHTS = 'https://scoutflair.top/api/v1/spotLights'; // Reverted to absolute URL
+// Also uses the consistent base URL for clarity (although only for spotlights currently)
+// If you add non-spotlight endpoints later, you might call apiFetch instead
+const API_BASE_SPOTLIGHTS = `${API_BASE_URL}/spotLights`; // Use the main base URL
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  // Uses "authToken" consistent with login and apiFetch
   const token = localStorage.getItem('authToken');
   
-  // Log the token being used for debugging
   console.log("fetchWithAuth using token:", token ? `Bearer ${token.substring(0,10)}...` : 'No Token Found');
 
-  // Construct the full URL
   const fullUrl = `${API_BASE_SPOTLIGHTS}${url}`;
   console.log(`fetchWithAuth Request: ${options.method || 'GET'} ${fullUrl}`);
 
-  const res = await fetch(fullUrl, { // Use the absolute URL
+  const res = await fetch(fullUrl, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      // Ensure Authorization header is added correctly ONLY if token exists
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
@@ -62,7 +66,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
        const errData = await res.json();
        errorMessage = errData.message || errorMessage;
      } catch {}
-    console.error(`fetchWithAuth Error for ${url}: ${errorMessage}`); // Added logging
+    console.error(`fetchWithAuth Error for ${url}: ${errorMessage}`);
     throw new Error(errorMessage);
   }
   return res.json();
@@ -82,13 +86,13 @@ export async function addPost(text: string, mediaFileKeys: string[] = []) {
 }
 
 // COMMENTS
-export async function getPostComments(postId: string, limit = 10, offset = 0) { // Changed postId to string based on PostBox
+export async function getPostComments(postId: string, limit = 10, offset = 0) {
   return fetchWithAuth(
     `/getPostComments?limit=${limit}&offset=${offset}&postId=${postId}`
   );
 }
 
-export async function addComment(postId: string, text: string) { // Changed postId to string
+export async function addComment(postId: string, text: string) {
   return fetchWithAuth(`/addComment`, {
     method: 'POST',
     body: JSON.stringify({ postId, text }),
@@ -96,7 +100,7 @@ export async function addComment(postId: string, text: string) { // Changed post
 }
 
 // LIKE
-export async function toggleLike(postId: string, like: boolean) { // Changed postId to string
+export async function toggleLike(postId: string, like: boolean) {
   return fetchWithAuth(`/like/increaseOrDecreaseCount`, {
     method: 'POST',
     body: JSON.stringify({ spotLightPostId: postId, like }),
@@ -104,7 +108,7 @@ export async function toggleLike(postId: string, like: boolean) { // Changed pos
 }
 
 // SHARE
-export async function increaseShare(postId: string) { // Changed postId to string
+export async function increaseShare(postId: string) {
   return fetchWithAuth(`/share/increaseCount`, {
     method: 'POST',
     body: JSON.stringify({ spotLightPostId: postId }),

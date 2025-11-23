@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -8,6 +7,34 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Check, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// 🔧 MOCK MODE FLAG - Set to false when backend is back online
+const USE_MOCK_AUTH = true;
+
+// 🔧 Mock users for testing - each with different roles
+const MOCK_USERS = [
+  {
+    email: 'scout@scoutflair.com',
+    password: 'scout123',
+    role: 'For Scouts',
+    token: 'mock-scout-token-' + Date.now(),
+    authority: 'SCOUT'
+  },
+  {
+    email: 'player@scoutflair.com',
+    password: 'player123',
+    role: 'For Players',
+    token: 'mock-player-token-' + Date.now(),
+    authority: 'PLAYER'
+  },
+  {
+    email: 'coach@scoutflair.com',
+    password: 'coach123',
+    role: 'For Coaches',
+    token: 'mock-coach-token-' + Date.now(),
+    authority: 'COACH'
+  }
+];
 
 const roles = [
   {
@@ -51,56 +78,110 @@ const LoginForm = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
+      if (USE_MOCK_AUTH) {
+        // 🔧 MOCK AUTHENTICATION
+        console.log('🔧 Using Mock Authentication (Backend offline)');
+        
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Find matching mock user
+        const mockUser = MOCK_USERS.find(
+          user => user.email === email && user.password === password && user.role === selectedRole.name
+        );
+        
+        if (mockUser) {
+          // Generate a realistic-looking JWT token with proper authority
+          const mockJwtToken = `eyJhbGciOiJIUzUxMiJ9.${btoa(JSON.stringify({
+            "": [{ authority: mockUser.authority }],
+            sub: email,
+            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
+            iat: Math.floor(Date.now() / 1000)
+          }))}.mock-signature-${Date.now()}`;
+          
+          // Save token
+          localStorage.setItem("authToken", mockJwtToken);
+          localStorage.setItem("mockAuthMode", "true");
+          localStorage.setItem("userRole", mockUser.authority);
+          
+          console.log('✅ Mock login successful:', { 
+            email, 
+            role: selectedRole.name, 
+            authority: mockUser.authority,
+            token: mockJwtToken.substring(0, 50) + '...'
+          });
+          
+          onLogin(email, password, mockJwtToken);
+        } else {
+          setError("Invalid credentials for " + selectedRole.name + ".\n\nTry:\n• " + 
+                   MOCK_USERS.find(u => u.role === selectedRole.name)?.email + " / " +
+                   MOCK_USERS.find(u => u.role === selectedRole.name)?.password);
+        }
+      } else {
+        // 🌐 REAL BACKEND AUTHENTICATION
         const response = await fetch("https://scoutflair.top/scoutflair/v1/signin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email,             // ✅ keep email
-                username: email,   // ✅ also send as username
-                password,
-            }),
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            username: email,
+            password,
+          }),
         });
 
         let data: any = null;
         const text = await response.text();
 
         try {
-            data = JSON.parse(text); // try JSON
+          data = JSON.parse(text);
         } catch {
-            data = { message: text }; // fallback to plain text
+          data = { message: text };
         }
 
         if (response.ok && data.jwtToken) {
-            // ✅ Save token
-            localStorage.setItem("authToken", data.jwtToken);
-
-            onLogin(email, password, data.jwtToken);
+          localStorage.setItem("authToken", data.jwtToken);
+          localStorage.removeItem("mockAuthMode");
+          localStorage.removeItem("userRole");
+          onLogin(email, password, data.jwtToken);
         } else {
-            setError(data?.message || "Login failed. Please try again.");
-            console.error("Signin response:", response.status, data);
+          setError(data?.message || "Login failed. Please try again.");
+          console.error("Signin response:", response.status, data);
         }
+      }
     } catch (err) {
-        console.error("Login error:", err);
-        setError("Network error. Please check your connection.");
+      console.error("Login error:", err);
+      setError("Network error. Please check your connection.");
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
-
+  };
 
   const handleQuickLogin = () => {
-    setEmail('player@scoutflair.com');
-    setPassword('password123');
+    // Auto-fill based on selected role
+    const mockUser = MOCK_USERS.find(user => user.role === selectedRole.name);
+    if (mockUser) {
+      setEmail(mockUser.email);
+      setPassword(mockUser.password);
+    }
   };
 
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-2xl p-8 shadow-2xl">
+      {/* Mock Mode Banner */}
+      {USE_MOCK_AUTH && (
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-xs text-yellow-800 text-center font-semibold">
+            🔧 Mock Auth Mode (Backend Offline)
+          </p>
+        </div>
+      )}
+
       {/* Avatar & Title */}
       <div className="flex flex-col items-center mb-8">
         <div className="relative w-24 h-24 mb-4">
@@ -156,8 +237,27 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
         </div>
 
+        {/* Mock Credentials Helper */}
+        {USE_MOCK_AUTH && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-xs text-blue-800 font-semibold mb-2">📝 Test Credentials for {selectedRole.name}:</p>
+            <div className="text-xs text-blue-700 font-mono">
+              {MOCK_USERS.filter(u => u.role === selectedRole.name).map(user => (
+                <div key={user.email} className="bg-white p-2 rounded mt-1">
+                  <div><strong>Email:</strong> {user.email}</div>
+                  <div><strong>Password:</strong> {user.password}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Error */}
-        {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+        {error && (
+          <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg whitespace-pre-line border border-red-200">
+            {error}
+          </div>
+        )}
 
         {/* Remember + Forgot */}
         <div className="flex items-center justify-between text-sm">
@@ -327,7 +427,7 @@ export default function SignInPage() {
   };
 
   const handleGoBack = () => {
-    router.back(); // Goes back to previous page
+    router.back();
   };
 
   if (showLoginForm && selectedRole) {
