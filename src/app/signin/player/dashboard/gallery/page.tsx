@@ -1,15 +1,75 @@
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+interface GalleryItem {
+  id: string;
+  url?: string;
+  imageUrl?: string;
+  category?: string;
+  username?: string;
+}
 
 export default function GalleryPage() {
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        // 🔥 Use the correct token key — your localStorage showed "authToken"
+        const token = localStorage.getItem("authToken");
+        const userSession = JSON.parse(localStorage.getItem("userSession") || "{}");
+
+        if (!token) {
+          throw new Error("No token found. Please log in again.");
+        }
+
+        console.log("🎟 Token found:", token);
+        console.log("👤 User session:", userSession);
+
+        // 🔥 Send the request to your local API route (proxy)
+        const response = await axios.get("/api/gallery", {
+          params: {
+            category: "players",
+            limit: 5,
+            offset: 0,
+            playeremail: userSession?.email || "shuniegold@gmail.com", // fallback
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "*/*",
+          },
+        });
+
+        console.log("📸 Full API Response:", response.data);
+
+        if (response.data?.data?.obj) {
+          setGallery(response.data.data.obj as GalleryItem[]);
+        } else {
+          setGallery([]);
+        }
+      } catch (err: any) {
+        console.error("❌ Error fetching gallery:", err.response || err.message);
+        setError("Failed to load gallery.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGallery();
+  }, []);
+
+  if (loading) return <p className="text-center">Loading gallery...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
   return (
     <div className="flex flex-col px-4 py-8 md:ml-[-18px]">
-      {/* Search Bar Container - Fixed positioning and responsive */}
+      {/* Search Bar */}
       <div className="w-full mt-[-20px] md:max-w-[805px] h-auto md:h-16 rounded-xl bg-white shadow-md px-3 md:px-4 py-3 md:py-0 md:mt-[-35px] flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0 relative z-10">
         <div className="w-full max-w-[805px] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-0">
-          
           {/* Search Box */}
           <div className="w-full md:max-w-[650px] h-[40px] md:h-[30px] rounded-md bg-[#EFEFEF] px-3 flex items-center justify-between">
-            {/* Left: Search Icon + Text */}
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 md:w-3 md:h-3 flex items-center justify-center">
                 <svg
@@ -34,9 +94,8 @@ export default function GalleryPage() {
               />
             </div>
 
-            {/* Right: Edit + Delete */}
+            {/* Edit + Delete Icons */}
             <div className="flex items-center space-x-4 md:space-x-5">
-              {/* Edit Icon */}
               <button>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -58,8 +117,6 @@ export default function GalleryPage() {
                   />
                 </svg>
               </button>
-
-              {/* Delete Icon */}
               <button>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -79,82 +136,34 @@ export default function GalleryPage() {
             </div>
           </div>
 
-          {/* Filter Button */}
           <button className="border border-gray-400 rounded-md px-6 md:px-7 py-2 md:py-1 text-gray-700 hover:bg-gray-100 w-full md:w-auto">
             Filter
           </button>
         </div>
-      </div> 
-      
-      {/* Main Layout: Left gallery + Right panel */}
+      </div>
+
+      {/* Main Layout */}
       <div className="flex flex-col lg:flex-row gap-6 mt-6 md:mt-8">
-
         {/* LEFT SIDE - Gallery */}
-        <div className="bg-white shadow-md rounded-xl p-3 md:p-4 space-y-6 w-full md:w-[724px] lg:flex-1 lg:max-w-[65%] order-1 lg:order-none">
-
-          {/* Section 1 */}
-          <div className="space-y-4">
-            <div className="text-[#222222] font-medium text-sm">
-              THURSDAY, AUGUST 29, 2024
-            </div>
-            {/* Responsive grid */}
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-1 md:gap-4">
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-            </div>
-          </div>
-
-          {/* Section 2 */}
-          <div className="space-y-4">
-            <div className="text-[#222222] font-medium text-sm">
-              WEDNESDAY, AUGUST 28, 2024
-            </div>
-            {/* Responsive grid */}
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-1 md:gap-4">
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-            </div>
-          </div>
-
-          {/* Section 3 */}
-          <div className="space-y-4">
-            <div className="text-[#222222] font-medium text-sm">
-              MONDAY, AUGUST 26, 2024
-            </div>
-            {/* Responsive grid */}
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-1 md:gap-4">
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-            </div>
-          </div>
-
-          {/* Section 4 */}
-          <div className="space-y-4">
-            <div className="text-[#222222] font-medium text-sm">
-              TUESDAY, AUGUST 27, 2024
-            </div>
-            {/* Responsive grid for 3 images */}
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-1 md:gap-4">
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-              <img src="/images/round.png" alt="Gallery image" className="w-full h-12 sm:h-16 md:w-[220px] md:h-[96px] lg:h-[90px] xl:h-[100px] xl:w-[500px] object-cover rounded-md" />
-            </div>
-          </div>
+        <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4">
+        {gallery.length > 0 ? (
+  gallery.map((item: GalleryItem) => (
+    <div
+      key={item.id}
+      className="border rounded-lg overflow-hidden shadow-sm"
+    >
+      <img
+        src={item.url || item.imageUrl || "/images/placeholder.png"}
+        alt="gallery"
+        className="w-full h-40 object-cover"
+      />
+    </div>
+  ))
+) : (
+  <p className="text-gray-500">No gallery items found.</p>
+)}
         </div>
-
-        {/* RIGHT SIDE - News Panel (stacked) */}
+                {/* RIGHT SIDE - News Panel (stacked) */}
         <div className="flex flex-col gap-4 md:gap-6 w-full md:w-[350px] lg:w-[35%] lg:max-w-[400px] order-2 lg:order-none md:mt-[-95px] lg:mt-[-95px]">
 
           {/* Top Container - News Feed */}
