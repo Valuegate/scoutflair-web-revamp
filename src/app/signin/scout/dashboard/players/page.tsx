@@ -7,7 +7,7 @@ import PlayersFooter from "../../components/PlayersFooter";
 export default function Home(){
     return(
         <div  className="space-y-8">
-      <AvailablePlayers/>
+     
       <Players/>
       <PlayersFooter/>
       </div>
