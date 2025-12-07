@@ -7,15 +7,20 @@ import {
   UserPlus, 
   FileText, 
   Bookmark, 
-  Star, 
   ChevronRight,
   Sparkles,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  User,
+  X,
+  Send,
+  DollarSign,
+  Calendar,
+  Target
 } from "lucide-react";
 
-// Mock Data: Global Player Database
+// --- Mock Data ---
 const marketPlayers = [
   { id: 1, name: "Emmanuel Chidiebere", age: 19, pos: "LW", club: "Diamond Academy", value: "$50k", fit: 94, status: "Available", image: "/images/avaplone.png" },
   { id: 2, name: "Musa Yusuf", age: 23, pos: "CDM", club: "Kano Pillars", value: "$120k", fit: 88, status: "Listed", image: "/images/avaptwo.png" },
@@ -25,19 +30,166 @@ const marketPlayers = [
   { id: 6, name: "Peter Olayinka", age: 24, pos: "CAM", club: "Remo Stars", value: "$150k", fit: 91, status: "Listed", image: "/images/avapsix.png" },
 ];
 
-// Mock Data: Reports from Scouts
 const scoutReports = [
   { id: 101, scout: "Dave Ishmael", player: "Emmanuel Chidiebere", rating: "A+", summary: "Exceptional pace and dribbling. Premier League potential.", date: "2h ago" },
   { id: 102, scout: "Sarah K.", player: "Musa Yusuf", rating: "B", summary: "Solid defensive awareness but lacks passing range.", date: "5h ago" },
   { id: 103, scout: "Dave Ishmael", player: "David Alaba (Jr)", rating: "C", summary: "Still very raw. Needs 1-2 years in academy.", date: "1d ago" },
 ];
 
+// --- MODAL COMPONENT ---
+interface RequestModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const CreateRequestModal = ({ isOpen, onClose }: RequestModalProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+        
+        {/* Modal Header */}
+        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">New Scouting Mandate</h2>
+            <p className="text-xs text-gray-500">Task your scouts to find a specific player profile.</p>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200 transition-colors text-gray-500">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+          
+          {/* Section 1: Player Profile */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <User size={16} className="text-blue-600" /> Target Profile
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Position</label>
+                <select className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                  <option>Striker (CF)</option>
+                  <option>Winger (LW/RW)</option>
+                  <option>Midfielder (CM/CAM)</option>
+                  <option>Defensive Mid (CDM)</option>
+                  <option>Center Back (CB)</option>
+                  <option>Full Back (LB/RB)</option>
+                  <option>Goalkeeper (GK)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Role</label>
+                <select className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                  <option>Target Man</option>
+                  <option>Poacher</option>
+                  <option>False 9</option>
+                  <option>Pressing Forward</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Age Range</label>
+                <div className="flex gap-2 items-center">
+                  <input type="number" placeholder="Min" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+                  <span className="text-gray-400">-</span>
+                  <input type="number" placeholder="Max" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Preferred Foot</label>
+                <div className="flex gap-2">
+                  <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+                    <input type="radio" name="foot" /> Left
+                  </label>
+                  <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+                    <input type="radio" name="foot" /> Right
+                  </label>
+                  <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+                    <input type="radio" name="foot" defaultChecked /> Any
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-gray-100" />
+
+          {/* Section 2: Logistics */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <Target size={16} className="text-red-500" /> Requirements
+            </h3>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Key Attributes (Select up to 3)</label>
+              <div className="flex flex-wrap gap-2">
+                {['Pace', 'Finishing', 'Heading', 'Tackling', 'Passing', 'Vision', 'Strength'].map(attr => (
+                  <span key={attr} className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-full border border-gray-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-colors">
+                    {attr}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Max Budget</label>
+                <div className="relative">
+                  <DollarSign size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type="text" placeholder="e.g. 50,000" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-lg" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Deadline</label>
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type="date" className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-500" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Additional Notes for Scouts</label>
+            <textarea 
+              rows={3} 
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g. Looking for a leader who communicates well..."
+            ></textarea>
+          </div>
+
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">
+            Cancel
+          </button>
+          <button onClick={onClose} className="flex items-center gap-2 px-6 py-2 bg-[#0A2342] text-white text-sm font-medium rounded-lg hover:bg-blue-800 transition-colors shadow-sm">
+            <Send size={16} /> Submit Request
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN PAGE ---
 export default function ScoutingNetworkPage() {
   const [activeTab, setActiveTab] = useState<"database" | "reports" | "shortlist">("database");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
   return (
-    <div className="space-y-6 p-4 md:p-6 lg:p-8 min-h-screen bg-gray-50">
+    <div className="space-y-6 p-4 md:p-6 lg:p-8 min-h-screen bg-gray-50 relative">
+      
+      {/* Modal Overlay */}
+      <CreateRequestModal isOpen={isRequestModalOpen} onClose={() => setIsRequestModalOpen(false)} />
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -45,7 +197,10 @@ export default function ScoutingNetworkPage() {
           <p className="text-sm md:text-base text-gray-500 mt-1">Find new talent and review scout recommendations.</p>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-[#0A2342] text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors shadow-sm">
+          <button 
+            onClick={() => setIsRequestModalOpen(true)}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-[#0A2342] text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors shadow-sm"
+          >
             <UserPlus size={16} /> Create Request
           </button>
         </div>

@@ -15,6 +15,8 @@ const UKFlag = () => (
   </svg>
 );
 
+
+
 export default function ScoutTopbar({ onMenuClick }: { onMenuClick: () => void }) {
   return (
     <div className="flex w-full justify-between items-center px-3 sm:px-6 py-3 border-b bg-white shadow-sm">

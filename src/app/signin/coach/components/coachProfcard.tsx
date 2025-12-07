@@ -14,7 +14,7 @@ export const ScoutProfileCard = () => {
   const router = useRouter();
 
   const name = "Denis Ojua";
-  const role = "Scout";
+  const role = "Coach";
 
   const initials = name
     .split(" ")
@@ -36,7 +36,7 @@ export const ScoutProfileCard = () => {
   }, []);
 
   const handleNavigate = (path: string) => {
-    router.push(path);
+    router.push(path);                                                                                                                                                                                                                                                                               
     setOpen(false);
   };
 
@@ -108,14 +108,7 @@ export const ScoutProfileCard = () => {
           </div>
 
           <div className="py-1">
-            {/* 2. Added "Switch to Player" button as the first item */}
-            <button
-              onClick={() => handleNavigate("/signin/player/dashboard")}
-              className="flex items-center gap-3 w-full text-left px-4 py-3 sm:py-2 hover:bg-gray-100 transition-colors text-gray-700"
-            >
-              <Repeat size={18} />
-              <span className="text-sm font-medium">Switch to Player</span>
-            </button>
+           
             
             {/* 3. Updated filter to only get the "Settings" link */}
             {links
