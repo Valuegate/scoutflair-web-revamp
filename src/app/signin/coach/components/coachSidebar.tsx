@@ -16,7 +16,7 @@ export default function SideBar({ isOpen, onClose }: { isOpen: boolean; onClose:
      { href: "/signin/coach/dashboard/scoutingnetwork", label: "Scouting Network", icon: <PlayersIcon /> },
     { href: "/signin/coach/dashboard/aianalyst", label: " Ai Analyst", icon: <MatchesIcon /> },
     { href: "/signin/coach/dashboard/tactics", label: "Tactics", icon: <AcademiesIcon /> },
-    { href: "/signin/coach/dashboard/matches", label: "Matches", icon: <LocalPitchIcon /> },
+    { href: "/signin/coach/dashboard/schedules", label: "Schedules", icon: <LocalPitchIcon /> },
     { href: "/signin/coach/dashboard/settings", label: "Settings", icon: <SettingsIcon/> },
    
     

@@ -236,7 +236,18 @@ const AllPlayersFilterIcon = () => {
 
     )
  }
-export {AcademiesIcon, LocalPitchIcon, LogOutIcons, SettingsIcon,
+
+ const NotebookIcon = () => {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="M17 2H7C5.9 2 5 2.9 5 4V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V4C19 2.9 18.1 2 17 2ZM17 20H7V4H17V20ZM9 6H15V8H9V6ZM9 10H15V12H9V10ZM9 14H13V16H9V14Z" 
+        fill="#fdfafaff"
+      />
+    </svg>
+  );
+};
+export {AcademiesIcon, LocalPitchIcon, LogOutIcons, SettingsIcon, NotebookIcon,
          MatchesIcon, PlayersIcon, EvaluationIcons,
          OverViewIcon, UpdatesIcon, ScoutplanIcon, StarsIcon,
          ProspectsIcon, CupStarIcon, EmojiPhoto, StarsIconOutline, AllPlayersIcon,FilterIcon, AllPlayersFilterIcon, NaijaImg, ArrowBack};

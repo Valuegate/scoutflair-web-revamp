@@ -3,7 +3,7 @@ import { Home, User, Image, Settings, LogOut, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ScoutFlairLogo from "@/app/ScoutflairLogo";
-import { EvaluationIcons, MatchesIcon, SettingsIcon, LogOutIcons, OverViewIcon, LocalPitchIcon,PlayersIcon, AcademiesIcon } from "../ScoutIcons";
+import { EvaluationIcons, MatchesIcon, SettingsIcon, LogOutIcons, OverViewIcon, LocalPitchIcon,PlayersIcon, AcademiesIcon, NotebookIcon } from "../ScoutIcons";
 
 export default function SideBar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname();
@@ -11,6 +11,7 @@ export default function SideBar({ isOpen, onClose }: { isOpen: boolean; onClose:
   const links = [
     { href: "/signin/scout/dashboard", label: "Overview", icon: <OverViewIcon /> },
     { href: "/signin/scout/dashboard/evaluations", label: "Evaluations", icon: <EvaluationIcons /> },
+    { href: "/signin/scout/dashboard/scoutingplan", label: "Scouting Plan", icon: <NotebookIcon /> },
      { href: "/signin/scout/dashboard/players", label: "Players", icon: <PlayersIcon /> },
     { href: "/signin/scout/dashboard/matches", label: "Matches", icon: <MatchesIcon /> },
     { href: "/signin/scout/dashboard/academies", label: "Academies", icon: <AcademiesIcon /> },
