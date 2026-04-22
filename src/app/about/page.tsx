@@ -21,13 +21,13 @@ export default function AboutPage() {
           </div>
           
           <Image
-            src="/images/Frame_2121457547_1616_1649.png"
-            alt="A football team on the field, viewed from above"
-            width={1300}
-            height={400}
-            className="w-full h-auto rounded-2xl object-cover transition-transform duration-300 ease-in-out"
-            data-ai-hint="football team"
-          />
+  src="/images/about_hero.png"
+  alt="A football team on the field, viewed from above"
+  width={1300}
+  height={400}
+  className="w-full h-auto lg:h-[420px] rounded-2xl object-cover transition-transform duration-300 ease-in-out"
+  data-ai-hint="football team"
+/>
         </div>
       </main>
       <PartnersSection />

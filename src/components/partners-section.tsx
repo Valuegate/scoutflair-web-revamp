@@ -1,13 +1,13 @@
 import Image from 'next/image';
 
 const partners = [
-    { name: 'Houth Fc', src: '/images/bemis_toilet_seats_icon_jpeg_1616_1656.png', hint: 'football logo' },
-    { name: 'Scoutflair Fc', src: '/images/nebraska_furniture_mart_icon_png_1616_1686.png', hint: 'football logo' },
-    { name: 'FayGroup', src: '/images/bemis_toilet_seats_icon_jpeg_1616_1662.png', hint: 'corporate logo' },
+    { name: 'Valuegate', src: '/images/ValueGate RevampArtboard 5@2x.png', hint: 'corporate logo' },
+    { name: 'Scoutflair Fc', src: '/images/scotflair-removebg-preview.png', hint: 'football logo' },
+    { name: 'FayGroup', src: '/images/faygroup-removebg-preview.png', hint: 'corporate logo' },
     { name: 'Sleek Fc', src: '/images/rocky_sand_studio_icon_png_1616_1665.png', hint: 'football logo' },
-    { name: 'Valuegate', src: '/images/nebraska_furniture_mart_icon_png_1616_1684.png', hint: 'corporate logo' },
-    { name: 'FayGroup', src: '/images/plaza_homes_icon_jpeg_1616_1671.png', hint: 'corporate logo' },
-    { name: 'Scoutflair Fc', src: '/images/nebraska_furniture_mart_icon_png_1616_1674.png', hint: 'football logo' },
+    { name: 'Valuegate', src: '/images/ValueGate RevampArtboard 5@2x.png', hint: 'corporate logo' },
+    { name: 'FayGroup', src: '/images/faygroup-removebg-preview.png', hint: 'corporate logo' },
+    { name: 'Scoutflair Fc', src: '/images/scotflair-removebg-preview.png', hint: 'football logo' },
     { name: 'Academy', src: '/images/roofingsource_icon_png_1616_1677.png', hint: 'academy logo' },
     { name: 'Mason', src: '/images/nebraska_furniture_mart_icon_png_1616_1688.png', hint: 'corporate logo' },
 ];

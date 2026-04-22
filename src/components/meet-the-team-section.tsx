@@ -19,12 +19,12 @@ const teamMembers = [
     },
     {
         name: 'Team Member 2',
-        image: '/images/Frame_2121457561_1617_1689.png',
+        image: '/images/joshua.png',
         hint: 'team member portrait'
     },
     {
         name: 'Team Member 3',
-        image: '/images/Frame_2121457562_1617_1692.png',
+        image: '/images/rahul.png',
         hint: 'team member portrait'
     },
     {

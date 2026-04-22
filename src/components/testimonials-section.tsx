@@ -1,62 +1,65 @@
 // src/components/sections/TestimonialsSection.tsx
 
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { motion, PanInfo } from 'framer-motion';
-import { FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight } from 'react-icons/fa';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import Image from "next/image";
+import { motion, PanInfo } from "framer-motion";
+import {
+  FaRegArrowAltCircleLeft,
+  FaRegArrowAltCircleRight,
+} from "react-icons/fa";
+import { cn } from "@/lib/utils";
 
 const testimonials = [
   {
-    image: '/images/Ellipse_2391_1601_1624.png',
-    name: 'Samuel Baracunda',
-    title: 'Professional Scout',
+    image: "/images/Ellipse_2391_1601_1624.png",
+    name: "Samuel Baracunda",
+    title: "Professional Scout",
     description:
-      '“Scoutflair has completely changed how I discover talent. The platform connects me with skilled, underrated players I wouldn’t have found otherwise. The detailed player insights and video highlights make scouting efficient and precise.”',
+      "“Scoutflair has completely changed how I discover talent. The platform connects me with skilled, underrated players I wouldn’t have found otherwise. The detailed player insights and video highlights make scouting efficient and precise.”",
   },
   {
-    image: '/images/Ellipse_2394_1601_1648.png',
-    name: 'Chinedu Okoro',
-    title: 'Rising Star Player',
+    image: "/images/Ellipse_2394_1601_1648.png",
+    name: "Chinedu Okoro",
+    title: "Rising Star Player",
     description:
-      '“The highlight reel feature was amazing. I could easily share my best moments with clubs and scouts, which directly led to me getting a professional tryout. It\'s an incredible tool for any aspiring player.”',
+      "“The highlight reel feature was amazing. I could easily share my best moments with clubs and scouts, which directly led to me getting a professional tryout. It's an incredible tool for any aspiring player.”",
   },
   {
-    image: '/images/Ellipse_2395_1601_1649.png',
-    name: 'Sofia Gunnarsson',
-    title: 'Head of Recruitment',
+    image: "/images/Ellipse_2395_1601_1649.png",
+    name: "Sofia Gunnarsson",
+    title: "Head of Recruitment",
     description:
-      '“Scoutflair has streamlined our entire recruitment process. The data is reliable, the platform is intuitive, and we\'re finding talent faster than ever before. It has become indispensable for our club.”',
+      "“Scoutflair has streamlined our entire recruitment process. The data is reliable, the platform is intuitive, and we're finding talent faster than ever before. It has become indispensable for our club.”",
   },
   {
-    image: '/images/Ellipse_2397_1601_1659.png',
-    name: 'Isabella Rossi',
-    title: 'Player Agent',
+    image: "/images/Isabella.png",
+    name: "Isabella Rossi",
+    title: "Player Agent",
     description:
-      '“The ability to connect directly with scouts has been invaluable for my clients. Scoutflair has opened doors that were previously closed. It\'s an essential tool for any agent.”',
+      "“The ability to connect directly with scouts has been invaluable for my clients. Scoutflair has opened doors that were previously closed. It's an essential tool for any agent.”",
   },
   {
-    image: '/images/Ellipse_2398_1601_1661.png',
-    name: 'Kenji Tanaka',
-    title: 'Academy Director',
+    image: "/images/Kenji.png",
+    name: "Kenji Tanaka",
+    title: "Academy Director",
     description:
-      '“We\'ve discovered exceptional young talent from regions we never thought to look. The platform\'s mapping tools are incredibly powerful for grassroots scouting.”',
+      "“We've discovered exceptional young talent from regions we never thought to look. The platform's mapping tools are incredibly powerful for grassroots scouting.”",
   },
   {
-    image: '/images/Ellipse_2396_1601_1651.png',
-    name: 'Javier Morales',
-    title: 'Youth Team Coach',
+    image: "/images/Ellipse_2396_1601_1651.png",
+    name: "Javier Morales",
+    title: "Youth Team Coach",
     description:
-      '“Finding the right players for my youth squad used to be a challenge. Scoutflair\'s detailed analytics and player profiles have made the process incredibly efficient. It\'s a game-changer for grassroots development.”',
+      "“Finding the right players for my youth squad used to be a challenge. Scoutflair's detailed analytics and player profiles have made the process incredibly efficient. It's a game-changer for grassroots development.”",
   },
   {
-    image: '/images/Ellipse_2396_1601_1663.png',
-    name: 'Ana Silva',
-    title: 'Aspiring Player',
+    image: "/images/Ellipse_2396_1601_1663.png",
+    name: "Ana Silva",
+    title: "Aspiring Player",
     description:
-      '“Thanks to Scoutflair, my profile was seen by a top-tier club. The direct line of communication is something I never had before. It truly levels the playing field for undiscovered talent.”',
+      "“Thanks to Scoutflair, my profile was seen by a top-tier club. The direct line of communication is something I never had before. It truly levels the playing field for undiscovered talent.”",
   },
 ];
 
@@ -70,10 +73,15 @@ export function TestimonialsSection() {
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length
+    );
   };
-  
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+
+  const handleDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
     if (info.offset.x > SWIPE_THRESHOLD) {
       prevSlide();
     } else if (info.offset.x < -SWIPE_THRESHOLD) {
@@ -115,13 +123,41 @@ export function TestimonialsSection() {
               const position = (index - currentIndex + total) % total;
               const isCenter = position === 0;
 
-              let scale = 1, opacity = 1, zIndex = 1, translateX = 0;
+              let scale = 1,
+                opacity = 1,
+                zIndex = 1,
+                translateX = 0;
               switch (position) {
-                case 0: scale = 1; opacity = 1; zIndex = 10; translateX = 0; break;
-                case 1: scale = 0.8; opacity = 0.8; zIndex = 5; translateX = 160; break;
-                case total - 1: scale = 0.8; opacity = 0.8; zIndex = 5; translateX = -160; break;
-                case 2: scale = 0.6; opacity = 0.6; zIndex = 3; translateX = 300; break;
-                case total - 2: scale = 0.6; opacity = 0.6; zIndex = 3; translateX = -300; break;
+                case 0:
+                  scale = 1;
+                  opacity = 1;
+                  zIndex = 10;
+                  translateX = 0;
+                  break;
+                case 1:
+                  scale = 0.8;
+                  opacity = 0.8;
+                  zIndex = 5;
+                  translateX = 160;
+                  break;
+                case total - 1:
+                  scale = 0.8;
+                  opacity = 0.8;
+                  zIndex = 5;
+                  translateX = -160;
+                  break;
+                case 2:
+                  scale = 0.6;
+                  opacity = 0.6;
+                  zIndex = 3;
+                  translateX = 300;
+                  break;
+                case total - 2:
+                  scale = 0.6;
+                  opacity = 0.6;
+                  zIndex = 3;
+                  translateX = -300;
+                  break;
                 default:
                   scale = 0.4;
                   opacity = 0;
@@ -135,7 +171,7 @@ export function TestimonialsSection() {
                   className="absolute"
                   initial={false}
                   animate={{ x: translateX, scale, opacity, zIndex }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 25 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 25 }}
                 >
                   <Image
                     src={testimonial.image}
@@ -143,11 +179,12 @@ export function TestimonialsSection() {
                     width={120}
                     height={120}
                     className={cn(
-                        "rounded-full border-4 pointer-events-none",
-                        isCenter && "transition-transform duration-300 ease-in-out hover:scale-110"
+                      "rounded-full border-4 pointer-events-none",
+                      isCenter &&
+                        "transition-transform duration-300 ease-in-out hover:scale-110"
                     )}
                     style={{
-                      borderColor: isCenter ? 'white' : 'transparent',
+                      borderColor: isCenter ? "white" : "transparent",
                     }}
                   />
                 </motion.div>
