@@ -1,312 +1,278 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
 
-interface GalleryItem {
+import { Search, PencilLine, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { useMemo, useState } from "react";
+
+type GalleryEntry = {
   id: string;
-  url?: string;
-  imageUrl?: string;
-  category?: string;
-  username?: string;
+  image: string;
+  alt: string;
+  dateLabel: string;
+};
+
+type NewsItem = {
+  id: string;
+  image: string;
+  category: string;
+  timeAgo: string;
+  headline: string;
+};
+
+const galleryEntries: GalleryEntry[] = [
+  { id: "g1", image: "/images/spotlight1.png", alt: "Players resting during a training break", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g2", image: "/images/spotlight2.png", alt: "Football drills during match preparation", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g3", image: "/images/post_1.png", alt: "Player making a forward run in training", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g4", image: "/images/post_2.png", alt: "Late run into midfield space during a session", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g5", image: "/images/scoutplayertwo.png", alt: "Attacking sequence on the edge of the area", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g6", image: "/images/scoutplayerfour.png", alt: "Wide player carrying the ball forward", dateLabel: "THURSDAY, AUGUST 29,2024" },
+
+  { id: "g7", image: "/images/allpone.png", alt: "Competitive play in a crowded final third", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g8", image: "/images/updatesone.png", alt: "Goalkeeper preparing during a finishing drill", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g9", image: "/images/updatestwo.png", alt: "Shot taken across goal during a scrimmage", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g10", image: "/images/updatesthree.png", alt: "Player dribbling in open space", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g11", image: "/images/grass.jpg", alt: "Wide pitch setup before an evening session", dateLabel: "THURSDAY, AUGUST 29,2024" },
+  { id: "g12", image: "/images/actone.png", alt: "Training activity viewed from touchline level", dateLabel: "THURSDAY, AUGUST 29,2024" },
+
+  { id: "g13", image: "/images/acttwo.png", alt: "Players holding shape in a line during drills", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
+  { id: "g14", image: "/images/actthree.png", alt: "Recovery work taking place beside the pitch", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
+  { id: "g15", image: "/images/actfour.png", alt: "Indoor football training session", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
+  { id: "g16", image: "/images/prosimgone.png", alt: "Youth players listening during a coaching block", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
+  { id: "g17", image: "/images/prosimgtwo.png", alt: "Senior player directing a buildup phase", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
+  { id: "g18", image: "/images/prosimgthree.png", alt: "Player striking the ball under pressure", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
+
+  { id: "g19", image: "/images/topone.png", alt: "Night training under floodlights", dateLabel: "TUESDAY, AUGUST 27,2024" },
+  { id: "g20", image: "/images/toptwo.png", alt: "Small-sided game between academy players", dateLabel: "TUESDAY, AUGUST 27,2024" },
+  { id: "g21", image: "/images/topthree.png", alt: "Touchline coaching during a team session", dateLabel: "TUESDAY, AUGUST 27,2024" },
+];
+
+const newsItems: NewsItem[] = [
+  {
+    id: "n1",
+    image: "/images/round.png",
+    category: "Sport News",
+    timeAgo: "2 hours ago",
+    headline: "Valuegate Football Academy unveils new 300-seater local stadium in Abuja, Nigeria.",
+  },
+  {
+    id: "n2",
+    image: "/images/dpone.png",
+    category: "Sport News",
+    timeAgo: "2 hours ago",
+    headline: "Weekend development fixtures to spotlight emerging midfield talent across local academies.",
+  },
+  {
+    id: "n3",
+    image: "/images/scdp.png",
+    category: "Sport News",
+    timeAgo: "2 hours ago",
+    headline: "Performance staff introduce recovery-focused microcycles ahead of the next trial window.",
+  },
+  {
+    id: "n4",
+    image: "/images/post_1.png",
+    category: "Sport News",
+    timeAgo: "2 hours ago",
+    headline: "Coaches highlight smarter pressing triggers as a key development target for young players.",
+  },
+  {
+    id: "n5",
+    image: "/images/spotlight2.png",
+    category: "Sport News",
+    timeAgo: "2 hours ago",
+    headline: "Training centres invest in match-realistic sessions to improve decision-making under pressure.",
+  },
+];
+
+function groupGalleryByDate(entries: GalleryEntry[]) {
+  return entries.reduce<Record<string, GalleryEntry[]>>((acc, entry) => {
+    if (!acc[entry.dateLabel]) {
+      acc[entry.dateLabel] = [];
+    }
+    acc[entry.dateLabel].push(entry);
+    return acc;
+  }, {});
 }
 
 export default function GalleryPage() {
-  const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
 
-  useEffect(() => {
-    const fetchGallery = async () => {
-      try {
-        // 🔥 Use the correct token key — your localStorage showed "authToken"
-        const token = localStorage.getItem("authToken");
-        const userSession = JSON.parse(localStorage.getItem("userSession") || "{}");
+  const filteredEntries = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
 
-        if (!token) {
-          throw new Error("No token found. Please log in again.");
-        }
+    if (!normalized) {
+      return galleryEntries;
+    }
 
-        console.log("🎟 Token found:", token);
-        console.log("👤 User session:", userSession);
+    return galleryEntries.filter((entry) => entry.alt.toLowerCase().includes(normalized));
+  }, [query]);
 
-        // 🔥 Send the request to your local API route (proxy)
-        const response = await axios.get("/api/gallery", {
-          params: {
-            category: "players",
-            limit: 5,
-            offset: 0,
-            playeremail: userSession?.email || "shuniegold@gmail.com", // fallback
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "*/*",
-          },
-        });
+  const groupedEntries = useMemo(() => groupGalleryByDate(filteredEntries), [filteredEntries]);
 
-        console.log("📸 Full API Response:", response.data);
-
-        if (response.data?.data?.obj) {
-          setGallery(response.data.data.obj as GalleryItem[]);
-        } else {
-          setGallery([]);
-        }
-      } catch (err: any) {
-        console.error("❌ Error fetching gallery:", err.response || err.message);
-        setError("Failed to load gallery.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGallery();
-  }, []);
-
-  if (loading) return <p className="text-center">Loading gallery...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
   return (
-    <div className="flex flex-col px-4 py-8 md:ml-[-18px]">
-      {/* Search Bar */}
-      <div className="w-full mt-[-20px] md:max-w-[805px] h-auto md:h-16 rounded-xl bg-white shadow-md px-3 md:px-4 py-3 md:py-0 md:mt-[-35px] flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0 relative z-10">
-        <div className="w-full max-w-[805px] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-0">
-          {/* Search Box */}
-          <div className="w-full md:max-w-[650px] h-[40px] md:h-[30px] rounded-md bg-[#EFEFEF] px-3 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 md:w-3 md:h-3 flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 md:h-3 md:w-3 text-[#555555]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-4.35-4.35M17 10.5A6.5 6.5 0 104 10.5a6.5 6.5 0 0013 0z"
-                  />
-                </svg>
+    <div className="px-2 py-7 md:px-1">
+      <div className="flex flex-col gap-6 xl:flex-row">
+        <div className="min-w-0 flex-1">
+          <div className="rounded-[22px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)]">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center">
+              <div className="flex h-12 flex-1 items-center rounded-xl bg-[#F5F5F5] px-4">
+                <Search className="mr-3 h-4 w-4 text-[#9CA3AF]" strokeWidth={1.7} />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="search..."
+                  className="w-full bg-transparent text-sm text-[#374151] outline-none placeholder:text-[#9CA3AF]"
+                />
+                <div className="ml-3 flex items-center gap-3 text-[#6B7280]">
+                  <button type="button" className="transition hover:text-[#0A2342]">
+                    <PencilLine className="h-4 w-4" strokeWidth={1.8} />
+                  </button>
+                  <button type="button" className="transition hover:text-[#0A2342]">
+                    <Trash2 className="h-4 w-4" strokeWidth={1.8} />
+                  </button>
+                </div>
               </div>
-              <input
-                type="text"
-                placeholder="search.."
-                className="bg-[#EFEFEF] outline-none text-black placeholder-gray-400 text-sm w-full"
-              />
-            </div>
 
-            {/* Edit + Delete Icons */}
-            <div className="flex items-center space-x-4 md:space-x-5">
-              <button>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 md:h-4 md:w-4 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"
-                  />
-                </svg>
-              </button>
-              <button>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 md:h-4 md:w-4 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
+              <button
+                type="button"
+                className="h-12 min-w-[90px] rounded-[10px] border border-[#A7B2C3] px-6 text-sm font-medium text-[#384152] transition hover:bg-[#F8FAFC]"
+              >
+                Filter
               </button>
             </div>
           </div>
 
-          <button className="border border-gray-400 rounded-md px-6 md:px-7 py-2 md:py-1 text-gray-700 hover:bg-gray-100 w-full md:w-auto">
-            Filter
-          </button>
+          <div className="mt-6 rounded-[24px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)] sm:p-5">
+            {filteredEntries.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-[#D1D5DB] px-6 py-12 text-center text-sm text-[#6B7280]">
+                No gallery items match your search.
+              </div>
+            ) : (
+              Object.entries(groupedEntries).map(([dateLabel, entries]) => (
+                <section key={dateLabel} className="mb-6 last:mb-0">
+                  <h2 className="mb-4 text-[15px] font-semibold uppercase tracking-tight text-[#404040]">
+                    {dateLabel}
+                  </h2>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {entries.map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="overflow-hidden rounded-[10px] bg-[#F5F5F5]"
+                      >
+                        <Image
+                          src={entry.image}
+                          alt={entry.alt}
+                          width={520}
+                          height={320}
+                          className="h-[138px] w-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Main Layout */}
-      <div className="flex flex-col lg:flex-row gap-6 mt-6 md:mt-8">
-        {/* LEFT SIDE - Gallery */}
-        <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4">
-        {gallery.length > 0 ? (
-  gallery.map((item: GalleryItem) => (
-    <div
-      key={item.id}
-      className="border rounded-lg overflow-hidden shadow-sm"
-    >
-      <img
-        src={item.url || item.imageUrl || "/images/placeholder.png"}
-        alt="gallery"
-        className="w-full h-40 object-cover"
-      />
-    </div>
-  ))
-) : (
-  <p className="text-gray-500">No gallery items found.</p>
-)}
-        </div>
-                {/* RIGHT SIDE - News Panel (stacked) */}
-        <div className="flex flex-col gap-4 md:gap-6 w-full md:w-[350px] lg:w-[35%] lg:max-w-[400px] order-2 lg:order-none md:mt-[-95px] lg:mt-[-95px]">
-
-          {/* Top Container - News Feed */}
-          <div className="w-full bg-white rounded-xl shadow-md p-4 relative min-h-[400px] md:h-[780px] lg:h-[600px] xl:h-[730px]">
-
-            {/* Top Frame */}
-            <div className="flex justify-between items-center mb-4 md:absolute md:w-[315px] lg:w-full lg:relative md:top-5 md:left-4 lg:top-0 lg:left-0">
-              {/* Left: News Feed */}
-              <span className="font-bold text-lg md:text-[18px] text-[#222222]">
-                News Feed
-              </span>
-
-              {/* Right: View All */}
-              <span className="text-xs md:text-[12px] text-[#222222]">
+        <aside className="w-full xl:w-[340px]">
+          <div className="rounded-[24px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)]">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-[18px] font-bold text-[#222222]">News Feed</h3>
+              <button type="button" className="text-xs text-[#6B7280] transition hover:text-[#0A2342]">
                 View All
-              </span>
+              </button>
             </div>
 
-            {/* Featured Article */}
-            <div className="relative mb-6 md:absolute md:top-[60px] lg:relative lg:top-0 md:left-4 lg:left-0 md:w-[315px] lg:w-full md:h-[140px] lg:h-auto">
-              {/* Background Image */}
-              <div className="w-full h-32 md:h-[140px] lg:h-[160px] rounded-lg overflow-hidden relative">
-                <img 
-                  src="/images/grass.jpg"
-                  alt="News"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-[#041931B8] rounded-lg p-4">
-                  {/* Top Bars */}
-                  <div className="flex items-center gap-1 mb-3">
-                    <div className="w-4 h-0.5 bg-white rounded"></div>
-                    <div className="w-8 h-0.5 bg-gray-400 rounded"></div>
+            <div className="relative mb-6 overflow-hidden rounded-[14px]">
+              <Image
+                src="/images/grass.jpg"
+                alt="Featured football news"
+                width={680}
+                height={380}
+                className="h-[160px] w-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-start justify-between bg-[linear-gradient(180deg,rgba(4,25,49,0.76)_0%,rgba(4,25,49,0.88)_100%)] p-4">
+                <div className="max-w-[66%]">
+                  <div className="mb-3 flex items-center gap-2 text-[10px] text-white">
+                    <span className="font-semibold">Local News</span>
+                    <span className="h-1 w-1 rounded-full bg-white/80" />
+                    <span>2 hours ago</span>
                   </div>
-
-                  {/* Content */}
-                  <div className="flex justify-between items-start">
-                    {/* Left: Text Content */}
-                    <div className="flex flex-col gap-2 flex-1 pr-3">
-                      {/* Category + Time */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-white font-bold text-xs">Local News</span>
-                        <div className="flex items-center gap-1">
-                          <div className="w-0.5 h-0.5 bg-white rounded-full"></div>
-                          <span className="text-white text-[10px]">2 hours ago</span>
-                        </div>
-                      </div>
-
-                      {/* Headline */}
-                      <p className="text-white text-xs leading-tight opacity-90">
-                        Valuegate Football Academy Unveils New 300-Seater Local Stadium, Located in Abuja, Nigeria
-                      </p>
-                    </div>
-
-                    {/* Right: Thumbnail */}
-                    <img 
-                      src="/images/round.png"
-                      alt="Thumbnail"
-                      className="w-16 h-12 md:w-[84px] md:h-[65px] lg:w-[90px] lg:h-[70px] rounded object-cover flex-shrink-0"
-                    />
-                  </div>
+                  <p className="text-sm leading-6 text-white">
+                    Valuegate Football Academy unveils new 300-seater local stadium, located in Abuja, Nigeria.
+                  </p>
                 </div>
+                <Image
+                  src="/images/round.png"
+                  alt="Featured story thumbnail"
+                  width={92}
+                  height={70}
+                  className="h-[70px] w-[92px] rounded-md object-cover"
+                />
               </div>
             </div>
 
-            {/* News List */}
-            <div className="space-y-3 md:absolute md:top-[220px] lg:relative lg:top-0 md:left-4 lg:left-0 md:w-[284px] lg:w-full">
-              {[...Array(5)].map((_, index) => (
-                <div key={index}>
-                  <div className="flex gap-3 p-2">
-                    {/* Left Thumbnail */}
-                    <img 
-                      src="/images/round.png" 
-                      alt="Thumb" 
-                      className="w-12 h-12 md:w-[65px] md:h-[65px] lg:w-[60px] lg:h-[60px] rounded object-cover flex-shrink-0"
+            <div>
+              {newsItems.map((item, index) => (
+                <div key={item.id} className={`${index < newsItems.length - 1 ? "border-b border-[#ECECEC] pb-4 mb-4" : ""}`}>
+                  <div className="flex gap-4">
+                    <Image
+                      src={item.image}
+                      alt={item.headline}
+                      width={72}
+                      height={72}
+                      className="h-[62px] w-[62px] rounded-md object-cover"
                     />
-
-                    {/* Right Text Block */}
-                    <div className="flex-1 flex flex-col gap-2">
-                      {/* Category + Time */}
-                      <div className="flex gap-2 items-center text-xs font-semibold">
-                        <span>Sport News</span>
-                        <div className="flex gap-1 items-center">
-                          <div className="w-0.5 h-0.5 bg-black rounded-full"></div>
-                          <span className="text-[10px] font-normal">2 hours ago</span>
-                        </div>
+                    <div className="min-w-0">
+                      <div className="mb-2 flex items-center gap-2 text-[10px] text-[#6B7280]">
+                        <span className="font-semibold text-[#404040]">{item.category}</span>
+                        <span className="h-1 w-1 rounded-full bg-[#9CA3AF]" />
+                        <span>{item.timeAgo}</span>
                       </div>
-
-                      {/* Headline */}
-                      <p className="text-xs leading-tight text-[#222] opacity-90">
-                        Valuegate Football Academy Unveils New 300-Seater Local Stadium, Located in Abuja, Nigeria
-                      </p>
+                      <p className="text-xs leading-5 text-[#666666]">{item.headline}</p>
                     </div>
                   </div>
-                  {index < 4 && <hr className="border-t border-gray-200 my-2 lg:w-full" />}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Bottom Container - Featured Ads */}
-          <div className="w-full mt-[2px] bg-white rounded-xl shadow-md p-4 flex md:h-[342px] lg:h-[280px] xl:h-[330px]">
-            {/* Left Side Content */}
-            <div className="flex-1 md:p-4 lg:p-2 md:pr-2">
-              {/* Featured Ads Header */}
-              <div className="mb-6 md:mb-12 lg:mb-12">
-                <h3 className="text-gray-800 font-bold text-base">
-                  Featured Ads
-                </h3>
+          <div className="mt-6 overflow-hidden rounded-[24px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)]">
+            <div className="flex h-full gap-4">
+              <div className="flex flex-1 flex-col justify-between py-2">
+                <div>
+                  <h3 className="mb-10 text-[18px] font-bold text-[#222222]">Featured Ads</h3>
+                  <h4 className="mb-3 max-w-[180px] text-[18px] font-semibold leading-6 text-[#222222]">
+                    Subscribe to Scoutflair Premium Plan
+                  </h4>
+                  <p className="mb-6 max-w-[190px] text-xs leading-5 text-[#666666]">
+                    Unlock verified exposure tools, richer player analytics, and premium promotion features built to help standout performances reach the right audience.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="h-11 w-full max-w-[132px] rounded-[10px] bg-[#0A2342] px-6 text-sm font-semibold text-white transition hover:opacity-95"
+                >
+                  Subscribe
+                </button>
               </div>
 
-              {/* Subscription Content */}
-              <div className="mb-6 lg:mb-4">
-                {/* Title */}
-                <h4 className="text-gray-800 font-semibold text-base mb-3 leading-tight">
-                  Subscribe to Scoutflair Premium Plan
-                </h4>
-
-                {/* Description */}
-                <p className="text-gray-600 text-xs leading-tight mb-4">
-                  Unlock verified exposure tools, richer player analytics, and premium promotion features built to help standout performances reach the right audience.
-                </p>
+              <div className="flex w-[132px] items-end justify-end">
+                <Image
+                  src="/images/image.png"
+                  alt="Featured premium ad player"
+                  width={240}
+                  height={320}
+                  className="h-auto w-full object-contain"
+                />
               </div>
-
-              {/* Subscribe Button */}
-              <button
-                className="bg-[#0A2A56] rounded px-8 md:px-12 lg:px-8 py-2 text-white font-semibold text-sm transition-colors hover:bg-blue-800 w-full md:w-auto lg:w-full  xl:w-auto"
-              >
-                Subscribe
-              </button>
-            </div>
-
-            {/* Right Side Image */}
-            <div className="w-48 h-50 md:w-[300px] md:h-[239px] lg:w-[180px] lg:h-[200px] xl:w-[220px] xl:h-[270px] relative md:mt-0 md:ml-[-115px] lg:ml-[-60px] xl:ml-[-80px] flex-shrink-0 ml-[-28px]">
-              <img 
-                src="/images/image.png" 
-                alt="Player" 
-                className="w-full h-full object-cover rounded-lg"
-              />
             </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

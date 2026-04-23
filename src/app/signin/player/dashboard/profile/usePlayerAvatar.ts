@@ -64,7 +64,7 @@ export function notifyPlayerProfileUpdated() {
 export const notifyPlayerAvatarUpdated = notifyPlayerProfileUpdated;
 
 export function usePlayerAvatar() {
-  const [avatar, setAvatar] = useState(defaultPlayerAvatar);
+  const [avatar, setAvatar] = useState<string>(defaultPlayerAvatar);
 
   useEffect(() => {
     const syncAvatar = () => setAvatar(resolvePlayerAvatar());
