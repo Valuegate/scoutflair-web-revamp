@@ -1,11 +1,10 @@
 "use client";
 
-// 1. Import the 'Repeat' icon for the switch functionality
-import { ChevronDown, LogOut, Repeat } from "lucide-react"; 
+import { ChevronDown, LogOut, Repeat } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { links } from './scoutLinks';
+import { links } from "./scoutLinks";
 
 export const ScoutProfileCard = () => {
   const [imgError, setImgError] = useState(false);
@@ -24,15 +23,15 @@ export const ScoutProfileCard = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleNavigate = (path: string) => {
@@ -50,21 +49,26 @@ export const ScoutProfileCard = () => {
           aria-label="Open profile menu"
         >
           {!imgError ? (
-            <Image
-              src="/images/profile.jpeg"
-              alt="Profile"
-              width={36}
-              height={36}
-              className="rounded-full object-cover ring-2 ring-transparent hover:ring-blue-200 transition-all"
-              onError={() => setImgError(true)}
-            />
+            <div className="relative w-9 h-9 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-blue-200 transition-all">
+              <Image
+                src="/images/profile.jpeg"
+                alt="Profile"
+                fill
+                className="object-cover"
+                onError={() => setImgError(true)}
+              />
+            </div>
           ) : (
             <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-semibold text-sm ring-2 ring-transparent hover:ring-blue-200 transition-all">
               {initials}
             </div>
           )}
           <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-            <ChevronDown className={`w-2 h-2 text-white transition-transform ${open ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              className={`w-2 h-2 text-white transition-transform ${
+                open ? "rotate-180" : ""
+              }`}
+            />
           </div>
         </button>
       </div>
@@ -76,26 +80,33 @@ export const ScoutProfileCard = () => {
       >
         <div className="flex items-center gap-3 flex-1">
           {!imgError ? (
-            <Image
-              src="/images/profile.jpeg"
-              alt="Profile"
-              width={40}
-              height={40}
-              className="rounded-full object-cover"
-              onError={() => setImgError(true)}
-            />
+            <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+              <Image
+                src="/images/profile.jpeg"
+                alt="Profile"
+                fill
+                className="object-cover"
+                onError={() => setImgError(true)}
+              />
+            </div>
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-semibold text-sm">
+            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-semibold text-sm flex-shrink-0">
               {initials}
             </div>
           )}
           <div className="hidden md:block text-left">
-            <p className="font-semibold text-sm text-gray-800 truncate max-w-[100px]">{name}</p>
+            <p className="font-semibold text-sm text-gray-800 truncate max-w-[100px]">
+              {name}
+            </p>
             <p className="text-xs text-gray-500">{role}</p>
           </div>
         </div>
         <div className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 bg-gray-50">
-          <ChevronDown className={`text-gray-600 w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`text-gray-600 w-3 h-3 transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+          />
         </div>
       </button>
 
@@ -108,7 +119,6 @@ export const ScoutProfileCard = () => {
           </div>
 
           <div className="py-1">
-            {/* 2. Added "Switch to Player" button as the first item */}
             <button
               onClick={() => handleNavigate("/signin/player/dashboard")}
               className="flex items-center gap-3 w-full text-left px-4 py-3 sm:py-2 hover:bg-gray-100 transition-colors text-gray-700"
@@ -116,8 +126,7 @@ export const ScoutProfileCard = () => {
               <Repeat size={18} />
               <span className="text-sm font-medium">Switch to Player</span>
             </button>
-            
-            {/* 3. Updated filter to only get the "Settings" link */}
+
             {links
               .filter((link) => link.label === "Settings")
               .map((link) => (
