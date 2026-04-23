@@ -285,7 +285,7 @@ export default function GalleryPage() {
 
                 {/* Description */}
                 <p className="text-gray-600 text-xs leading-tight mb-4">
-                  Lorem ipsum dolor sit amet consectetur. Nunc malesuada ultricies amet metus vive at.
+                  Unlock verified exposure tools, richer player analytics, and premium promotion features built to help standout performances reach the right audience.
                 </p>
               </div>
 

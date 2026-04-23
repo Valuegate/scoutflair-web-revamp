@@ -5,14 +5,16 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { links } from "./links"; // Assuming 'links' is the correct import for this component
+import { usePlayerAvatar, usePlayerDisplayName } from "../profile/usePlayerAvatar";
 
 export const ProfileCard = () => {
   const [imgError, setImgError] = useState(false);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const playerAvatar = usePlayerAvatar();
+  const name = usePlayerDisplayName();
 
-  const name = "Denis Ojua";
   const role = "Player"; // Role is now Player
 
   const initials = name
@@ -50,7 +52,7 @@ export const ProfileCard = () => {
         >
           {!imgError ? (
             <Image
-              src="/images/profile.jpeg"
+              src={playerAvatar}
               alt="Profile"
               width={36}
               height={36}
@@ -76,7 +78,7 @@ export const ProfileCard = () => {
         <div className="flex items-center gap-3 flex-1">
           {!imgError ? (
             <Image
-              src="/images/profile.jpeg"
+              src={playerAvatar}
               alt="Profile"
               width={40}
               height={40}

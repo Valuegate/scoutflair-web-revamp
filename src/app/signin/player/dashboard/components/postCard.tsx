@@ -5,6 +5,7 @@ import { Heart, MessageCircle, Share2, Camera, Image, Smile } from 'lucide-react
 import { SendIcon } from './spotIcons';
 import { useRouter } from "next/navigation";
 import PostBox from './postBox';
+import { usePlayerAvatar } from '../profile/usePlayerAvatar';
 
 // LazyImage Component
 const LazyImage: React.FC<{ src: string; alt: string; className: string }> = ({ src, alt, className }) => {
@@ -65,7 +66,7 @@ const SocialFeed: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   
   const router = useRouter();
-  const currentUserAvatar = "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=24&h=24&fit=crop&crop=face";
+  const currentUserAvatar = usePlayerAvatar();
 
   // Fetch both global and user posts
   const fetchPosts = async (token: string) => {

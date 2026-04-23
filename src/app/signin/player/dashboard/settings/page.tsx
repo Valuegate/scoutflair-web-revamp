@@ -1,5 +1,10 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  defaultPlayerAvatar,
+  defaultPlayerBasicInfo,
+  notifyPlayerProfileUpdated,
+} from '../profile/usePlayerAvatar';
 
 interface FormData {
   firstName: string;
@@ -32,15 +37,12 @@ interface LinkedAccounts {
   google: boolean;
 }
 
-const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
+const DEFAULT_AVATAR = defaultPlayerAvatar;
+const DEFAULT_FORM_DATA: FormData = defaultPlayerBasicInfo;
 
 const SettingsPage = () => {
   const [formData, setFormData] = useState<FormData>({
-    firstName: 'Pete',
-    lastName: 'Abbias',
-    email: 'Joshfavomi@gmail.com',
-    phone: '08034*****',
-    address: ''
+    ...DEFAULT_FORM_DATA
   });
 
   const [notifications, setNotifications] = useState<Notifications>({
@@ -83,12 +85,9 @@ const SettingsPage = () => {
     const savedData = localStorage.getItem('settingsData');
     if (savedData) {
       const parsed = JSON.parse(savedData);
-      setFormData(parsed.formData || {
-        firstName: 'Pete',
-        lastName: 'Abbias',
-        email: 'Joshfavomi@gmail.com',
-        phone: '08034*****',
-        address: ''
+      setFormData({
+        ...DEFAULT_FORM_DATA,
+        ...(parsed.formData || {})
       });
       setNotifications(parsed.notifications || {
         messages: { push: true, email: true, sms: false },
@@ -146,6 +145,7 @@ const SettingsPage = () => {
       reader.onload = (event) => {
         if (event.target?.result && typeof event.target.result === 'string') {
           setAvatarUrl(event.target.result);
+          notifyPlayerProfileUpdated();
         }
       };
       reader.readAsDataURL(file);
@@ -154,6 +154,7 @@ const SettingsPage = () => {
 
   const handleAvatarRemove = () => {
     setAvatarUrl(DEFAULT_AVATAR);
+    notifyPlayerProfileUpdated();
   };
 
   const handleSave = () => {
@@ -165,6 +166,7 @@ const SettingsPage = () => {
       avatarUrl
     };
     localStorage.setItem('settingsData', JSON.stringify(data));
+    notifyPlayerProfileUpdated();
     alert('Changes saved successfully!');
   };
 

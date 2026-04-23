@@ -8,6 +8,7 @@ import { addPost } from "@/lib/api";
 import { uploadFileToR2 } from "@/lib/utils"; // Import from the utils file
 
 import type { ReactCropperElement } from "react-cropper";
+import { usePlayerAvatar, usePlayerDisplayName } from "../profile/usePlayerAvatar";
 
 // Helper: convert Data URL to File
 const dataURLtoFile = (dataurl: string, filename: string): File | null => {
@@ -426,6 +427,8 @@ const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onCl
 
 // --- Main PostBox Component ---
 export default function PostBox({ onCreatePost }: PostBoxProps) {
+  const playerAvatar = usePlayerAvatar();
+  const playerName = usePlayerDisplayName();
   const [text, setText] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<ImageItem[]>([]);
   const [selectedVideos, setSelectedVideos] = useState<VideoItem[]>([]);
@@ -523,7 +526,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
       const savedPost: Post = {
         // --- Use optional chaining to safely access nested properties ---
         id: response?.data?.obj?.id ?? Date.now().toString(), // Use real ID or fallback
-        user: { name: "You", avatar: "/images/profile.jpeg", timeAgo: "Just now" },
+        user: { name: playerName, avatar: playerAvatar, timeAgo: "Just now" },
         content: text.trim(),
         image: mediaUrls.length === 1 ? mediaUrls[0] : mediaUrls,
         likes: 0,
@@ -571,8 +574,8 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
       <div className="bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
         <div className="flex h-auto items-center space-x-2 sm:space-x-3">
           <img
-            src="/images/profile.jpeg"
-            alt="User avatar"
+            src={playerAvatar}
+            alt={playerName}
             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
           />
           <div className="flex-1 flex items-center bg-gray-100 rounded-lg px-2 sm:px-3 min-w-0">
