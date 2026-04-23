@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import {
   FolderOpen,
@@ -10,15 +11,16 @@ import {
   Share2,
   Smile,
 } from "lucide-react";
+import PostBox from "./postBox";
 import { usePlayerAvatar, usePlayerDisplayName } from "../profile/usePlayerAvatar";
 
 type SpotlightPost = {
-  id: number;
+  id: number | string;
   author: string;
   avatar: string;
   date: string;
   content: string;
-  image: string;
+  image: string | string[];
   likedBy: string[];
   comments: number;
   shares: number;
@@ -51,50 +53,6 @@ const spotlightPosts: SpotlightPost[] = [
   },
 ];
 
-function ComposerBar({
-  playerAvatar,
-  playerName,
-  submitLabel,
-  submitIconOnly = false,
-}: {
-  playerAvatar: string;
-  playerName: string;
-  submitLabel: string;
-  submitIconOnly?: boolean;
-}) {
-  return (
-    <div className="rounded-[24px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)]">
-      <div className="flex items-center gap-3">
-        <Image
-          src={playerAvatar}
-          alt={playerName}
-          width={40}
-          height={40}
-          className="h-10 w-10 rounded-md object-cover"
-        />
-
-        <div className="flex h-11 flex-1 items-center rounded-xl bg-[#F5F5F5] px-4 text-[15px] text-[#9CA3AF]">
-          <span>What&apos;s happening?</span>
-          <div className="ml-auto flex items-center gap-3 text-[#4B5563]">
-            <FolderOpen className="h-4 w-4" strokeWidth={1.75} />
-            <ImageIcon className="h-4 w-4" strokeWidth={1.75} />
-            {!submitIconOnly && <Smile className="h-4 w-4" strokeWidth={1.75} />}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className={`flex items-center justify-center rounded-[10px] bg-[#0A2342] font-semibold text-white transition hover:opacity-95 ${
-            submitIconOnly ? "h-11 w-11" : "h-11 min-w-[102px] px-6"
-          }`}
-        >
-          {submitIconOnly ? <SendHorizontal className="h-5 w-5" strokeWidth={2} /> : submitLabel}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function SpotlightCard({
   post,
   playerAvatar,
@@ -104,6 +62,8 @@ function SpotlightCard({
   playerAvatar: string;
   playerName: string;
 }) {
+  const media = Array.isArray(post.image) ? post.image : [post.image];
+
   return (
     <article className="rounded-[24px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)] sm:p-5">
       <div className="mb-4 flex items-start gap-4">
@@ -126,7 +86,7 @@ function SpotlightCard({
 
       <div className="overflow-hidden rounded-[8px]">
         <Image
-          src={post.image}
+          src={media[0]}
           alt={`${post.author} spotlight post`}
           width={1200}
           height={700}
@@ -205,16 +165,40 @@ function SpotlightCard({
 export default function Spotlight() {
   const playerAvatar = usePlayerAvatar();
   const playerName = usePlayerDisplayName();
+  const [posts, setPosts] = useState<SpotlightPost[]>(spotlightPosts);
+
+  const handleCreatePost = async (newPost: {
+    id: string;
+    user: { name: string; avatar: string; timeAgo: string };
+    content: string;
+    image: string | string[];
+    likes: number;
+    isLiked: boolean;
+    comments: number;
+    shares: number;
+    likedBy: string[];
+  }) => {
+    setPosts((prev) => [
+      {
+        id: newPost.id,
+        author: newPost.user.name,
+        avatar: newPost.user.avatar,
+        date: newPost.user.timeAgo,
+        content: newPost.content,
+        image: newPost.image,
+        likedBy: newPost.likedBy,
+        comments: newPost.comments,
+        shares: newPost.shares,
+      },
+      ...prev,
+    ]);
+  };
 
   return (
     <section className="mx-auto flex w-full max-w-[860px] flex-col gap-7 px-1 pb-6">
-      <ComposerBar
-        playerAvatar={playerAvatar}
-        playerName={playerName}
-        submitLabel="Post"
-      />
+      <PostBox onCreatePost={handleCreatePost} />
 
-      {spotlightPosts.map((post) => (
+      {posts.map((post) => (
         <SpotlightCard
           key={post.id}
           post={post}
