@@ -1,10 +1,10 @@
-import Image from 'next/image';
-import { PartnersSection } from '@/components/partners-section';
-import { OurDreamSection } from '@/components/our-dream-section';
-import { MissionVisionSection } from '@/components/mission-vision-section';
-import { TestimonialsSection } from '@/components/testimonials-section';
-import { MeetTheTeamSection } from '@/components/meet-the-team-section';
-import { CtaSection } from '@/components/cta-section';
+import Image from "next/image";
+import { PartnersSection } from "@/components/partners-section";
+import { OurDreamSection } from "@/components/our-dream-section";
+import { MissionVisionSection } from "@/components/mission-vision-section";
+import { TestimonialsSection } from "@/components/testimonials-section";
+import { MeetTheTeamSection } from "@/components/meet-the-team-section";
+import { CtaSection } from "@/components/cta-section";
 
 export default function AboutPage() {
   return (
@@ -16,18 +16,21 @@ export default function AboutPage() {
               Changing How Football Talent is Found & Fostered
             </h1>
             <p className="text-lg text-foreground/90 font-lato">
-              We are transforming the way football talent is discovered and nurtured. Through cutting-edge data and insightful scouting, we connect emerging players with top scouts and clubs, ensuring no talent goes unnoticed.
+              We are transforming the way football talent is discovered and
+              nurtured. Through cutting-edge data and insightful scouting, we
+              connect emerging players with top scouts and clubs, ensuring no
+              talent goes unnoticed.
             </p>
           </div>
-          
+
           <Image
-  src="/images/about_hero.png"
-  alt="A football team on the field, viewed from above"
-  width={1300}
-  height={400}
-  className="w-full h-auto lg:h-[420px] rounded-2xl object-cover transition-transform duration-300 ease-in-out"
-  data-ai-hint="football team"
-/>
+            src="/images/soccer_team.png"
+            alt="A football team on the field, viewed from above"
+            width={1300}
+            height={400}
+            className="w-full h-auto lg:h-[420px] rounded-2xl object-cover transition-transform duration-300 ease-in-out"
+            data-ai-hint="football team"
+          />
         </div>
       </main>
       <PartnersSection />
