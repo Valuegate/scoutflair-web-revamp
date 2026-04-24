@@ -1,13 +1,12 @@
 "use client"
-import SocialFeed from "./components/postCard";
+import Spotlight from "./components/spotLight";
 
 
 export default function SpotlightPage() {
   return (
-    <div  className=" ">
-   <SocialFeed/>
+    <div>
+      <Spotlight />
     </div>
-     
   );
 }
 
