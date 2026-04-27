@@ -1,65 +1,76 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Check, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowRight,
+  Check,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // 🔧 MOCK MODE FLAG - Set to false when backend is back online
-const USE_MOCK_AUTH = true;
+const USE_MOCK_AUTH = false;
 
 // 🔧 Mock users for testing - each with different roles
 const MOCK_USERS = [
   {
-    email: 'scout@scoutflair.com',
-    password: 'scout123',
-    role: 'For Scouts',
-    token: 'mock-scout-token-' + Date.now(),
-    authority: 'SCOUT'
+    email: "scout@scoutflair.com",
+    password: "scout123",
+    role: "For Scouts",
+    token: "mock-scout-token-" + Date.now(),
+    authority: "SCOUT",
   },
   {
-    email: 'player@scoutflair.com',
-    password: 'player123',
-    role: 'For Players',
-    token: 'mock-player-token-' + Date.now(),
-    authority: 'PLAYER'
+    email: "player@scoutflair.com",
+    password: "player123",
+    role: "For Players",
+    token: "mock-player-token-" + Date.now(),
+    authority: "PLAYER",
   },
   {
-    email: 'coach@scoutflair.com',
-    password: 'coach123',
-    role: 'For Coaches',
-    token: 'mock-coach-token-' + Date.now(),
-    authority: 'COACH'
-  }
+    email: "coach@scoutflair.com",
+    password: "coach123",
+    role: "For Coaches",
+    token: "mock-coach-token-" + Date.now(),
+    authority: "COACH",
+  },
 ];
 
 const roles = [
   {
-    name: 'For Players',
-    description: 'Access your profile, track your progress, and connect with scouts.',
-    image: '/images/scoutplayertwo.png',
-    hint: 'football player portrait',
-    href: '/signin/player',
-    dashboardRoute: '/signin/player/dashboard',
+    name: "For Players",
+    description:
+      "Access your profile, track your progress, and connect with scouts.",
+    image: "/images/scoutplayertwo.png",
+    hint: "football player portrait",
+    href: "/signin/player",
+    dashboardRoute: "/signin/player/dashboard",
   },
   {
-    name: 'For Coaches',
-    description: 'Manage your prospects, review talent, and build your winning team.',
-    image: '/images/scdp.png',
-    hint: 'football coach portrait',
-    href: '/signin/coach',
-    dashboardRoute: '/signin/coach/dashboard',
+    name: "For Coaches",
+    description:
+      "Manage your prospects, review talent, and build your winning team.",
+    image: "/images/scdp.png",
+    hint: "football coach portrait",
+    href: "/signin/coach",
+    dashboardRoute: "/signin/coach/dashboard",
   },
   {
-    name: 'For Scouts',
-    description: 'Continue your search for the next soccer star and manage your watchlist.',
-    image: '/images/avapfive.png',
-    hint: 'football scout portrait',
-    href: '/signin/scout',
-    dashboardRoute: '/signin/scout/dashboard',
+    name: "For Scouts",
+    description:
+      "Continue your search for the next soccer star and manage your watchlist.",
+    image: "/images/avapfive.png",
+    hint: "football scout portrait",
+    href: "/signin/scout",
+    dashboardRoute: "/signin/scout/dashboard",
   },
 ];
 
@@ -68,72 +79,85 @@ const LoginForm = ({
   onBack,
   onLogin,
 }: {
-  selectedRole: typeof roles[0];
+  selectedRole: (typeof roles)[0];
   onBack: () => void;
   onLogin: (email: string, password: string, token: string) => void;
 }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  
+  const [error, setError] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       if (USE_MOCK_AUTH) {
         // 🔧 MOCK AUTHENTICATION
-        console.log('🔧 Using Mock Authentication (Backend offline)');
-        
+        console.log("🔧 Using Mock Authentication (Backend offline)");
+
         // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         // Find matching mock user
         const mockUser = MOCK_USERS.find(
-          user => user.email === email && user.password === password && user.role === selectedRole.name
+          (user) =>
+            user.email === email &&
+            user.password === password &&
+            user.role === selectedRole.name
         );
-        
+
         if (mockUser) {
           // Generate a realistic-looking JWT token with proper authority
-          const mockJwtToken = `eyJhbGciOiJIUzUxMiJ9.${btoa(JSON.stringify({
-            "": [{ authority: mockUser.authority }],
-            sub: email,
-            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
-            iat: Math.floor(Date.now() / 1000)
-          }))}.mock-signature-${Date.now()}`;
-          
+          const mockJwtToken = `eyJhbGciOiJIUzUxMiJ9.${btoa(
+            JSON.stringify({
+              "": [{ authority: mockUser.authority }],
+              sub: email,
+              exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
+              iat: Math.floor(Date.now() / 1000),
+            })
+          )}.mock-signature-${Date.now()}`;
+
           // Save token
           localStorage.setItem("authToken", mockJwtToken);
           localStorage.setItem("mockAuthMode", "true");
           localStorage.setItem("userRole", mockUser.authority);
-          
-          console.log('✅ Mock login successful:', { 
-            email, 
-            role: selectedRole.name, 
+
+          console.log("✅ Mock login successful:", {
+            email,
+            role: selectedRole.name,
             authority: mockUser.authority,
-            token: mockJwtToken.substring(0, 50) + '...'
+            token: mockJwtToken.substring(0, 50) + "...",
           });
-          
+
           onLogin(email, password, mockJwtToken);
         } else {
-          setError("Invalid credentials for " + selectedRole.name + ".\n\nTry:\n• " + 
-                   MOCK_USERS.find(u => u.role === selectedRole.name)?.email + " / " +
-                   MOCK_USERS.find(u => u.role === selectedRole.name)?.password);
+          setError(
+            "Invalid credentials for " +
+              selectedRole.name +
+              ".\n\nTry:\n• " +
+              MOCK_USERS.find((u) => u.role === selectedRole.name)?.email +
+              " / " +
+              MOCK_USERS.find((u) => u.role === selectedRole.name)?.password
+          );
         }
       } else {
         // 🌐 REAL BACKEND AUTHENTICATION
-        const response = await fetch("https://scoutflair.top/scoutflair/v1/signin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            username: email,
-            password,
-          }),
-        });
+        const response = await fetch(
+          "https://scoutflair.top/scoutflair/v1/signin",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              username: email,
+              password,
+            }),
+          }
+        );
 
         let data: any = null;
         const text = await response.text();
@@ -164,7 +188,7 @@ const LoginForm = ({
 
   const handleQuickLogin = () => {
     // Auto-fill based on selected role
-    const mockUser = MOCK_USERS.find(user => user.role === selectedRole.name);
+    const mockUser = MOCK_USERS.find((user) => user.role === selectedRole.name);
     if (mockUser) {
       setEmail(mockUser.email);
       setPassword(mockUser.password);
@@ -194,7 +218,7 @@ const LoginForm = ({
           />
         </div>
         <h2 className="font-manrope text-2xl font-bold text-[#192B4D] text-center">
-          Sign In {selectedRole.name.replace('For ', 'as ')}
+          Sign In {selectedRole.name.replace("For ", "as ")}
         </h2>
         <p className="font-lato text-sm text-black/70 text-center mt-2">
           {selectedRole.description}
@@ -220,7 +244,7 @@ const LoginForm = ({
           <div className="relative">
             <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -232,7 +256,11 @@ const LoginForm = ({
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
@@ -240,14 +268,22 @@ const LoginForm = ({
         {/* Mock Credentials Helper */}
         {USE_MOCK_AUTH && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-xs text-blue-800 font-semibold mb-2">📝 Test Credentials for {selectedRole.name}:</p>
+            <p className="text-xs text-blue-800 font-semibold mb-2">
+              📝 Test Credentials for {selectedRole.name}:
+            </p>
             <div className="text-xs text-blue-700 font-mono">
-              {MOCK_USERS.filter(u => u.role === selectedRole.name).map(user => (
-                <div key={user.email} className="bg-white p-2 rounded mt-1">
-                  <div><strong>Email:</strong> {user.email}</div>
-                  <div><strong>Password:</strong> {user.password}</div>
-                </div>
-              ))}
+              {MOCK_USERS.filter((u) => u.role === selectedRole.name).map(
+                (user) => (
+                  <div key={user.email} className="bg-white p-2 rounded mt-1">
+                    <div>
+                      <strong>Email:</strong> {user.email}
+                    </div>
+                    <div>
+                      <strong>Password:</strong> {user.password}
+                    </div>
+                  </div>
+                )
+              )}
             </div>
           </div>
         )}
@@ -265,7 +301,10 @@ const LoginForm = ({
             <input type="checkbox" className="mr-2 rounded" />
             <span className="font-lato text-black/70">Remember me</span>
           </label>
-          <button type="button" className="font-lato text-[#192B4D] hover:underline">
+          <button
+            type="button"
+            className="font-lato text-[#192B4D] hover:underline"
+          >
             Forgot password?
           </button>
         </div>
@@ -299,8 +338,11 @@ const LoginForm = ({
         <Link href="/signup">
           <div className="text-center">
             <p className="font-lato text-sm text-black/70">
-              Don't have an account?{' '}
-              <button type="button" className="text-[#192B4D] hover:underline font-semibold">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                className="text-[#192B4D] hover:underline font-semibold"
+              >
                 Sign up
               </button>
             </p>
@@ -325,7 +367,7 @@ const RoleCard = ({
   isSelected,
   onClick,
 }: {
-  role: typeof roles[0];
+  role: (typeof roles)[0];
   className?: string;
   isSelected: boolean;
   onClick: () => void;
@@ -333,8 +375,8 @@ const RoleCard = ({
   <div
     onClick={onClick}
     className={cn(
-      'group bg-white rounded-2xl p-6 md:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm mx-auto h-full cursor-pointer',
-      className,
+      "group bg-white rounded-2xl p-6 md:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm mx-auto h-full cursor-pointer",
+      className
     )}
   >
     <div className="relative w-32 h-32 md:w-40 md:h-40 mb-6">
@@ -348,22 +390,26 @@ const RoleCard = ({
       />
       <div
         className={cn(
-          'absolute top-1 right-1 rounded-full p-1.5 border-2 border-white flex items-center justify-center transition-colors duration-300',
-          isSelected ? 'bg-[#192B4D]' : 'bg-gray-300',
+          "absolute top-1 right-1 rounded-full p-1.5 border-2 border-white flex items-center justify-center transition-colors duration-300",
+          isSelected ? "bg-[#192B4D]" : "bg-gray-300"
         )}
       >
         <Check
           className={cn(
-            'w-4 h-4 transition-colors duration-300',
-            isSelected ? 'text-white' : 'text-gray-500',
+            "w-4 h-4 transition-colors duration-300",
+            isSelected ? "text-white" : "text-gray-500"
           )}
           strokeWidth={3}
         />
       </div>
     </div>
     <div className="flex flex-col items-center gap-4 flex-grow">
-      <h2 className="font-manrope text-xl md:text-2xl font-bold text-[#192B4D]">{role.name}</h2>
-      <p className="font-lato text-base text-black/80 leading-relaxed">{role.description}</p>
+      <h2 className="font-manrope text-xl md:text-2xl font-bold text-[#192B4D]">
+        {role.name}
+      </h2>
+      <p className="font-lato text-base text-black/80 leading-relaxed">
+        {role.description}
+      </p>
     </div>
     <div className="mt-6 flex flex-col items-center gap-2">
       <Button className="rounded-full bg-[#041931] hover:bg-[#041931]/90 h-11 px-8 font-poppins text-base font-semibold flex items-center justify-center gap-2">
@@ -381,8 +427,8 @@ export default function SignInPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedRole = localStorage.getItem('selectedSignInRole');
+    if (typeof window !== "undefined") {
+      const storedRole = localStorage.getItem("selectedSignInRole");
       if (storedRole && roles.some((r) => r.name === storedRole)) {
         setSelectedRole(storedRole);
       }
@@ -392,13 +438,13 @@ export default function SignInPage() {
   const handleRoleClick = (roleName: string) => {
     setSelectedRole(roleName);
     setShowLoginForm(true);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedSignInRole', roleName);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedSignInRole", roleName);
     }
   };
 
   const handleLogin = (email: string, password: string, token: string) => {
-    console.log('Login successful', { email, selectedRole });
+    console.log("Login successful", { email, selectedRole });
 
     // Save session
     const loginSession = {
@@ -408,15 +454,17 @@ export default function SignInPage() {
       isLoggedIn: true,
     };
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userSession', JSON.stringify(loginSession));
-      if (token) localStorage.setItem('authToken', token);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("userSession", JSON.stringify(loginSession));
+      if (token) localStorage.setItem("authToken", token);
     }
 
     // Redirect to the right dashboard
-    let dashboardPath = '/signin/player/dashboard';
-    if (selectedRole === 'For Coaches') dashboardPath = '/signin/coach/dashboard';
-    if (selectedRole === 'For Scouts') dashboardPath = '/signin/scout/dashboard';
+    let dashboardPath = "/signin/player/dashboard";
+    if (selectedRole === "For Coaches")
+      dashboardPath = "/signin/coach/dashboard";
+    if (selectedRole === "For Scouts")
+      dashboardPath = "/signin/scout/dashboard";
 
     window.location.href = dashboardPath;
   };
@@ -436,7 +484,11 @@ export default function SignInPage() {
       return (
         <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-[url('/images/Onboarding_Select_1736_1803.png')]">
           <div className="relative z-10 w-full max-w-md mx-auto">
-            <LoginForm selectedRole={role} onBack={handleBackToRoles} onLogin={handleLogin} />
+            <LoginForm
+              selectedRole={role}
+              onBack={handleBackToRoles}
+              onLogin={handleLogin}
+            />
           </div>
         </div>
       );

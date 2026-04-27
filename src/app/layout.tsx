@@ -1,57 +1,70 @@
-"use client";
-
 import React from "react";
-import { usePathname } from "next/navigation";
 import "./globals.css";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/toaster";
-import { cn } from "@/lib/utils";
+import ClientLayout from "@/components/layout/client-layout";
+import {
+  Inter,
+  Lato,
+  Manrope,
+  Merriweather,
+  Montserrat,
+  Poppins,
+  Roboto,
+} from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+});
+const lato = Lato({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  variable: "--font-lato",
+});
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-manrope",
+});
+const merriweather = Merriweather({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-merriweather",
+});
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["500"],
+  variable: "--font-montserrat",
+});
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  variable: "--font-poppins",
+});
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["500"],
+  variable: "--font-roboto",
+});
+
+export const metadata = {
+  title: "ScoutFlair",
+  description: "The future of sports scouting",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const hideHeaderFooter =
-    pathname.startsWith("/signup") || pathname.startsWith("/signin");
-
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* suppressHydrationWarning on head prevents the Google Fonts link mismatch error */}
-      <head suppressHydrationWarning>
-        <title>ScoutFlair</title>
-        <meta name="description" content="The future of sports scouting" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;500;700;900&family=Manrope:wght@700&family=Merriweather&family=Montserrat:wght@500&family=Poppins:wght@500;600&family=Roboto:ital,wght@0,500;1,500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-lato antialiased">
-        <div
-          className={cn("flex flex-col min-h-screen", {
-            "bg-[#192B4D]":
-              pathname.startsWith("/signup") &&
-              (pathname.endsWith("/signup") || pathname.endsWith("/signin")),
-            "bg-white":
-              hideHeaderFooter &&
-              !(
-                pathname.startsWith("/signup") &&
-                (pathname.endsWith("/signup") || pathname.endsWith("/signin"))
-              ),
-          })}
-        >
-          {!hideHeaderFooter && <Header />}
-          <main className="flex-grow">{children}</main>
-          {!hideHeaderFooter && <Footer />}
-        </div>
+      <body
+        suppressHydrationWarning
+        className={`${inter.variable} ${lato.variable} ${manrope.variable} ${merriweather.variable} ${montserrat.variable} ${poppins.variable} ${roboto.variable} font-lato antialiased`}
+      >
+        <ClientLayout>{children}</ClientLayout>
         <Toaster />
       </body>
     </html>
