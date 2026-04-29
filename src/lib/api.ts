@@ -4,6 +4,37 @@
 // We assume all API calls should go directly to the production backend
 const API_BASE_URL = 'https://scoutflair.top/api/v1';
 
+type QueryValue = string | number | boolean | null | undefined;
+
+function buildQueryString(params: Record<string, QueryValue>) {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") {
+      return;
+    }
+
+    searchParams.set(key, String(value));
+  });
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
+}
+
+async function parseApiResponse(res: Response) {
+  const rawBody = await res.text();
+
+  if (!rawBody) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawBody);
+  } catch {
+    return rawBody;
+  }
+}
+
 // --- apiFetch ---
 // Now uses the absolute URL
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
@@ -24,17 +55,18 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     headers,
   });
 
+  const responseBody = await parseApiResponse(res);
+
   if (!res.ok) {
     let errorMessage = `Error ${res.status}`;
-    try {
-      const errData = await res.json();
-      errorMessage = errData.message || errorMessage;
-    } catch {}
+    if (responseBody && typeof responseBody === "object" && "message" in responseBody) {
+      errorMessage = String(responseBody.message || errorMessage);
+    }
     console.error(`apiFetch Error for ${endpoint}: ${errorMessage}`);
     throw new Error(errorMessage);
   }
 
-  return res.json();
+  return responseBody;
 }
 
 
@@ -60,21 +92,37 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
     },
   });
 
+  const responseBody = await parseApiResponse(res);
+
   if (!res.ok) {
     let errorMessage = `Error ${res.status}: ${res.statusText}`;
-     try {
-       const errData = await res.json();
-       errorMessage = errData.message || errorMessage;
-     } catch {}
+    if (responseBody && typeof responseBody === "object" && "message" in responseBody) {
+      errorMessage = String(responseBody.message || errorMessage);
+    }
     console.error(`fetchWithAuth Error for ${url}: ${errorMessage}`);
     throw new Error(errorMessage);
   }
-  return res.json();
+
+  return responseBody;
 }
 
 // POSTS
 export async function getPosts(limit = 10, offset = 0) {
   return fetchWithAuth(`/getPosts?limit=${limit}&offset=${offset}`);
+}
+
+export async function getUserPosts(limit = 10, offset = 0) {
+  return fetchWithAuth(`/getUserPosts?limit=${limit}&offset=${offset}`);
+}
+
+export async function getUserPostsByScout(params: {
+  limit?: number;
+  offset?: number;
+  playerMail?: string;
+} = {}) {
+  const { limit = 10, offset = 0, playerMail } = params;
+  const query = buildQueryString({ limit, offset, playerMail });
+  return fetchWithAuth(`/getUserPostsByScout${query}`);
 }
 
 // Updated to accept mediaFileKeys
@@ -102,7 +150,7 @@ export async function addComment(postId: string, text: string) {
 // LIKE
 export async function toggleLike(postId: string, like: boolean) {
   return fetchWithAuth(`/like/increaseOrDecreaseCount`, {
-    method: 'POST',
+    method: 'PUT',
     body: JSON.stringify({ spotLightPostId: postId, like }),
   });
 }
@@ -110,7 +158,7 @@ export async function toggleLike(postId: string, like: boolean) {
 // SHARE
 export async function increaseShare(postId: string) {
   return fetchWithAuth(`/share/increaseCount`, {
-    method: 'POST',
+    method: 'PUT',
     body: JSON.stringify({ spotLightPostId: postId }),
   });
 }
