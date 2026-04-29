@@ -73,6 +73,74 @@ interface EmojiOverlay {
   size: number;
 }
 
+type UnknownRecord = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is UnknownRecord =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const pickString = (...values: unknown[]) => {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return "";
+};
+
+const extractResponsePostId = (payload: unknown): string => {
+  const queue: unknown[] = [payload];
+  const seen = new Set<unknown>();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (!current || seen.has(current)) {
+      continue;
+    }
+
+    seen.add(current);
+
+    if (Array.isArray(current)) {
+      current.forEach((item) => {
+        if (Array.isArray(item) || isRecord(item)) {
+          queue.push(item);
+        }
+      });
+      continue;
+    }
+
+    if (!isRecord(current)) {
+      continue;
+    }
+
+    const candidateId = pickString(
+      current.id,
+      current.postId,
+      current.spotLightPostId,
+      current._id,
+    );
+
+    if (candidateId) {
+      return candidateId;
+    }
+
+    ["data", "obj", "item", "post", "result"].forEach((key) => {
+      if (key in current) {
+        queue.push(current[key]);
+      }
+    });
+
+    Object.values(current).forEach((value) => {
+      if (Array.isArray(value) || isRecord(value)) {
+        queue.push(value);
+      }
+    });
+  }
+
+  return Date.now().toString();
+};
+
 
 // --- Image Editor Modal ---
 const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ image, onSave, onClose }) => {
@@ -524,8 +592,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
 
       // Create a new post object for the UI
       const savedPost: Post = {
-        // --- Use optional chaining to safely access nested properties ---
-        id: response?.data?.obj?.id ?? Date.now().toString(), // Use real ID or fallback
+        id: extractResponsePostId(response),
         user: { name: playerName, avatar: playerAvatar, timeAgo: "Just now" },
         content: text.trim(),
         image: mediaUrls.length === 1 ? mediaUrls[0] : mediaUrls,
