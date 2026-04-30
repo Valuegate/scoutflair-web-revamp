@@ -163,3 +163,19 @@ export async function increaseShare(postId: string) {
   });
 }
 
+// NOTIFICATIONS
+export async function getNotifications(limit = 10, offset = 0) {
+  return apiFetch(`notifications/getNotifications?limit=${limit}&offset=${offset}`);
+}
+
+export async function findNotificationById(notificationId: string | number) {
+  return apiFetch(`notifications/findById?notificationId=${notificationId}`);
+}
+
+export async function saveNotification(notifications: Record<string, unknown>) {
+  return apiFetch(`notifications/add`, {
+    method: 'POST',
+    body: JSON.stringify(notifications),
+  });
+}
+
