@@ -179,3 +179,16 @@ export async function saveNotification(notifications: Record<string, unknown>) {
   });
 }
 
+// PLAYER PROFILE
+export async function getPlayerProfile(playerEmail?: string) {
+  const query = buildQueryString({ playerEmail });
+  return apiFetch(`profile/player/getProfile${query}`);
+}
+
+export async function editPlayerProfile(editProfileDtos: Record<string, unknown>) {
+  return apiFetch(`profile/player/editProfile`, {
+    method: 'POST',
+    body: JSON.stringify(editProfileDtos),
+  });
+}
+

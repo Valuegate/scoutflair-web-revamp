@@ -1,9 +1,13 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
+import { editPlayerProfile } from '@/lib/api';
+import { uploadFileToR2 } from '@/lib/utils';
 import {
-  defaultPlayerAvatar,
-  defaultPlayerBasicInfo,
+  fetchPlayerProfileFromBackend,
   notifyPlayerProfileUpdated,
+  usePlayerAvatar,
+  usePlayerBasicInfo,
+  writeStoredPlayerProfile,
 } from '../profile/usePlayerAvatar';
 
 interface FormData {
@@ -37,10 +41,17 @@ interface LinkedAccounts {
   google: boolean;
 }
 
-const DEFAULT_AVATAR = defaultPlayerAvatar;
-const DEFAULT_FORM_DATA: FormData = defaultPlayerBasicInfo;
+const DEFAULT_FORM_DATA: FormData = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
+};
 
 const SettingsPage = () => {
+  const playerBasicInfo = usePlayerBasicInfo();
+  const playerAvatar = usePlayerAvatar();
   const [formData, setFormData] = useState<FormData>({
     ...DEFAULT_FORM_DATA
   });
@@ -78,17 +89,15 @@ const SettingsPage = () => {
     google: true
   });
 
-  const [avatarUrl, setAvatarUrl] = useState<string>(DEFAULT_AVATAR);
+  const [avatarUrl, setAvatarUrl] = useState<string>(playerAvatar);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const savedData = localStorage.getItem('settingsData');
     if (savedData) {
       const parsed = JSON.parse(savedData);
-      setFormData({
-        ...DEFAULT_FORM_DATA,
-        ...(parsed.formData || {})
-      });
       setNotifications(parsed.notifications || {
         messages: { push: true, email: true, sms: false },
         messages2: { push: true, email: false, sms: false },
@@ -103,9 +112,24 @@ const SettingsPage = () => {
       setLinkedAccounts(parsed.linkedAccounts || {
         google: true
       });
-      setAvatarUrl(parsed.avatarUrl || DEFAULT_AVATAR);
     }
+
+    void fetchPlayerProfileFromBackend(true);
   }, []);
+
+  useEffect(() => {
+    setFormData({
+      firstName: playerBasicInfo.firstName,
+      lastName: playerBasicInfo.lastName,
+      email: playerBasicInfo.email,
+      phone: playerBasicInfo.phone,
+      address: playerBasicInfo.address,
+    });
+  }, [playerBasicInfo]);
+
+  useEffect(() => {
+    setAvatarUrl(playerAvatar);
+  }, [playerAvatar]);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
@@ -141,11 +165,11 @@ const SettingsPage = () => {
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
+      setPendingAvatarFile(file);
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result && typeof event.target.result === 'string') {
           setAvatarUrl(event.target.result);
-          notifyPlayerProfileUpdated();
         }
       };
       reader.readAsDataURL(file);
@@ -153,21 +177,84 @@ const SettingsPage = () => {
   };
 
   const handleAvatarRemove = () => {
-    setAvatarUrl(DEFAULT_AVATAR);
-    notifyPlayerProfileUpdated();
+    setPendingAvatarFile(null);
+    setAvatarUrl("");
   };
 
-  const handleSave = () => {
-    const data = {
-      formData,
-      notifications,
-      language,
-      linkedAccounts,
-      avatarUrl
-    };
-    localStorage.setItem('settingsData', JSON.stringify(data));
-    notifyPlayerProfileUpdated();
-    alert('Changes saved successfully!');
+  const handleSave = async () => {
+    setIsSaving(true);
+
+    try {
+      const currentProfile = await fetchPlayerProfileFromBackend(true);
+
+      let imageFileKey = currentProfile.imageFileKey;
+      let nextAvatarUrl = currentProfile.avatarUrl;
+
+      if (pendingAvatarFile) {
+        const uploadResponse = await uploadFileToR2(pendingAvatarFile);
+        imageFileKey = uploadResponse.fileKey;
+        nextAvatarUrl = uploadResponse.url;
+      } else if (!avatarUrl) {
+        imageFileKey = "";
+        nextAvatarUrl = "";
+      }
+
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+
+      const payload = {
+        address: formData.address,
+        biography: currentProfile.biography,
+        currentTeam: currentProfile.currentTeam,
+        dob: currentProfile.dob,
+        email: formData.email,
+        facebookUrl: currentProfile.facebookUrl,
+        fullName,
+        height: currentProfile.height,
+        igUrl: currentProfile.igUrl,
+        imageFileKey,
+        jerseyNumber: currentProfile.jerseyNumber,
+        licenceNumber: currentProfile.licenceNumber,
+        location: currentProfile.location,
+        nationality: currentProfile.nationality,
+        nin: currentProfile.nin,
+        phone: formData.phone,
+        playerId: currentProfile.playerId ?? 0,
+        position: currentProfile.position,
+        preferredFoot: currentProfile.preferredFoot,
+        ticTokUrl: currentProfile.ticTokUrl,
+        weight: currentProfile.weight,
+        xurl: currentProfile.xurl,
+      };
+
+      await editPlayerProfile(payload);
+
+      writeStoredPlayerProfile({
+        ...currentProfile,
+        fullName,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        imageFileKey,
+        avatarUrl: nextAvatarUrl,
+      });
+
+      const data = {
+        notifications,
+        language,
+        linkedAccounts,
+      };
+      localStorage.setItem('settingsData', JSON.stringify(data));
+      setPendingAvatarFile(null);
+      notifyPlayerProfileUpdated();
+      alert('Changes saved successfully!');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save profile changes.';
+      alert(message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -278,7 +365,7 @@ const SettingsPage = () => {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                         <img 
-                          src={avatarUrl} 
+                          src={avatarUrl || "/images/profile.jpeg"} 
                           alt="Avatar" 
                           className="w-full h-full object-cover"
                         />
@@ -523,8 +610,8 @@ const SettingsPage = () => {
 
             {/* Save Changes Button */}
             <div className="flex justify-center">
-              <button onClick={handleSave} className="w-full sm:w-auto px-8 py-3 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors">
-                Save changes
+              <button onClick={() => void handleSave()} disabled={isSaving} className="w-full sm:w-auto px-8 py-3 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors disabled:cursor-not-allowed disabled:opacity-60">
+                {isSaving ? "Saving..." : "Save changes"}
               </button>
             </div>
           </div>
