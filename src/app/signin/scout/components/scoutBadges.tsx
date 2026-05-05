@@ -1,35 +1,22 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
-const badges = [
-  {
-    label: "Experience",
-    value: "5",
-    status: "Professional",
-    color: "text-red-500",
-    bg: "bg-red-50",
-    desc: "5 years of active scouting experience across 3 leagues.",
-  },
-  {
-    label: "Transfers",
-    value: "12",
-    status: "Successful",
-    color: "text-green-500",
-    bg: "bg-green-50",
-    desc: "12 successful player transfers facilitated this season.",
-  },
-  {
-    label: "Accuracy",
-    value: "87%",
-    status: "Scouting",
-    color: "text-blue-500",
-    bg: "bg-blue-50",
-    desc: "87% scouting report accuracy based on player outcomes.",
-  },
-];
+const BASE_URL = "https://scoutflair.top";
 
-type Badge = (typeof badges)[0];
+function getToken() {
+  return localStorage.getItem("authToken") || "";
+}
+
+type Badge = {
+  label: string;
+  value: string;
+  status: string;
+  color: string;
+  bg: string;
+  desc: string;
+};
 
 function BadgeModal({ badge, onClose }: { badge: Badge; onClose: () => void }) {
   return (
@@ -64,11 +51,145 @@ function BadgeModal({ badge, onClose }: { badge: Badge; onClose: () => void }) {
   );
 }
 
+function SkeletonBadge() {
+  return (
+    <div className="bg-white rounded-md flex-1 shadow-md flex flex-col justify-center items-center py-2 gap-1 animate-pulse">
+      <div className="h-2.5 w-12 bg-gray-200 rounded" />
+      <div className="h-5 w-8 bg-gray-300 rounded" />
+      <div className="h-2.5 w-14 bg-gray-200 rounded" />
+    </div>
+  );
+}
+
 export default function ScoutsBadges() {
   const [selected, setSelected] = useState<Badge | null>(null);
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchBadges() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const token = getToken();
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const [profileRes, prospectsRes, metricsRes] = await Promise.allSettled(
+          [
+            fetch(`${BASE_URL}/api/v1/profile/scout/getScoutProfile`, {
+              headers,
+            }).then((r) => r.json()),
+            fetch(`${BASE_URL}/api/v1/profile/scout/getScoutPlayerProspects`, {
+              headers,
+            }).then((r) => r.json()),
+            fetch(`${BASE_URL}/api/v1/profile/scout/getScoutPlayerMetrics`, {
+              headers,
+            }).then((r) => r.json()),
+          ]
+        );
+
+        // ── Experience ──────────────────────────────────────────
+        let experienceValue = "—";
+        let experienceDesc = "No experience data available.";
+        if (profileRes.status === "fulfilled") {
+          const profile = profileRes.value;
+          experienceValue = profile?.experience ?? profile?.career ?? "—";
+          experienceDesc = profile?.career
+            ? `Career: ${profile.career}`
+            : profile?.experience
+            ? `${profile.experience} of scouting experience.`
+            : "Experience data from scout profile.";
+        }
+
+        // ── Prospects ───────────────────────────────────────────
+        let prospectsValue = "—";
+        let prospectsDesc = "No prospect data available.";
+        if (prospectsRes.status === "fulfilled") {
+          const prospects = prospectsRes.value;
+          const count =
+            prospects?.data?.totalCount ??
+            (Array.isArray(prospects?.data?.obj)
+              ? prospects.data.obj.length
+              : null);
+          prospectsValue = count !== null ? String(count) : "—";
+          prospectsDesc =
+            count !== null
+              ? `${count} player prospect(s) added to your watchlist.`
+              : "Prospect count unavailable.";
+        }
+
+        // ── Accuracy ────────────────────────────────────────────
+        let accuracyValue = "—";
+        let accuracyDesc = "No metrics data available.";
+        if (metricsRes.status === "fulfilled") {
+          const obj = metricsRes.value?.data?.obj;
+          if (obj) {
+            if (typeof obj.accuracy === "number") {
+              accuracyValue = `${obj.accuracy}%`;
+              accuracyDesc = "Scouting accuracy from player skill metrics.";
+            } else {
+              const fields = [
+                "accuracy",
+                "fitness",
+                "shotPower",
+                "header",
+                "longShots",
+                "oneToOne",
+              ] as const;
+              const vals = fields
+                .map((f) => obj[f])
+                .filter((v): v is number => typeof v === "number");
+              if (vals.length) {
+                const avg = Math.round(
+                  vals.reduce((a, b) => a + b, 0) / vals.length
+                );
+                accuracyValue = `${avg}%`;
+                accuracyDesc = `Avg of ${vals.length} tracked skill metrics.`;
+              }
+            }
+          }
+        }
+
+        setBadges([
+          {
+            label: "Experience",
+            value: experienceValue,
+            status: "Professional",
+            color: "text-red-500",
+            bg: "bg-red-50",
+            desc: experienceDesc,
+          },
+          {
+            label: "Prospects",
+            value: prospectsValue,
+            status: "Identified",
+            color: "text-green-500",
+            bg: "bg-green-50",
+            desc: prospectsDesc,
+          },
+          {
+            label: "Accuracy",
+            value: accuracyValue,
+            status: "Scouting",
+            color: "text-blue-500",
+            bg: "bg-blue-50",
+            desc: accuracyDesc,
+          },
+        ]);
+      } catch (err) {
+        setError("Failed to load badge data.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBadges();
+  }, []);
 
   return (
-    <div className="bg-white rounded-[12px] shadow-md p-3 w-full sm:max-w-[350px] h-[145px]">
+    <div className="bg-white rounded-[12px] shadow-md p-3 w-full sm:max-w-[350px]">
       {selected && (
         <BadgeModal badge={selected} onClose={() => setSelected(null)} />
       )}
@@ -77,22 +198,34 @@ export default function ScoutsBadges() {
         Scout&apos;s Badges
       </h3>
 
-      <div className="flex justify-between gap-2 h-[calc(100%-32px)]">
-        {badges.map((badge, i) => (
-          <button
-            key={i}
-            onClick={() => setSelected(badge)}
-            className="bg-white rounded-md flex-1 shadow-md flex flex-col justify-center items-center py-2 hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
-          >
-            <p className="text-[11px] text-gray-600">{badge.label}</p>
-            <p className="text-lg sm:text-xl font-bold text-gray-900">
-              {badge.value}
-            </p>
-            <p className={`text-[11px] font-medium ${badge.color}`}>
-              {badge.status}
-            </p>
-          </button>
-        ))}
+      <div className="flex justify-between gap-2 h-[100px]">
+        {loading ? (
+          <>
+            <SkeletonBadge />
+            <SkeletonBadge />
+            <SkeletonBadge />
+          </>
+        ) : error ? (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-xs text-red-400 text-center">{error}</p>
+          </div>
+        ) : (
+          badges.map((badge, i) => (
+            <button
+              key={i}
+              onClick={() => setSelected(badge)}
+              className="bg-white rounded-md flex-1 shadow-md flex flex-col justify-center items-center py-2 hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
+            >
+              <p className="text-[11px] text-gray-600">{badge.label}</p>
+              <p className="text-lg sm:text-xl font-bold text-gray-900">
+                {badge.value}
+              </p>
+              <p className={`text-[11px] font-medium ${badge.color}`}>
+                {badge.status}
+              </p>
+            </button>
+          ))
+        )}
       </div>
     </div>
   );

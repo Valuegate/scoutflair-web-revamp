@@ -2,6 +2,8 @@ import React from "react";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import ClientLayout from "@/components/layout/client-layout";
+// Import your provider - adjust path if necessary
+import { LanguageProvider } from "@/app/signin/scout/components/LanguageContext";
 import {
   Inter,
   Lato,
@@ -64,7 +66,10 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${inter.variable} ${lato.variable} ${manrope.variable} ${merriweather.variable} ${montserrat.variable} ${poppins.variable} ${roboto.variable} font-lato antialiased`}
       >
-        <ClientLayout>{children}</ClientLayout>
+        {/* Wrap everything in the LanguageProvider to enable site-wide language logic */}
+        <LanguageProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </LanguageProvider>
         <Toaster />
       </body>
     </html>

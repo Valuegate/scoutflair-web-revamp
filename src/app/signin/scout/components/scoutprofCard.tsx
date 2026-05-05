@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, LogOut, Repeat } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -169,13 +169,7 @@ export const ScoutProfileCard = () => {
           </div>
 
           <div className="py-1">
-            <button
-              onClick={() => handleNavigate("/signin/player/dashboard")}
-              className="flex items-center gap-3 w-full text-left px-4 py-3 sm:py-2 hover:bg-gray-100 transition-colors text-gray-700"
-            >
-              <Repeat size={18} />
-              <span className="text-sm font-medium">Switch to Player</span>
-            </button>
+            {/* Switch to Player button removed */}
 
             {links
               .filter((link) => link.label === "Settings")

@@ -1,21 +1,25 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Menu, Bell, X } from "lucide-react";
+import { Menu, Bell, X, Loader2 } from "lucide-react";
 import { ScoutProfileCard } from "./scoutprofCard";
-import SearchContainer from "../../player/dashboard/components/searchContainer";
+import SearchContainer from "../../scout/components/searchContainer";
+import { useLanguage, Language } from "./LanguageContext"; // Ensure Language type is exported from your context
 
-// Mock Notifications
-const NOTIFICATIONS = [
-  { id: 1, text: "New pitch added in Lagos", time: "2m ago", unread: true },
-  {
-    id: 2,
-    text: "Valuegate Stadium updated details",
-    time: "1h ago",
-    unread: false,
-  },
-  { id: 3, text: "New scout message received", time: "3h ago", unread: true },
-];
+const BASE_URL = "https://scoutflair.top";
+
+function getToken() {
+  return typeof window !== "undefined"
+    ? localStorage.getItem("authToken") || ""
+    : "";
+}
+
+interface Notification {
+  id: number;
+  message: string;
+  date: string;
+  read?: boolean;
+}
 
 const UKFlag = () => (
   <svg
@@ -41,16 +45,63 @@ const FrenchFlag = () => (
   </svg>
 );
 
+function formatDate(dateStr: string): string {
+  if (!dateStr) return "";
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diff < 60) return "just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  } catch {
+    return dateStr;
+  }
+}
+
 export default function ScoutTopbar({
   onMenuClick,
 }: {
   onMenuClick: () => void;
 }) {
+  const { language, setLanguage } = useLanguage();
+
   const [showNotifications, setShowNotifications] = useState(false);
-  const [language, setLanguage] = useState("English");
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const notificationRef = useRef<HTMLDivElement>(null);
 
-  // Close notifications when clicking outside
+  const fetchNotifications = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `${BASE_URL}/api/v1/notifications/getNotifications?limit=10&offset=0`,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      if (!res.ok) throw new Error(`Failed (${res.status})`);
+      const data = await res.json();
+
+      const list: Notification[] = Array.isArray(data)
+        ? data.map((n: any) => ({
+            id: n.id,
+            message: n.message,
+            date: formatDate(n.date),
+            read: false,
+          }))
+        : [];
+
+      setNotifications(list);
+    } catch (err: any) {
+      setError("Could not load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -64,9 +115,12 @@ export default function ScoutTopbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (showNotifications) fetchNotifications();
+  }, [showNotifications]);
+
   return (
     <div className="flex w-full justify-between items-center px-3 sm:px-6 py-3 border-b bg-white shadow-sm relative z-50">
-      {/* Left side */}
       <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
         <button
           onClick={onMenuClick}
@@ -76,67 +130,75 @@ export default function ScoutTopbar({
         </button>
         <div className="flex-1 max-w-sm sm:max-w-md">
           <SearchContainer
-            placeholder={language === "French" ? "Rechercher..." : "Search..."}
+            placeholder={
+              language === "Français" ? "Rechercher..." : "Search..."
+            }
           />
         </div>
       </div>
 
-      {/* Right side */}
       <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-        {/* Notification Bell */}
         <div className="relative" ref={notificationRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
           >
             <Bell className="w-5 h-5 text-gray-600" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            {notifications.length > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full border border-white">
+                {notifications.length > 9 ? "9+" : notifications.length}
+              </span>
+            )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 shadow-xl rounded-lg overflow-hidden animate-in fade-in slide-in-from-top-1">
-              <div className="p-3 border-b flex justify-between items-center bg-gray-50">
-                <span className="font-bold text-xs text-gray-700">
-                  Notifications
-                </span>
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 shadow-xl rounded-lg overflow-hidden z-50">
+              <div className="p-4 border-b flex justify-between items-center bg-gray-50">
+                <span className="font-semibold text-sm">Notifications</span>
                 <button onClick={() => setShowNotifications(false)}>
                   <X className="w-4 h-4 text-gray-400 hover:text-black" />
                 </button>
               </div>
-              <div className="max-h-60 overflow-y-auto">
-                {NOTIFICATIONS.map((n) => (
-                  <div
-                    key={n.id}
-                    className="p-3 border-b last:border-0 hover:bg-gray-50 transition cursor-pointer"
-                  >
-                    <p
-                      className={`text-[11px] ${
-                        n.unread ? "font-bold text-black" : "text-gray-600"
-                      }`}
-                    >
-                      {n.text}
-                    </p>
-                    <span className="text-[9px] text-gray-400">{n.time}</span>
+              <div className="max-h-96 overflow-y-auto">
+                {loading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
                   </div>
-                ))}
+                ) : notifications.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500 text-sm">
+                    <p className="text-2xl mb-2">🔔</p>
+                    <p>No notifications yet</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <div
+                      key={n.id}
+                      className="p-4 border-b last:border-0 hover:bg-gray-50 transition cursor-pointer"
+                    >
+                      <p className="text-sm text-gray-800">{n.message}</p>
+                      <span className="text-xs text-gray-400 mt-1 block">
+                        {n.date}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
         </div>
 
-        {/* Flag Display */}
         <div className="hidden sm:block">
-          {language === "French" ? <FrenchFlag /> : <UKFlag />}
+          {language === "Français" ? <FrenchFlag /> : <UKFlag />}
         </div>
 
-        {/* Language selector */}
+        {/* FIXED: Added 'as Language' to resolve Error 2345 */}
         <select
           value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          onChange={(e) => setLanguage(e.target.value as Language)}
           className="hidden sm:block text-gray-600 px-2 py-1 text-xs rounded border border-gray-300 outline-none bg-white cursor-pointer hover:border-gray-400"
         >
           <option value="English">English</option>
-          <option value="French">Français</option>
+          <option value="Français">Français</option>
         </select>
 
         <ScoutProfileCard />
