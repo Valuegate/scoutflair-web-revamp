@@ -1,168 +1,160 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { AllPlayersIcon, FilterIcon } from "../ScoutIcons";
 import PlayerCard from "./playerCard";
 import Link from "next/link";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Loader2 } from "lucide-react";
 
-const players = [
-  {
-    name: "Adams",
-    surname: "Taylor",
-    age: 17,
-    nationality: "Nigerian",
-    flag: "🇳🇬",
-    position: "Midfielder",
-    number: 3,
-    image: "/images/allpone.png",
-  },
-  {
-    name: "Emeka",
-    surname: "Okafor",
-    age: 19,
-    nationality: "Nigerian",
-    flag: "🇳🇬",
-    position: "Striker",
-    number: 9,
-    image: "/images/EmekaO.png",
-  },
-  {
-    name: "Kwame",
-    surname: "Mensah",
-    age: 20,
-    nationality: "Ghanaian",
-    flag: "🇬🇭",
-    position: "Defender",
-    number: 5,
-    image: "/images/Kwame.png",
-  },
-  {
-    name: "Yusuf",
-    surname: "Bello",
-    age: 18,
-    nationality: "Nigerian",
-    flag: "🇳🇬",
-    position: "Winger",
-    number: 11,
-    image: "/images/Bello.png",
-  },
-  {
-    name: "Kofi",
-    surname: "Asante",
-    age: 21,
-    nationality: "Ghanaian",
-    flag: "🇬🇭",
-    position: "Goalkeeper",
-    number: 1,
-    image: "/images/Asante.png",
-  },
-  {
-    name: "Chidi",
-    surname: "Nwosu",
-    age: 17,
-    nationality: "Nigerian",
-    flag: "🇳🇬",
-    position: "Midfielder",
-    number: 8,
-    image: "/images/Nwosu.png",
-  },
-  {
-    name: "Segun",
-    surname: "Adeyemi",
-    age: 22,
-    nationality: "Nigerian",
-    flag: "🇳🇬",
-    position: "Defender",
-    number: 4,
-    image: "/images/Adeyemi.png",
-  },
-  {
-    name: "Moussa",
-    surname: "Diallo",
-    age: 19,
-    nationality: "Senegalese",
-    flag: "🇸🇳",
-    position: "Striker",
-    number: 10,
-    image: "/images/Diallo.png",
-  },
-];
+const BASE_URL = "https://scoutflair.top";
 
-const positions = [
-  "All",
-  ...Array.from(new Set(players.map((p) => p.position))),
-];
+function getToken() {
+  return localStorage.getItem("authToken") || "";
+}
 
-type Player = (typeof players)[0];
+async function getImageUrl(fileKey: string): Promise<string> {
+  if (!fileKey || fileKey.trim() === "") return "";
+  try {
+    const res = await fetch(
+      `${BASE_URL}/scoutflair/v1/storage/presign-download/${fileKey}`,
+      { headers: { Authorization: `Bearer ${getToken()}` } }
+    );
+    const data = await res.json();
+    return data?.presignedUrl || "";
+  } catch {
+    return "";
+  }
+}
 
-function PlayerDetailModal({
-  player,
-  onClose,
-}: {
-  player: Player;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-        {/* Hero */}
-        <div className="relative bg-gradient-to-br from-[#0A2342] to-blue-700 p-6 text-white text-center">
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 p-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
-          >
-            <X size={16} />
-          </button>
-          <img
-            src={player.image}
-            alt={player.name}
-            className="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-white/30 object-cover bg-white/10"
-          />
-          <h2 className="text-xl font-bold">
-            {player.name} {player.surname}
-          </h2>
-          <p className="text-blue-200 text-sm">{player.position}</p>
-        </div>
+type ApiPlayer = {
+  playerId: number;
+  fullName: string;
+  position: string;
+  jerseyNumber: string;
+  nationality: string;
+  imageFileKey: string;
+  height: string;
+  weight: string;
+  dob: string;
+  email: string;
+};
 
-        {/* Stats */}
-        <div className="p-5 space-y-3">
-          <div className="grid grid-cols-3 gap-3 text-center">
-            {[
-              { label: "Number", value: `#${player.number}` },
-              { label: "Age", value: player.age },
-              { label: "Nationality", value: player.flag },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-gray-50 rounded-xl p-3">
-                <p className="text-lg font-bold text-gray-900">{stat.value}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-          <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-700">
-            <span className="font-medium">Nationality:</span>{" "}
-            {player.nationality} {player.flag}
-          </div>
-          <div className="flex gap-2 pt-1">
-            <button className="flex-1 py-2.5 bg-[#0A2342] text-white text-sm font-semibold rounded-xl hover:bg-blue-800 transition-colors">
-              Start Report
-            </button>
-            <button
-              onClick={onClose}
-              className="px-4 py-2.5 border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+type Player = {
+  id: number;
+  name: string;
+  surname: string;
+  age: number;
+  nationality: string;
+  flag: string;
+  position: string;
+  number: number;
+  image: string;
+  email: string;
+};
+
+function getFlagEmoji(nationality: string): string {
+  const flags: Record<string, string> = {
+    Nigerian: "🇳🇬",
+    Ghanaian: "🇬🇭",
+    Senegalese: "🇸🇳",
+    American: "🇺🇸",
+    Brazilian: "🇧🇷",
+    Portuguese: "🇵🇹",
+    Spanish: "🇪🇸",
+    Egyptian: "🇪🇬",
+    Turkish: "🇹🇷",
+    Croatian: "🇭🇷",
+    German: "🇩🇪",
+    Irish: "🇮🇪",
+    Argentine: "🇦🇷",
+    French: "🇫🇷",
+    English: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "South African": "🇿🇦",
+    Ivorian: "🇨🇮",
+    Cameroonian: "🇨🇲",
+  };
+  return flags[nationality] || "🌍";
+}
+
+function getAge(dob: string): number {
+  if (!dob) return 0;
+  const birth = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+
+function getFirstAndSurname(fullName: string): {
+  name: string;
+  surname: string;
+} {
+  const parts = (fullName || "").trim().split(" ");
+  const name = parts[0] || "";
+  const surname = parts.slice(1).join(" ") || "";
+  return { name, surname };
 }
 
 export default function AllPlayers() {
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
+  useEffect(() => {
+    async function fetchPlayers() {
+      setLoading(true);
+      setError("");
+      try {
+        const token = getToken();
+        const res = await fetch(
+          `${BASE_URL}/api/v1/profile/scout/getPlayers?limit=50&offset=0`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (!res.ok) throw new Error(`Failed to fetch players (${res.status})`);
+
+        const data: ApiPlayer[] = await res.json();
+
+        const mapped = await Promise.all(
+          data.map(async (p) => {
+            const imageUrl =
+              p.imageFileKey && p.imageFileKey.trim() !== ""
+                ? await getImageUrl(p.imageFileKey)
+                : "";
+            const { name, surname } = getFirstAndSurname(p.fullName);
+            return {
+              id: p.playerId,
+              name,
+              surname,
+              age: getAge(p.dob),
+              nationality: p.nationality || "Unknown",
+              flag: getFlagEmoji(p.nationality || ""),
+              position: p.position || "Unknown",
+              number: parseInt(p.jerseyNumber) || 0,
+              image: imageUrl,
+              email: p.email,
+            };
+          })
+        );
+
+        setPlayers(mapped);
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPlayers();
+  }, []);
+
+  const positions = [
+    "All",
+    ...Array.from(new Set(players.map((p) => p.position))),
+  ];
 
   const filtered =
     activeFilter === "All"
@@ -171,14 +163,6 @@ export default function AllPlayers() {
 
   return (
     <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
-      {/* Detail Modal */}
-      {selectedPlayer && (
-        <PlayerDetailModal
-          player={selectedPlayer}
-          onClose={() => setSelectedPlayer(null)}
-        />
-      )}
-
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-semibold flex items-center gap-2">
@@ -192,6 +176,7 @@ export default function AllPlayers() {
         <div className="relative">
           <button
             onClick={() => setFilterOpen(!filterOpen)}
+            disabled={loading}
             className={`flex items-center gap-2 px-4 py-2 border rounded-lg shadow-sm hover:bg-gray-50 transition-colors ${
               activeFilter !== "All"
                 ? "border-blue-300 bg-blue-50 text-blue-700"
@@ -249,24 +234,39 @@ export default function AllPlayers() {
         </div>
       )}
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
-        {filtered.length > 0 ? (
-          filtered.map((player, idx) => (
-            <div
-              key={idx}
-              onClick={() => setSelectedPlayer(player)}
-              className="cursor-pointer hover:scale-[1.02] transition-transform"
-            >
-              <PlayerCard {...player} />
+      {/* Loading */}
+      {loading && (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <p className="text-sm">Loading players...</p>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && !loading && (
+        <div className="text-center py-12 text-red-500 text-sm">
+          <p>⚠️ {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-3 text-xs underline text-gray-500 hover:text-gray-700"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {/* Grid — PlayerCard handles its own modals now */}
+      {!loading && !error && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6">
+          {filtered.length > 0 ? (
+            filtered.map((player) => <PlayerCard key={player.id} {...player} />)
+          ) : (
+            <div className="col-span-full text-center py-12 text-gray-400 text-sm">
+              No players found for "{activeFilter}".
             </div>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12 text-gray-400 text-sm">
-            No players found for "{activeFilter}".
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Footer */}
       <div className="flex justify-center mt-10">

@@ -11,12 +11,12 @@ const nextConfig: NextConfig = {
         hostname: "mediumslateblue-salamander-253615.hostingersite.com",
         pathname: "/**",
       },
+      { protocol: "https", hostname: "**.amazonaws.com" }, // S3 presigned URLs
+      { protocol: "https", hostname: "randomuser.me" },
+      { protocol: "https", hostname: "**" }, // catch-all for any other external image URLs
     ],
   },
-  experimental: {
-    // @ts-ignore - Next.js suggests this but types might not be updated yet
-    allowedDevOrigins: ["f9fptg-9002.csb.app"],
-  } as any, // Casting here resolves the TS2353 error
+  allowedDevOrigins: ["f9fptg-9002.csb.app"],
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
 };

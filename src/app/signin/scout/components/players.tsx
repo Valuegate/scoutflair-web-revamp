@@ -1,11 +1,85 @@
 "use client";
 
-import { useState } from "react";
-import { playersData } from "@/lib/data";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, Loader2 } from "lucide-react";
 
-// ── Country flag using flagcdn.com ───────────────────────────────────────────
+const BASE_URL = "https://scoutflair.top";
+
+function getToken() {
+  return localStorage.getItem("authToken") || "";
+}
+
+async function getImageUrl(fileKey: string): Promise<string> {
+  if (!fileKey || fileKey.trim() === "") return "";
+  try {
+    const res = await fetch(
+      `${BASE_URL}/scoutflair/v1/storage/presign-download/${fileKey}`,
+      { headers: { Authorization: `Bearer ${getToken()}` } }
+    );
+    const data = await res.json();
+    return data?.presignedUrl || "";
+  } catch {
+    return "";
+  }
+}
+
+interface Player {
+  id: string;
+  name: string;
+  position: string;
+  number: number;
+  age: number;
+  countryCode: string;
+  cm: number;
+  lb: string;
+  image: string;
+  email: string;
+}
+
+function getCountryCode(nationality: string): string {
+  const map: Record<string, string> = {
+    Nigerian: "ng",
+    Ghanaian: "gh",
+    Senegalese: "sn",
+    American: "us",
+    Brazilian: "br",
+    Portuguese: "pt",
+    Spanish: "es",
+    Egyptian: "eg",
+    Turkish: "tr",
+    Croatian: "hr",
+    German: "de",
+    Irish: "ie",
+    Argentine: "ar",
+    French: "fr",
+    English: "gb-eng",
+    "South African": "za",
+    Ivorian: "ci",
+    Cameroonian: "cm",
+    Kenyan: "ke",
+    Moroccan: "ma",
+    Algerian: "dz",
+  };
+  return map[nationality] || "un";
+}
+
+function getAge(dob: string): number {
+  if (!dob) return 0;
+  const birth = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+
+function parseCm(height: string): number {
+  const match = height?.match(/\d+/);
+  return match ? parseInt(match[0]) : 0;
+}
+
+// ── Country flag ─────────────────────────────────────────────────────────────
 function CountryFlag({ code }: { code: string }) {
   return (
     <img
@@ -19,12 +93,13 @@ function CountryFlag({ code }: { code: string }) {
 }
 
 // ── Search bar ───────────────────────────────────────────────────────────────
-type SearchContainerProps = {
+const SearchContainer = ({
+  query,
+  onQueryChange,
+}: {
   query: string;
-  onQueryChange: (query: string) => void;
-};
-
-const SearchContainer = ({ query, onQueryChange }: SearchContainerProps) => (
+  onQueryChange: (q: string) => void;
+}) => (
   <div className="relative flex-grow">
     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
     <input
@@ -37,15 +112,11 @@ const SearchContainer = ({ query, onQueryChange }: SearchContainerProps) => (
   </div>
 );
 
-// ── Positions list ───────────────────────────────────────────────────────────
-const ALL_POSITIONS = Array.from(
-  new Set(playersData.map((p) => p.position))
-).sort();
-
 // ── Filter panel ─────────────────────────────────────────────────────────────
 type FilterPanelProps = {
   open: boolean;
   onClose: () => void;
+  positions: string[];
   selectedPositions: string[];
   onTogglePosition: (pos: string) => void;
   ageRange: [number, number];
@@ -56,6 +127,7 @@ type FilterPanelProps = {
 const FilterPanel = ({
   open,
   onClose,
+  positions,
   selectedPositions,
   onTogglePosition,
   ageRange,
@@ -82,7 +154,7 @@ const FilterPanel = ({
             Position
           </h3>
           <div className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
-            {ALL_POSITIONS.map((pos) => (
+            {positions.map((pos) => (
               <label
                 key={pos}
                 className="flex items-center gap-2 cursor-pointer group"
@@ -164,35 +236,81 @@ const FilterPanel = ({
   );
 };
 
-// ── Player avatar with fallback ──────────────────────────────────────────────
+// ── Player avatar ─────────────────────────────────────────────────────────────
 function PlayerAvatar({ src, name }: { src: string; name: string }) {
   const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     name
   )}&size=150&background=fed7aa&color=7c2d12&bold=true`;
-
   return (
     <img
-      src={src}
+      src={src || fallback}
       alt={name}
       width={96}
       height={96}
       className="rounded-full w-24 h-24 object-cover border-2 border-orange-300"
       referrerPolicy="no-referrer"
       onError={(e) => {
-        const target = e.target as HTMLImageElement;
-        target.onerror = null; // prevent infinite loop
-        target.src = fallback;
+        const t = e.target as HTMLImageElement;
+        t.onerror = null;
+        t.src = fallback;
       }}
     />
   );
 }
 
-// ── Main page ────────────────────────────────────────────────────────────────
+// ── Main page ─────────────────────────────────────────────────────────────────
 export default function PlayersPage() {
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedPositions, setSelectedPositions] = useState<string[]>([]);
   const [ageRange, setAgeRange] = useState<[number, number]>([18, 40]);
+
+  useEffect(() => {
+    async function fetchPlayers() {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/v1/profile/scout/getPlayers?limit=50&offset=0`,
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        );
+        if (!res.ok) throw new Error(`Failed to fetch players (${res.status})`);
+        const data = await res.json();
+
+        const mapped: Player[] = await Promise.all(
+          data.map(async (p: any) => {
+            const imageUrl =
+              p.imageFileKey && p.imageFileKey.trim() !== ""
+                ? await getImageUrl(p.imageFileKey)
+                : "";
+            return {
+              id: String(p.playerId),
+              name: p.fullName || "Unknown",
+              position: p.position || "Unknown",
+              number: parseInt(p.jerseyNumber) || 0,
+              age: getAge(p.dob),
+              countryCode: getCountryCode(p.nationality || ""),
+              cm: parseCm(p.height),
+              lb: p.weight?.match(/\d+/)?.[0] || "0",
+              image: imageUrl,
+              email: p.email || "",
+            };
+          })
+        );
+
+        setPlayers(mapped);
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPlayers();
+  }, []);
 
   const togglePosition = (pos: string) =>
     setSelectedPositions((prev) =>
@@ -204,11 +322,15 @@ export default function PlayersPage() {
     setAgeRange([18, 40]);
   };
 
+  const allPositions = Array.from(
+    new Set(players.map((p) => p.position))
+  ).sort();
+
   const activeFilterCount =
     selectedPositions.length +
     (ageRange[0] !== 18 || ageRange[1] !== 40 ? 1 : 0);
 
-  const filteredPlayers = playersData
+  const filteredPlayers = players
     .filter((player) => {
       const matchesSearch = player.name
         .toLowerCase()
@@ -216,8 +338,9 @@ export default function PlayersPage() {
       const matchesPosition =
         selectedPositions.length === 0 ||
         selectedPositions.includes(player.position);
-      const age = parseInt(player.AGE);
-      const matchesAge = age >= ageRange[0] && age <= ageRange[1];
+      const matchesAge =
+        player.age === 0 ||
+        (player.age >= ageRange[0] && player.age <= ageRange[1]);
       return matchesSearch && matchesPosition && matchesAge;
     })
     .sort((a, b) => {
@@ -235,6 +358,7 @@ export default function PlayersPage() {
       <FilterPanel
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
+        positions={allPositions}
         selectedPositions={selectedPositions}
         onTogglePosition={togglePosition}
         ageRange={ageRange}
@@ -269,48 +393,76 @@ export default function PlayersPage() {
           </button>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-          {filteredPlayers.map((player) => (
-            <div
-              key={player.id}
-              className="bg-white shadow rounded-lg flex gap-4 p-4 items-center hover:shadow-md transition-shadow"
-            >
-              <div className="flex-shrink-0">
-                <PlayerAvatar src={player.image} name={player.name} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start gap-2">
-                  <h2 className="text-base sm:text-lg font-bold truncate">
-                    {player.name}
-                  </h2>
-                  <div className="flex-shrink-0 pt-0.5">
-                    <CountryFlag code={player.countryFlag} />
-                  </div>
-                </div>
-                <div className="flex gap-1 flex-wrap text-xs text-gray-600">
-                  <span>{player.position},</span>
-                  <span>No. {player.number}</span>
-                </div>
-                <p className="text-sm text-gray-700">AGE: {player.AGE}</p>
-                <div className="flex gap-2 text-xs text-gray-600">
-                  <span>{player.cm}cm</span>
-                  <span>{player.lb}lb</span>
-                </div>
-                <Link href={`/signin/scout/dashboard/profile/${player.id}`}>
-                  <button className="mt-2 border border-orange-300 rounded-full px-3 py-1 text-xs text-gray-600 hover:bg-orange-50 transition">
-                    View profile
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ))}
+        {/* Loading */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-400">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-400" />
+            <p className="text-sm">Loading players...</p>
+          </div>
+        )}
 
-          {filteredPlayers.length === 0 && (
-            <p className="col-span-full text-center text-gray-500 mt-8">
-              No players found.
-            </p>
-          )}
-        </div>
+        {/* Error */}
+        {error && !loading && (
+          <div className="text-center py-12 text-red-500 text-sm">
+            <p>⚠️ {error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-3 text-xs underline text-gray-500 hover:text-gray-700"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {/* Grid */}
+        {!loading && !error && (
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+            {filteredPlayers.map((player) => (
+              <div
+                key={player.id}
+                className="bg-white shadow rounded-lg flex gap-4 p-4 items-center hover:shadow-md transition-shadow"
+              >
+                <div className="flex-shrink-0">
+                  <PlayerAvatar src={player.image} name={player.name} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start gap-2">
+                    <h2 className="text-base sm:text-lg font-bold truncate">
+                      {player.name}
+                    </h2>
+                    <div className="flex-shrink-0 pt-0.5">
+                      <CountryFlag code={player.countryCode} />
+                    </div>
+                  </div>
+                  <div className="flex gap-1 flex-wrap text-xs text-gray-600">
+                    <span>{player.position},</span>
+                    <span>No. {player.number || "—"}</span>
+                  </div>
+                  <p className="text-sm text-gray-700">
+                    AGE: {player.age || "—"}
+                  </p>
+                  {(player.cm > 0 || player.lb !== "0") && (
+                    <div className="flex gap-2 text-xs text-gray-600">
+                      {player.cm > 0 && <span>{player.cm}cm</span>}
+                      {player.lb !== "0" && <span>{player.lb}lb</span>}
+                    </div>
+                  )}
+                  <Link href={`/signin/scout/dashboard/profile/${player.id}`}>
+                    <button className="mt-2 border border-orange-300 rounded-full px-3 py-1 text-xs text-gray-600 hover:bg-orange-50 transition">
+                      View profile
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+
+            {filteredPlayers.length === 0 && (
+              <p className="col-span-full text-center text-gray-500 mt-8">
+                No players found.
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

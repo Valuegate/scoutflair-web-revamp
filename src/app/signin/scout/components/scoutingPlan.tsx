@@ -1,339 +1,551 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
+import {
+  Search,
+  Filter,
+  Plus,
+  MapPin,
+  Calendar,
+  ChevronDown,
+  X,
+  CheckCircle2,
+  MoreHorizontal,
+  TrendingUp,
+  FileText,
+  Zap,
+  RefreshCw,
+} from "lucide-react";
 import AddTaskForm from "./addNewTask";
-import { Star } from "lucide-react";
-import { useState } from "react";
-import { apiFetch } from "@/lib/api"; // Import your API helper
+import { SCOUTING_REFRESH_EVENT } from "./scoutingPlanWidget";
 
-interface TaskFormData {
-  academyClubName: string;
-  playerName: string;
-  position: string;
-  height: string;
-  weight: string;
-  rating: number;
-  nationality: string;
-  games: number;
-  goals: number;
-  assists: number;
-  image: string | null;
+const BASE = "https://scoutflair.top/api/v1";
+
+function getToken() {
+  return typeof window !== "undefined"
+    ? localStorage.getItem("authToken") ?? ""
+    : "";
 }
 
-// This interface is for the data we actually send to the API
-interface ApiTaskData {
-  academyClubName: string;
-  playerName: string;
-  position: string;
-  height: number;
-  weight: number;
-  rating: number;
-  nationality: string;
-  games: number;
-  goals: number;
-  assists: number;
-  image: string | null;
+async function scoutGet(path: string) {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error(`${path} → ${res.status}`);
+  return res.json();
 }
 
-export default function ScoutingPlan() {
+interface ScoutPlayer {
+  playerId?: number;
+  fullName?: string;
+  position?: string;
+  height?: string;
+  weight?: string;
+  currentTeam?: string;
+  imageFileKey?: string | null;
+  location?: string;
+}
+
+interface ActivityItem {
+  id: number;
+  message: string;
+  date: string;
+}
+
+interface NewRequest {
+  title: string;
+  club: string;
+  deadline: string;
+}
+
+function extractList(raw: unknown): ScoutPlayer[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  const r = raw as Record<string, unknown>;
+  if (Array.isArray(r?.data)) return r.data as ScoutPlayer[];
+  const obj = r?.data as Record<string, unknown> | undefined;
+  if (Array.isArray(obj?.obj)) return obj!.obj as ScoutPlayer[];
+  if (Array.isArray(r?.content)) return r.content as ScoutPlayer[];
+  console.log(
+    "extractList — unrecognized shape:",
+    JSON.stringify(raw).slice(0, 300)
+  );
+  return [];
+}
+
+function TaskSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl p-4 border border-gray-100 animate-pulse flex items-center gap-4">
+      <div className="w-14 h-14 rounded-full bg-gray-200 shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 w-36 bg-gray-200 rounded" />
+        <div className="h-3 w-48 bg-gray-100 rounded" />
+        <div className="h-3 w-32 bg-gray-100 rounded" />
+      </div>
+      <div className="h-8 w-24 bg-gray-200 rounded-xl shrink-0" />
+    </div>
+  );
+}
+
+function PlayerTaskCard({
+  player,
+  index,
+}: {
+  player: ScoutPlayer;
+  index: number;
+}) {
+  return (
+    <div className="bg-white rounded-2xl p-4 border border-gray-100 hover:border-[#0A2342]/20 hover:shadow-md transition-all duration-200 group">
+      <div className="flex items-center gap-4">
+        <div className="relative shrink-0">
+          {player.imageFileKey ? (
+            <img
+              src={player.imageFileKey}
+              alt={player.fullName}
+              className="w-14 h-14 rounded-full object-cover border-2 border-gray-100"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#0A2342] to-blue-500 flex items-center justify-center text-white font-bold text-xl">
+              {player.fullName?.[0]?.toUpperCase() ?? "P"}
+            </div>
+          )}
+          {index % 3 === 1 && (
+            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-gray-900 text-sm truncate">
+            {player.fullName ?? "Unknown Player"}
+          </p>
+          <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+            <MapPin size={11} className="shrink-0" />
+            <span className="truncate">
+              {player.location ?? "TBD"} |{" "}
+              {player.currentTeam ?? "Unknown Club"}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+            <span className="flex items-center gap-1 text-[11px] text-gray-400">
+              <Calendar size={10} /> Pending evaluation
+            </span>
+            {player.position && (
+              <span className="text-[11px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+                {player.position}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full border bg-amber-50 text-amber-600 border-amber-200">
+            Pending
+          </span>
+          <button className="bg-[#0A2342] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-blue-900 transition whitespace-nowrap">
+            Start Report
+          </button>
+          <button className="text-gray-400 hover:text-gray-600 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <MoreHorizontal size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ScoutingPlanPage() {
   const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [players, setPlayers] = useState<ScoutPlayer[]>([]);
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [prospectsCount, setProspectsCount] = useState(0);
+  const [newRequest, setNewRequest] = useState<NewRequest | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"Name" | "Date">("Date");
+  const loadingRef = useRef(false);
 
-  const handleAddTaskClick = () => {
-    setShowModal(true);
-    setError(null);
-  };
-
-  const handleCancel = () => {
-    setShowModal(false);
-    setError(null);
-  };
-
-  const handleSave = async (formData: TaskFormData) => {
-    setIsLoading(true);
-    setError(null);
-
-    // --- START VALIDATION & CONVERSION ---
-    const heightNum = parseFloat(formData.height);
-    const weightNum = parseFloat(formData.weight);
-    const gamesNum = Number(formData.games);
-    const goalsNum = Number(formData.goals);
-    const assistsNum = Number(formData.assists);
-
-    // 1. Check for valid numbers
-    if (
-      isNaN(heightNum) ||
-      isNaN(weightNum) ||
-      isNaN(gamesNum) ||
-      isNaN(goalsNum) ||
-      isNaN(assistsNum)
-    ) {
-      let validationError =
-        "Please enter valid numbers for: Height, Weight, Games, Goals, and Assists.";
-      setError(validationError);
-      setIsLoading(false);
-      return;
-    }
-
-    // 2. NEW: Add reasonable range validation
-    if (heightNum < 100 || heightNum > 250) {
-      setError("Invalid Height. Please use centimeters (e.g., 178).");
-      setIsLoading(false);
-      return;
-    }
-
-    if (weightNum < 30 || weightNum > 150) {
-      setError("Invalid Weight. Please use kilograms (e.g., 75).");
-      setIsLoading(false);
-      return;
-    }
-
-    // Create the payload with the correct data types
-    const payload: ApiTaskData = {
-      ...formData,
-      height: heightNum,
-      weight: weightNum,
-      games: gamesNum,
-      goals: goalsNum,
-      assists: assistsNum,
-      image: null,
-    };
-    // --- END VALIDATION & CONVERSION ---
+  async function load() {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setLoading(true);
 
     try {
-      console.log("=== API Call Debug ===");
-      console.log("Endpoint:", "/api/v1/profile/scout/createNewScoutTask");
-      console.log("Data being sent (Payload):", payload);
+      const [playersRes, activityRes, prospectsRes] = await Promise.allSettled([
+        scoutGet("/profile/scout/getScoutPlayers?limit=20&offset=0"),
+        scoutGet("/profile/scout/getActivityFeed?limit=5&offset=0"),
+        scoutGet("/profile/scout/getScoutPlayerProspects"),
+      ]);
+
       console.log(
-        "Token in localStorage:",
-        localStorage.getItem("authToken") ? "EXISTS" : "MISSING"
+        "Page RAW players:",
+        playersRes.status === "fulfilled"
+          ? JSON.stringify(playersRes.value).slice(0, 300)
+          : playersRes.reason
+      );
+      console.log(
+        "Page RAW activity:",
+        activityRes.status === "fulfilled"
+          ? JSON.stringify(activityRes.value).slice(0, 300)
+          : activityRes.reason
+      );
+      console.log(
+        "Page RAW prospects:",
+        prospectsRes.status === "fulfilled"
+          ? JSON.stringify(prospectsRes.value).slice(0, 300)
+          : prospectsRes.reason
       );
 
-      const result = await apiFetch("profile/scout/createNewScoutTask", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      if (playersRes.status === "fulfilled") {
+        setPlayers(extractList(playersRes.value));
+      }
 
-      console.log("✅ Task created successfully:", result);
+      if (activityRes.status === "fulfilled") {
+        const list = extractList(activityRes.value);
+        setActivity(
+          list.map((a: Record<string, unknown>, idx: number) => ({
+            id: idx,
+            message: String(a.message ?? a.description ?? "Activity recorded"),
+            date: String(a.date ?? a.createdAt ?? ""),
+          }))
+        );
+      }
 
-      alert(result.message || "Task created successfully!");
-
-      setShowModal(false);
-    } catch (err) {
-      console.error("❌ Error creating task:", err);
-      console.error("Error details:", {
-        message: err instanceof Error ? err.message : "Unknown error",
-        type: typeof err,
-        err,
-      });
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if (prospectsRes.status === "fulfilled") {
+        const raw = prospectsRes.value as Record<string, unknown>;
+        const list = extractList(raw);
+        const count =
+          ((raw?.data as Record<string, unknown>)?.totalCount as number) ??
+          list.length;
+        setProspectsCount(count);
+        if (list.length > 0) {
+          const first = list[0];
+          setNewRequest({
+            title: `${first.position ?? "Player"} — ${
+              first.fullName ?? "Prospect"
+            }`,
+            club: first.currentTeam ?? "Unknown Club",
+            deadline: "3 Days",
+          });
+        } else {
+          setNewRequest(null);
+        }
+      }
+    } catch (e) {
+      console.error("Page load error:", e);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
+      loadingRef.current = false;
     }
-  };
+  }
 
-  const players = [
-    {
-      club: "Scoutflair FC",
-      name: "Denis Chuks",
-      position: "Midfielder",
-      height: 178,
-      weight: 69,
-      games: 50,
-      assists: 15,
-      goals: 5,
-      image: "/images/scoutplanone.png",
-    },
-    {
-      club: "ValueGate Consulting",
-      name: "Babajide Akinyemi",
-      position: "Midfielder",
-      height: 178,
-      weight: 69,
-      games: 50,
-      assists: 15,
-      goals: 5,
-      image: "/images/scoutplantwo.png",
-    },
-    {
-      club: "Faygroup",
-      name: "Larry John",
-      position: "Midfielder",
-      height: 178,
-      weight: 69,
-      games: 50,
-      assists: 15,
-      goals: 5,
-      image: "/images/scoutplanthree.png",
-    },
-    {
-      club: "Scoutflair FC",
-      name: "Abubakar Kabir",
-      position: "Midfielder",
-      height: 178,
-      weight: 69,
-      games: 50,
-      assists: 15,
-      goals: 5,
-      image: "/images/scoutplanfour.png",
-    },
-  ];
+  useEffect(() => {
+    load();
+    function handleRefresh() {
+      load();
+    }
+    window.addEventListener(SCOUTING_REFRESH_EVENT, handleRefresh);
+    return () =>
+      window.removeEventListener(SCOUTING_REFRESH_EVENT, handleRefresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const NaijaImg = () => (
-    <svg
-      width="20"
-      height="14"
-      viewBox="0 0 18 13"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M2.8125 0.3125C0.948656 0.3125 0 1.69766 0 3.40625V9.59375C0 11.3023 0.948656 12.6875 2.8125 12.6875H6.1875V0.3125H2.8125ZM15.1875 0.3125H11.8125V12.6875H15.1875C17.0513 12.6875 18 11.3023 18 9.59375V3.40625C18 1.69766 17.0513 0.3125 15.1875 0.3125Z"
-        fill="#128807"
-      />
-    </svg>
-  );
+  function handleTaskSaved() {
+    setShowModal(false);
+    load();
+    window.dispatchEvent(new Event(SCOUTING_REFRESH_EVENT));
+  }
 
-  const topPlayers = [
-    {
-      name: "Denis Wills",
-      position: "Midfielder",
-      image: "/images/topone.png",
-    },
-    {
-      name: "Lookman Adamson",
-      position: "Midfielder",
-      image: "/images/toptwo.png",
-    },
-    {
-      name: "Abubakar Man",
-      position: "Midfielder",
-      image: "/images/topthree.png",
-    },
-  ];
+  const filtered = players
+    .filter((p) => {
+      const q = search.toLowerCase();
+      return (
+        !q ||
+        p.fullName?.toLowerCase().includes(q) ||
+        p.currentTeam?.toLowerCase().includes(q) ||
+        p.location?.toLowerCase().includes(q) ||
+        p.position?.toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) =>
+      sortBy === "Name" ? (a.fullName ?? "").localeCompare(b.fullName ?? "") : 0
+    );
+
+  const totalReports = 20;
+  const progressPct = Math.min((prospectsCount / totalReports) * 100, 100);
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 w-full">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
-          <span className="mr-2">
-            <svg width="20" height="21" viewBox="0 0 20 21" fill="none">
-              <path
-                d="M14.1874 3.02833L13.3916 2.81583C11.1416 2.21583 10.0166 1.91666 9.13074 2.42583C8.24408 2.93416 7.94241 4.05333 7.33908 6.29L6.48741 9.45416C5.88408 11.6917 5.58241 12.81 6.09491 13.6917C6.60658 14.5725 7.73158 14.8725 9.98158 15.4717L10.7766 15.6842C13.0266 16.2842 14.1516 16.5833 15.0382 16.0742C15.9241 15.5658 16.2257 14.4467 16.8282 12.21L17.6807 9.04583C18.2841 6.80833 18.5849 5.69 18.0732 4.80833C17.5616 3.92666 16.4382 3.6275 14.1874 3.02833Z"
-                stroke="#222"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M10.0003 17.955L9.20701 18.1717C6.96201 18.7825 5.84035 19.0883 4.95535 18.5692C4.07201 18.0508 3.77035 16.9108 3.16951 14.6292L2.31868 11.4025C1.71701 9.12167 1.41618 7.98084 1.92701 7.0825C2.36868 6.305 3.33368 6.33334 4.58368 6.33334M14.0453 6.69417C14.0453 7.3725 13.492 7.9225 12.8095 7.9225C12.1278 7.9225 11.5745 7.3725 11.5745 6.69417C11.5745 6.01584 12.1278 5.46584 12.8095 5.46584C13.4928 5.46584 14.0453 6.01584 14.0453 6.69417Z"
-                stroke="#222"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-          Scouting Plan
-        </h3>
-
-        <button
-          onClick={handleAddTaskClick}
-          className="text-gray-900 border border-black font-semibold px-3 py-2 rounded-md text-xs sm:text-sm hover:bg-blue-700 hover:text-white transition"
-        >
-          Add Task
-        </button>
-
-        {showModal && (
-          <AddTaskForm
-            onCancel={handleCancel}
-            onSave={handleSave}
-            isLoading={isLoading}
-            error={error}
-          />
-        )}
-      </div>
-
-      {/* Scout Profile */}
-      <div className="flex items-center mb-4">
-        <img
-          src="/images/scdp.png"
-          alt="Joshua Fayomi"
-          className="rounded-full mr-3 w-9 h-9 sm:w-10 sm:h-10 object-cover"
+    <div className="min-h-screen bg-gray-50">
+      {showModal && (
+        <AddTaskForm
+          onCancel={() => setShowModal(false)}
+          onSave={handleTaskSaved}
         />
-        <p className="text-sm font-medium text-gray-800">Dave Ishmael</p>
-      </div>
+      )}
 
-      {/* Player Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
-        {players.map((player, i) => (
-          <div
-            key={i}
-            className="bg-[rgba(255,250,250,1)] w-full sm:max-w-[151px] rounded-lg p-2 sm:p-3 text-center border border-gray-300"
-          >
-            <div className="flex justify-center items-center gap-1 text-[10px] sm:text-xs font-medium text-green-600 mb-2">
-              {player.club} <NaijaImg />
-            </div>
-            <img
-              src={player.image}
-              alt={player.name}
-              className="mx-auto mb-2 rounded-md w-16 h-20 sm:w-20 sm:h-28 object-cover"
-            />
-            <div className="flex justify-center mb-1">
-              {[...Array(5)].map((_, j) => (
-                <Star
-                  key={j}
-                  size={12}
-                  className="text-yellow-400 fill-yellow-400"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Scouting Plan</h1>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Manage your schedule, routes, and scouting assignments.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => load()}
+              disabled={loading}
+              className="p-2 rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition"
+              title="Refresh"
+            >
+              <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+              <Calendar size={15} /> Calendar View
+            </button>
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#0A2342] text-white rounded-xl text-sm font-semibold hover:bg-blue-900 transition shadow-sm"
+            >
+              <Plus size={15} /> Add Task
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main */}
+          <div className="lg:col-span-2 space-y-5">
+            {/* Search */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                 />
-              ))}
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by player, club, or location..."
+                  className="w-full pl-9 pr-9 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0A2342]/20"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+              <button className="flex items-center gap-1.5 px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition">
+                <Filter size={14} />
+                <ChevronDown size={13} />
+              </button>
             </div>
-            <p className="text-xs sm:text-sm font-medium text-gray-900">
-              {player.name}
-            </p>
-            <p className="text-[10px] sm:text-xs text-gray-700">
-              {player.position}
-            </p>
-            <p className="text-[10px] sm:text-xs text-gray-700">
-              Height {player.height} • Weight {player.weight}
-            </p>
-            <p className="text-[10px] sm:text-xs text-gray-800 mt-1">
-              Academy Stats
-            </p>
-            <div className="flex justify-between text-[9px] sm:text-[10px] text-gray-800 mt-1">
-              <span>Games {player.games}</span>
-              <span>Assists {player.assists}</span>
-              <span>Goals {player.goals}</span>
-            </div>
-          </div>
-        ))}
-      </div>
 
-      {/* Top 3 Players */}
-      <h4 className="text-sm sm:text-md font-semibold mb-2 text-gray-800">
-        Top 3 Players
-      </h4>
-      <div className="flex flex-wrap gap-2 sm:grid sm:grid-cols-2 lg:grid-cols-3">
-        {topPlayers.map((top, i) => (
-          <div
-            key={i}
-            className="bg-[rgba(255,250,250,1)] flex items-center gap-2 p-2 rounded-lg border border-gray-300 w-full sm:max-w-[220px]"
-          >
-            <img
-              src={top.image}
-              alt={top.name}
-              className="rounded-full w-7 h-7 sm:w-8 sm:h-8 object-cover"
-            />
-            <NaijaImg />
-            <div className="ml-1">
-              <p className="text-xs sm:text-sm font-semibold text-gray-900">
-                {top.name}
-              </p>
-              <p className="text-[10px] sm:text-xs text-gray-700">
-                {top.position}
-              </p>
+            {/* New Request Banner */}
+            {newRequest && !loading && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                        <Zap size={10} /> NEW REQUEST
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        From Coach Dave
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-gray-900 text-base truncate">
+                      {newRequest.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-0.5">
+                      High priority for{" "}
+                      <span className="font-semibold">{newRequest.club}</span>.
+                      Deadline:{" "}
+                      <span className="text-red-500 font-semibold">
+                        {newRequest.deadline}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button className="flex items-center gap-1.5 bg-[#0A2342] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-blue-900 transition">
+                      <CheckCircle2 size={12} /> Accept
+                    </button>
+                    <button
+                      onClick={() => setNewRequest(null)}
+                      className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 text-xs font-medium px-3 py-2 rounded-xl hover:bg-gray-50 transition"
+                    >
+                      <X size={12} /> Dismiss
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tasks List */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-semibold text-gray-900 text-sm">
+                  Upcoming Tasks{" "}
+                  <span className="ml-1.5 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                    {loading ? "…" : filtered.length}
+                  </span>
+                </h2>
+                <button
+                  onClick={() => setSortBy(sortBy === "Date" ? "Name" : "Date")}
+                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#0A2342] transition"
+                >
+                  Sort by{" "}
+                  <span className="font-semibold text-gray-700 ml-0.5">
+                    {sortBy}
+                  </span>
+                  <ChevronDown size={12} />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {loading ? (
+                  Array(3)
+                    .fill(0)
+                    .map((_, i) => <TaskSkeleton key={i} />)
+                ) : filtered.length > 0 ? (
+                  filtered.map((player, i) => (
+                    <PlayerTaskCard
+                      key={player.playerId ?? `player-${i}`}
+                      player={player}
+                      index={i}
+                    />
+                  ))
+                ) : (
+                  <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
+                    <div className="text-4xl mb-3">{search ? "🔍" : "📋"}</div>
+                    <p className="text-sm font-medium text-gray-600">
+                      {search
+                        ? `No results for "${search}"`
+                        : "No scouting tasks yet"}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1 mb-4">
+                      {search
+                        ? "Try a different name, club, or location"
+                        : "Add a task to get started"}
+                    </p>
+                    {!search && (
+                      <button
+                        onClick={() => setShowModal(true)}
+                        className="flex items-center gap-1.5 mx-auto bg-[#0A2342] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-blue-900 transition"
+                      >
+                        <Plus size={13} /> Add Task
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        ))}
+
+          {/* Sidebar */}
+          <div className="space-y-5">
+            {/* Route */}
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <span className="text-sm font-semibold text-gray-800">
+                  Today&apos;s Route
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-purple-500 font-medium">
+                  <Zap size={11} /> AI Optimized
+                </span>
+              </div>
+              <div className="mx-4 mb-3 h-32 bg-gradient-to-br from-slate-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-400">
+                <div className="text-center">
+                  <MapPin size={22} className="mx-auto mb-1 opacity-40" />
+                  <span className="text-xs opacity-60">
+                    Interactive Map View
+                  </span>
+                </div>
+              </div>
+              <div className="mx-4 mb-4 bg-purple-50 rounded-xl p-3 flex gap-2.5 items-start">
+                <div className="mt-0.5 p-1.5 bg-purple-100 rounded-lg shrink-0">
+                  <TrendingUp size={13} className="text-purple-500" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-800">
+                    Efficiency Insight
+                  </p>
+                  <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+                    {filtered.length > 1
+                      ? `${filtered.length} tasks scheduled. Group nearby venues to save travel time.`
+                      : "Add more tasks to get route optimisation suggestions."}
+                  </p>
+                </div>
+              </div>
+              <div className="px-4 pb-4">
+                <button className="w-full text-sm font-semibold text-[#0A2342] border border-[#0A2342]/20 rounded-xl py-2.5 hover:bg-[#0A2342]/5 transition flex items-center justify-center gap-1.5">
+                  Apply Optimized Route →
+                </button>
+              </div>
+            </div>
+
+            {/* Monthly Targets */}
+            <div className="bg-[#0A2342] rounded-2xl p-5 text-white">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText size={15} className="text-blue-300" />
+                <span className="text-sm font-semibold">Monthly Targets</span>
+              </div>
+              <div className="flex items-end gap-1.5 mb-1">
+                <span className="text-4xl font-bold">{prospectsCount}</span>
+                <span className="text-blue-300 text-sm mb-1.5">
+                  / {totalReports} Reports Filed
+                </span>
+              </div>
+              <div className="w-full bg-white/20 rounded-full h-2 mb-3">
+                <div
+                  className="bg-blue-400 h-2 rounded-full transition-all duration-700"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+              <p className="text-blue-200 text-xs">
+                {prospectsCount >= totalReports
+                  ? "🎉 Monthly target reached!"
+                  : "You are on track! Keep scouting to hit your target."}
+              </p>
+            </div>
+
+            {/* Activity */}
+            {activity.length > 0 ? (
+              <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">
+                  Recent Activity
+                </h3>
+                <div className="space-y-3">
+                  {activity.map((item) => (
+                    <div key={item.id} className="flex gap-2.5 items-start">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-700 leading-relaxed">
+                          {item.message}
+                        </p>
+                        {item.date && (
+                          <p className="text-[10px] text-gray-400 mt-0.5">
+                            {item.date}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              !loading && (
+                <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-4 text-center">
+                  <p className="text-xs text-gray-400">
+                    Activity will appear here as you scout players.
+                  </p>
+                </div>
+              )
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
