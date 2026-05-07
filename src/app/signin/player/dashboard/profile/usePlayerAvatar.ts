@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { getPlayerProfile } from "@/lib/api";
-import { playerProfile } from "./profileData";
-
 const SETTINGS_STORAGE_KEY = "settingsData";
 const PLAYER_PROFILE_STORAGE_KEY = "playerProfileCache";
 const PLAYER_PROFILE_EVENT = "player-profile-updated";
+const LEGACY_SEEDED_PROFILE_EMAIL = "peter.abbas@scoutflair.com";
+const LEGACY_SEEDED_PROFILE_AVATAR = "/images/profile.jpeg";
+const R2_PUBLIC_BASE_URL = "https://pub-cc6bfa4db4fa4eb8b3d35333dcfdca5e.r2.dev";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -39,24 +40,24 @@ export type StoredPlayerProfile = {
 };
 
 const defaultStoredPlayerProfile: StoredPlayerProfile = {
-  fullName: playerProfile.name,
-  firstName: playerProfile.firstName,
-  lastName: playerProfile.lastName,
-  email: playerProfile.email,
-  phone: playerProfile.phone,
-  address: playerProfile.address,
-  avatarUrl: playerProfile.avatar,
+  fullName: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
+  avatarUrl: "",
   imageFileKey: "",
-  biography: playerProfile.bio,
+  biography: "",
   currentTeam: "",
-  dob: playerProfile.dateOfBirth,
-  height: playerProfile.height,
-  weight: playerProfile.weight,
-  nationality: playerProfile.nationality,
-  location: playerProfile.address,
-  position: playerProfile.position,
-  preferredFoot: playerProfile.preferredFoot,
-  jerseyNumber: String(playerProfile.shirtNumber),
+  dob: "",
+  height: "",
+  weight: "",
+  nationality: "",
+  location: "",
+  position: "",
+  preferredFoot: "",
+  jerseyNumber: "",
   nin: "",
   licenceNumber: "",
   facebookUrl: "",
@@ -124,14 +125,25 @@ function splitFullName(fullName: string) {
   }
 
   const [firstName, ...rest] = normalizedName.split(/\s+/);
-  return {
-    firstName,
-    lastName: rest.join(" "),
-  };
+    return {
+      firstName,
+      lastName: rest.join(" "),
+    };
 }
 
 function isUsableAvatarUrl(value: string) {
   return /^(https?:\/\/|data:|blob:|\/)/i.test(value);
+}
+
+function normalizeAvatarUrl(value: string) {
+  const avatarValue = value.trim();
+  if (!avatarValue) {
+    return "";
+  }
+
+  return isUsableAvatarUrl(avatarValue)
+    ? avatarValue
+    : `${R2_PUBLIC_BASE_URL}/${avatarValue.replace(/^\/+/, "")}`;
 }
 
 function readStoredSettings(): StoredSettings {
@@ -165,6 +177,13 @@ function getPlayerSessionEmail() {
   return isRecord(session) ? pickString(session.email) : "";
 }
 
+function isLegacySeededProfile(profile: Partial<StoredPlayerProfile>) {
+  return (
+    pickString(profile.email).toLowerCase() === LEGACY_SEEDED_PROFILE_EMAIL ||
+    pickString(profile.avatarUrl) === LEGACY_SEEDED_PROFILE_AVATAR
+  );
+}
+
 export function readStoredPlayerProfile(): StoredPlayerProfile {
   if (typeof window === "undefined") {
     return defaultStoredPlayerProfile;
@@ -177,6 +196,11 @@ export function readStoredPlayerProfile(): StoredPlayerProfile {
     }
 
     const parsedProfile = JSON.parse(rawProfile) as Partial<StoredPlayerProfile>;
+    if (isLegacySeededProfile(parsedProfile)) {
+      window.localStorage.removeItem(PLAYER_PROFILE_STORAGE_KEY);
+      return defaultStoredPlayerProfile;
+    }
+
     const fullName = pickString(parsedProfile.fullName) || defaultStoredPlayerProfile.fullName;
     const nameParts = splitFullName(fullName);
 
@@ -263,8 +287,7 @@ function normalizePlayerProfile(rawProfile: unknown) {
   const currentProfile = readStoredPlayerProfile();
   const fullName =
     pickString(record.fullName, record.name, record.playerName) ||
-    currentProfile.fullName ||
-    defaultStoredPlayerProfile.fullName;
+    currentProfile.fullName;
   const nameParts = splitFullName(fullName);
 
   const imageFileKey = pickString(record.imageFileKey, record.fileKey);
@@ -286,14 +309,12 @@ function normalizePlayerProfile(rawProfile: unknown) {
     lastName: nameParts.lastName,
     email:
       pickString(record.email, record.playerEmail, getPlayerSessionEmail()) ||
-      currentProfile.email ||
-      defaultStoredPlayerProfile.email,
+      currentProfile.email,
     phone: pickString(record.phone, record.phoneNumber) || currentProfile.phone,
     address: pickString(record.address) || currentProfile.address,
     avatarUrl:
-      (isUsableAvatarUrl(avatarCandidate) ? avatarCandidate : "") ||
-      currentProfile.avatarUrl ||
-      defaultStoredPlayerProfile.avatarUrl,
+      normalizeAvatarUrl(avatarCandidate) ||
+      currentProfile.avatarUrl,
     imageFileKey: imageFileKey || currentProfile.imageFileKey,
     biography: pickString(record.biography, record.bio) || currentProfile.biography,
     currentTeam: pickString(record.currentTeam) || currentProfile.currentTeam,
@@ -363,7 +384,7 @@ export function resolvePlayerBasicInfo(): PlayerBasicInfo {
 
 export function resolvePlayerDisplayName() {
   const profile = readStoredPlayerProfile();
-  return profile.fullName || `${profile.firstName} ${profile.lastName}`.trim() || playerProfile.name;
+  return profile.fullName || `${profile.firstName} ${profile.lastName}`.trim();
 }
 
 export function resolvePlayerAvatar() {
@@ -435,9 +456,32 @@ export function usePlayerBasicInfo() {
   return basicInfo;
 }
 
+export function usePlayerProfile() {
+  const [profile, setProfile] = useState<StoredPlayerProfile>(readStoredPlayerProfile());
+
+  useEffect(() => {
+    const syncProfile = () => setProfile(readStoredPlayerProfile());
+
+    syncProfile();
+    void fetchPlayerProfileFromBackend().then((nextProfile) => {
+      setProfile(nextProfile);
+    });
+
+    window.addEventListener("storage", syncProfile);
+    window.addEventListener(PLAYER_PROFILE_EVENT, syncProfile);
+
+    return () => {
+      window.removeEventListener("storage", syncProfile);
+      window.removeEventListener(PLAYER_PROFILE_EVENT, syncProfile);
+    };
+  }, []);
+
+  return profile;
+}
+
 export function usePlayerDisplayName() {
   const basicInfo = usePlayerBasicInfo();
-  return `${basicInfo.firstName} ${basicInfo.lastName}`.trim() || playerProfile.name;
+  return `${basicInfo.firstName} ${basicInfo.lastName}`.trim();
 }
 
 export function clearPlayerSettingsStorage() {

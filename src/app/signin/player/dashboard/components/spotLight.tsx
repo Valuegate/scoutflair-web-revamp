@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   Heart,
@@ -9,17 +10,20 @@ import {
   RefreshCw,
   SendHorizontal,
   Share2,
+  Trash2,
 } from "lucide-react";
 import PostBox from "./postBox";
 import {
   addComment,
+  deleteSpotlightPost,
   getPostComments,
   getPosts,
+  getStorageDownloadUrl,
   getUserPosts,
   increaseShare,
   toggleLike,
 } from "@/lib/api";
-import { usePlayerAvatar, usePlayerDisplayName } from "../profile/usePlayerAvatar";
+import { usePlayerAvatar, usePlayerDisplayName, usePlayerProfile } from "../profile/usePlayerAvatar";
 
 type SpotlightPost = {
   id: string;
@@ -33,6 +37,8 @@ type SpotlightPost = {
   isLiked: boolean;
   comments: number;
   shares: number;
+  isOwnPost: boolean;
+  profileHref: string;
 };
 
 type SpotlightComment = {
@@ -57,7 +63,8 @@ type ComposerPost = {
 
 type RecordLike = Record<string, unknown>;
 
-const DEFAULT_POST_AVATAR = "/images/profile.jpeg";
+const DEFAULT_POST_AVATAR = "";
+const R2_PUBLIC_BASE_URL = "https://pub-cc6bfa4db4fa4eb8b3d35333dcfdca5e.r2.dev";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
@@ -186,6 +193,10 @@ function extractFirstRecord(payload: unknown): RecordLike | null {
           current.content,
           current.author,
           current.userName,
+          current.presignedUrl,
+          current.publicUrl,
+          current.downloadUrl,
+          current.url,
           current.id,
         ),
       );
@@ -233,6 +244,13 @@ function normalizeUrlCollection(value: unknown): string[] {
       value.url,
       value.publicUrl,
       value.fileUrl,
+      value.imageUrl,
+      value.publicUrl,
+      value.presignedUrl,
+      value.downloadUrl,
+      value.mediaFileKey,
+      value.fileKey,
+      value.imageFileKey,
       value.src,
       value.location,
       value.path,
@@ -240,20 +258,119 @@ function normalizeUrlCollection(value: unknown): string[] {
   );
 }
 
-function formatDateLabel(value: unknown) {
-  if (typeof value === "string" && value.trim()) {
-    const parsed = new Date(value);
-    if (!Number.isNaN(parsed.getTime())) {
-      return dateFormatter.format(parsed).replace(" at ", " | ");
-    }
+function joinName(...values: unknown[]) {
+  return values
+    .map((value) => (typeof value === "string" ? value.trim() : ""))
+    .filter(Boolean)
+    .join(" ");
+}
 
+function isDisplayableUrl(value: string) {
+  return /^(https?:\/\/|blob:|data:|\/images\/|\/)/i.test(value);
+}
+
+function normalizeFileKey(value: string) {
+  return value.replace(/^\/+/, "");
+}
+
+function fileKeyToPublicUrl(value: string) {
+  return `${R2_PUBLIC_BASE_URL}/${normalizeFileKey(value)}`;
+}
+
+async function resolveStorageUrl(value: string) {
+  if (!value.trim()) {
+    return "";
+  }
+
+  if (isDisplayableUrl(value)) {
     return value.trim();
   }
 
-  if (typeof value === "number") {
-    const parsed = new Date(value);
+  try {
+    const response = await getStorageDownloadUrl(value.trim());
+    const record = extractFirstRecord(response);
+    const downloadUrl = record
+      ? pickString(record.presignedUrl, record.publicUrl, record.url, record.downloadUrl)
+      : "";
+    return downloadUrl || fileKeyToPublicUrl(value);
+  } catch {
+    return fileKeyToPublicUrl(value);
+  }
+}
+
+async function resolveStorageUrls(values: string[]) {
+  const resolvedValues = await Promise.all(values.map(resolveStorageUrl));
+  return resolvedValues.filter(Boolean);
+}
+
+function parseDateValue(value: unknown): Date | null {
+  if (typeof value === "string" && value.trim()) {
+    const dateValue = value.trim();
+    const backendDateMatch = dateValue.match(
+      /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(?:([+-]\d{2}:?\d{2}|Z))?$/,
+    );
+
+    if (backendDateMatch) {
+      const [, year, month, day, hour, minute, second = "0", timezone] = backendDateMatch;
+      const normalizedIsoDate = `${year}-${month}-${day}T${hour}:${minute}:${second}${timezone || ""}`;
+      const parsed = new Date(normalizedIsoDate);
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed;
+      }
+    }
+
+    const numericValue = Number(dateValue);
+    if (!Number.isNaN(numericValue)) {
+      return parseDateValue(numericValue);
+    }
+
+    const parsed = new Date(dateValue);
     if (!Number.isNaN(parsed.getTime())) {
-      return dateFormatter.format(parsed).replace(" at ", " | ");
+      return parsed;
+    }
+
+    return null;
+  }
+
+  if (typeof value === "number") {
+    const timestamp = value > 0 && value < 10000000000 ? value * 1000 : value;
+    const parsed = new Date(timestamp);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+
+  if (Array.isArray(value) && value.length >= 3) {
+    const [year, month, day, hour = 0, minute = 0, second = 0] = value;
+    if (
+      typeof year === "number" &&
+      typeof month === "number" &&
+      typeof day === "number"
+    ) {
+      const parsed = new Date(year, month - 1, day, Number(hour), Number(minute), Number(second));
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed;
+      }
+    }
+  }
+
+  return null;
+}
+
+function formatDateLabel(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim() && Number.isNaN(Number(value))) {
+      const parsed = parseDateValue(value);
+      if (parsed) {
+        return dateFormatter.format(parsed).replace(" at ", " | ").replace(/\s(AM|PM)$/, "$1");
+      }
+
+      return value.trim();
+    }
+
+    const parsed = parseDateValue(value);
+    if (parsed) {
+      return dateFormatter.format(parsed).replace(" at ", " | ").replace(/\s(AM|PM)$/, "$1");
     }
   }
 
@@ -264,49 +381,147 @@ function isVideoUrl(url: string) {
   return /\.(mp4|webm|ogg|mov|m4v)$/i.test(url);
 }
 
-function mapPostRecord(record: RecordLike) {
-  const user = isRecord(record.user)
+type CurrentPlayerFallback = {
+  name: string;
+  avatar: string;
+  id?: number;
+  email?: string;
+};
+
+function normalizeComparable(value: unknown) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
+function getPostUser(record: RecordLike) {
+  const firstMediaRecord = Array.isArray(record.mediaFileKey) && isRecord(record.mediaFileKey[0])
+    ? record.mediaFileKey[0]
+    : null;
+  const firstMediaUser = firstMediaRecord && isRecord(firstMediaRecord.user) ? firstMediaRecord.user : null;
+
+  return isRecord(record.user)
     ? record.user
     : isRecord(record.createdBy)
       ? record.createdBy
       : isRecord(record.player)
         ? record.player
-        : null;
+        : firstMediaUser;
+}
+
+function isOwnedByCurrentPlayer(record: RecordLike, fallback?: CurrentPlayerFallback, forceOwn = false) {
+  if (forceOwn) {
+    return true;
+  }
+
+  const user = getPostUser(record);
+  const currentId = fallback?.id;
+  const postUserId = pickNumber(
+    record.userId,
+    record.playerId,
+    record.createdById,
+    record.ownerId,
+    user?.id,
+    user?.playerId,
+    user?.profileId,
+  );
+
+  if (currentId !== undefined && postUserId !== 0 && postUserId === currentId) {
+    return true;
+  }
+
+  const currentEmail = normalizeComparable(fallback?.email);
+  const postEmail = normalizeComparable(
+    pickString(record.userEmail, record.playerEmail, record.email, user?.email, user?.username),
+  );
+
+  if (currentEmail && postEmail && currentEmail === postEmail) {
+    return true;
+  }
+
+  return false;
+}
+
+function getProfileHref(record: RecordLike, fallback?: CurrentPlayerFallback, forceOwn = false) {
+  if (isOwnedByCurrentPlayer(record, fallback, forceOwn)) {
+    return "/signin/player/dashboard/profile";
+  }
+
+  const user = getPostUser(record);
+  const playerEmail = pickString(record.userEmail, record.playerEmail, record.email, user?.email, user?.username);
+
+  return playerEmail
+    ? `/signin/player/dashboard/profile?playerEmail=${encodeURIComponent(playerEmail)}`
+    : "";
+}
+
+function mapPostRecord(record: RecordLike, fallback?: CurrentPlayerFallback, forceOwn = false) {
+  const user = getPostUser(record);
 
   const likedBy = normalizeUrlCollection(record.likedBy);
   const commentSource = Array.isArray(record.comments) ? record.comments : [];
 
-  const media =
-    normalizeUrlCollection(record.mediaUrls).length > 0
-      ? normalizeUrlCollection(record.mediaUrls)
-      : normalizeUrlCollection(record.media).length > 0
-        ? normalizeUrlCollection(record.media)
-        : normalizeUrlCollection(record.images).length > 0
-          ? normalizeUrlCollection(record.images)
-          : normalizeUrlCollection(record.attachments).length > 0
-            ? normalizeUrlCollection(record.attachments)
-            : normalizeUrlCollection(record.image);
+  const media = [
+    ...normalizeUrlCollection(record.mediaUrls),
+    ...normalizeUrlCollection(record.mediaFileKeys),
+    ...normalizeUrlCollection(record.mediaFileKey),
+    ...normalizeUrlCollection(record.mediaFiles),
+    ...normalizeUrlCollection(record.media),
+    ...normalizeUrlCollection(record.images),
+    ...normalizeUrlCollection(record.attachments),
+  ];
+  const author = pickString(
+    record.userFullName,
+    record.userName,
+    record.author,
+    record.playerName,
+    record.fullName,
+    joinName(record.firstName, record.lastName),
+    user?.name,
+    user?.fullName,
+    joinName(user?.firstName, user?.lastName),
+    user?.username,
+    record.name,
+    fallback?.name,
+  ) || "Player";
+  const avatar = pickString(
+    record.userProfilePicUrl,
+    record.userAvatar,
+    record.avatar,
+    record.avatarUrl,
+    record.profileImage,
+    record.profilePicture,
+    record.userImageFileKey,
+    record.imageFileKey,
+    user?.avatarUrl,
+    user?.avatar,
+    user?.profileImage,
+    user?.profilePicture,
+    user?.photo,
+    user?.imageUrl,
+    user?.image,
+    user?.imageFileKey,
+    fallback?.avatar,
+  );
 
   return {
     id: String(record.id ?? record._id ?? record.postId ?? record.spotLightPostId ?? Date.now()),
-    author: pickString(
-      record.userName,
-      record.author,
-      user?.name,
-      user?.fullName,
-      user?.username,
-      record.name,
-    ) || "Player",
-    avatar:
-      pickString(
-        record.userAvatar,
-        record.avatar,
-        user?.avatar,
-        user?.profileImage,
-        user?.photo,
-        user?.image,
-      ) || DEFAULT_POST_AVATAR,
-    date: formatDateLabel(record.createdAt ?? record.updatedAt ?? record.date ?? record.timeAgo),
+    author,
+    avatar: avatar || DEFAULT_POST_AVATAR,
+    date: formatDateLabel(
+      record.dateCreated,
+      record.createdAt,
+      record.createdDate,
+      record.createdOn,
+      record.created_at,
+      record.created,
+      record.postDate,
+      record.postedAt,
+      record.timestamp,
+      record.time,
+      record.updatedAt,
+      record.updatedDate,
+      record.date,
+      record.timeAgo,
+    ),
     content: pickString(record.text, record.content, record.caption, record.description),
     media,
     likedBy,
@@ -326,6 +541,8 @@ function mapPostRecord(record: RecordLike) {
       commentSource.length,
     ),
     shares: pickNumber(record.shareCount, record.sharesCount, record.totalShares, record.shares),
+    isOwnPost: isOwnedByCurrentPlayer(record, fallback, forceOwn),
+    profileHref: getProfileHref(record, fallback, forceOwn),
   } satisfies SpotlightPost;
 }
 
@@ -354,16 +571,52 @@ function mapCommentRecord(record: RecordLike) {
         user?.photo,
       ) || DEFAULT_POST_AVATAR,
     text: pickString(record.text, record.comment, record.content),
-    date: formatDateLabel(record.createdAt ?? record.updatedAt ?? record.date ?? record.timeAgo),
+    date: formatDateLabel(
+      record.dateCreated,
+      record.createdAt,
+      record.createdDate,
+      record.createdOn,
+      record.created_at,
+      record.created,
+      record.commentDate,
+      record.commentedAt,
+      record.timestamp,
+      record.time,
+      record.updatedAt,
+      record.updatedDate,
+      record.date,
+      record.timeAgo,
+    ),
   } satisfies SpotlightComment;
 }
 
-function mapResponseToPosts(response: unknown) {
-  return extractFirstArray(response).map(mapPostRecord);
+function mapResponseToPosts(response: unknown, fallback?: CurrentPlayerFallback, forceOwn = false) {
+  return extractFirstArray(response).map((record) => mapPostRecord(record, fallback, forceOwn));
+}
+
+async function hydratePostMedia(posts: SpotlightPost[], fallback?: CurrentPlayerFallback) {
+  return Promise.all(
+    posts.map(async (post) => ({
+      ...post,
+      author: post.author === "Player" && fallback?.name ? fallback.name : post.author,
+      avatar: (await resolveStorageUrl(post.avatar)) || fallback?.avatar || DEFAULT_POST_AVATAR,
+      media: await resolveStorageUrls([...new Set(post.media)]),
+      likedBy: await resolveStorageUrls(post.likedBy),
+    })),
+  );
 }
 
 function mapResponseToComments(response: unknown) {
   return extractFirstArray(response).map(mapCommentRecord);
+}
+
+async function hydrateComments(comments: SpotlightComment[]) {
+  return Promise.all(
+    comments.map(async (comment) => ({
+      ...comment,
+      avatar: (await resolveStorageUrl(comment.avatar)) || DEFAULT_POST_AVATAR,
+    })),
+  );
 }
 
 function mapCreatedComment(response: unknown, playerName: string, playerAvatar: string, text: string) {
@@ -428,6 +681,7 @@ function SpotlightCard({
   currentUserName,
   onToggleLike,
   onShare,
+  onDelete,
   onLoadComments,
   onAddComment,
 }: {
@@ -436,6 +690,7 @@ function SpotlightCard({
   currentUserName: string;
   onToggleLike: (post: SpotlightPost) => Promise<void>;
   onShare: (post: SpotlightPost) => Promise<void>;
+  onDelete: (post: SpotlightPost) => Promise<void>;
   onLoadComments: (postId: string) => Promise<SpotlightComment[]>;
   onAddComment: (postId: string, text: string) => Promise<SpotlightComment>;
 }) {
@@ -502,15 +757,40 @@ function SpotlightCard({
   return (
     <article className="rounded-[24px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)] sm:p-5">
       <div className="mb-4 flex items-start gap-4">
-        <img
-          src={post.avatar}
-          alt={post.author}
-          className="h-10 w-10 rounded-md object-cover"
-        />
+        {post.profileHref ? (
+          <Link href={post.profileHref} className="shrink-0">
+            {post.avatar ? (
+              <img
+                src={post.avatar}
+                alt={post.author}
+                className="h-10 w-10 rounded-md object-cover"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-md bg-gray-100" />
+            )}
+          </Link>
+        ) : post.avatar ? (
+            <img
+              src={post.avatar}
+              alt={post.author}
+              className="h-10 w-10 rounded-md object-cover"
+            />
+        ) : (
+          <div className="h-10 w-10 rounded-md bg-gray-100" />
+        )}
         <div className="min-w-0">
-          <h2 className="truncate text-[15px] font-semibold leading-none text-[#222222] sm:text-[18px]">
-            {post.author}
-          </h2>
+          {post.profileHref ? (
+            <Link
+              href={post.profileHref}
+              className="block truncate text-[15px] font-semibold leading-none text-[#222222] transition hover:text-[#0A2342] sm:text-[18px]"
+            >
+              {post.author}
+            </Link>
+          ) : (
+            <h2 className="truncate text-[15px] font-semibold leading-none text-[#222222] sm:text-[18px]">
+              {post.author}
+            </h2>
+          )}
           <p className="mt-1 text-[10px] text-[#6B7280]">{post.date}</p>
         </div>
       </div>
@@ -572,6 +852,16 @@ function SpotlightCard({
             <Share2 className="h-4 w-4" strokeWidth={1.8} />
             <span>Share</span>
           </button>
+          {post.isOwnPost ? (
+            <button
+              type="button"
+              onClick={() => onDelete(post)}
+              className="flex items-center gap-2 transition hover:text-[#C0392B]"
+            >
+              <Trash2 className="h-4 w-4" strokeWidth={1.8} />
+              <span>Delete</span>
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -586,11 +876,15 @@ function SpotlightCard({
             <div className="space-y-3">
               {comments.map((comment) => (
                 <div key={comment.id} className="flex items-start gap-3">
-                  <img
-                    src={comment.avatar}
-                    alt={comment.author}
-                    className="h-9 w-9 rounded-full object-cover"
-                  />
+                  {comment.avatar ? (
+                    <img
+                      src={comment.avatar}
+                      alt={comment.author}
+                      className="h-9 w-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-9 w-9 rounded-full bg-gray-100" />
+                  )}
                   <div className="flex-1 rounded-[14px] bg-[#F5F5F5] px-4 py-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-semibold text-[#1F2937]">{comment.author}</span>
@@ -606,11 +900,15 @@ function SpotlightCard({
           )}
 
           <div className="mt-4 flex items-center gap-3">
-            <img
-              src={currentUserAvatar}
-              alt={currentUserName}
-              className="h-10 w-10 rounded-md object-cover"
-            />
+            {currentUserAvatar ? (
+              <img
+                src={currentUserAvatar}
+                alt={currentUserName || "Player profile"}
+                className="h-10 w-10 rounded-md object-cover"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-md bg-gray-100" />
+            )}
 
             <div className="flex h-11 flex-1 items-center rounded-xl bg-[#F5F5F5] px-4">
               <input
@@ -655,10 +953,17 @@ function SpotlightCard({
 export default function Spotlight() {
   const playerAvatar = usePlayerAvatar();
   const playerName = usePlayerDisplayName();
+  const playerProfile = usePlayerProfile();
   const [posts, setPosts] = useState<SpotlightPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [actionError, setActionError] = useState("");
+  const currentPlayerFallback = {
+    name: playerName,
+    avatar: playerAvatar,
+    id: playerProfile.playerId,
+    email: playerProfile.email,
+  };
 
   const updatePost = (postId: string, updater: (post: SpotlightPost) => SpotlightPost) => {
     setPosts((prev) => prev.map((post) => (post.id === postId ? updater(post) : post)));
@@ -670,7 +975,10 @@ export default function Spotlight() {
 
     try {
       const globalResponse = await getPosts(20, 0);
-      const globalPosts = mapResponseToPosts(globalResponse);
+      const globalPosts = await hydratePostMedia(
+        mapResponseToPosts(globalResponse, currentPlayerFallback),
+        currentPlayerFallback,
+      );
 
       if (globalPosts.length > 0) {
         setPosts(globalPosts);
@@ -678,11 +986,21 @@ export default function Spotlight() {
       }
 
       const userResponse = await getUserPosts(20, 0);
-      setPosts(mapResponseToPosts(userResponse));
+      setPosts(
+        await hydratePostMedia(
+          mapResponseToPosts(userResponse, currentPlayerFallback, true),
+          currentPlayerFallback,
+        ),
+      );
     } catch (error) {
       try {
         const userResponse = await getUserPosts(20, 0);
-        setPosts(mapResponseToPosts(userResponse));
+        setPosts(
+          await hydratePostMedia(
+            mapResponseToPosts(userResponse, currentPlayerFallback, true),
+            currentPlayerFallback,
+          ),
+        );
       } catch (userPostsError) {
         const message =
           userPostsError instanceof Error
@@ -699,7 +1017,7 @@ export default function Spotlight() {
 
   useEffect(() => {
     void loadPosts();
-  }, []);
+  }, [playerAvatar, playerName, playerProfile.playerId, playerProfile.email]);
 
   const handleCreatePost = async (newPost: ComposerPost) => {
     setActionError("");
@@ -717,6 +1035,8 @@ export default function Spotlight() {
         isLiked: newPost.isLiked,
         comments: newPost.comments,
         shares: newPost.shares,
+        isOwnPost: true,
+        profileHref: "/signin/player/dashboard/profile",
       },
       ...prev,
     ]);
@@ -786,9 +1106,28 @@ export default function Spotlight() {
     }
   };
 
+  const handleDeletePost = async (post: SpotlightPost) => {
+    if (!post.isOwnPost) {
+      return;
+    }
+
+    setActionError("");
+    const previousPosts = posts;
+
+    setPosts((currentPosts) => currentPosts.filter((currentPost) => currentPost.id !== post.id));
+
+    try {
+      await deleteSpotlightPost(post.id);
+    } catch (error) {
+      setPosts(previousPosts);
+      const message = error instanceof Error ? error.message : "Failed to delete spotlight post.";
+      setActionError(message);
+    }
+  };
+
   const handleLoadComments = async (postId: string) => {
     const response = await getPostComments(postId, 20, 0);
-    return mapResponseToComments(response);
+    return hydrateComments(mapResponseToComments(response));
   };
 
   const handleAddComment = async (postId: string, text: string) => {
@@ -798,7 +1137,11 @@ export default function Spotlight() {
       comments: currentPost.comments + 1,
     }));
 
-    return mapCreatedComment(response, playerName, playerAvatar, text);
+    const createdComment = mapCreatedComment(response, playerName, playerAvatar, text);
+    return {
+      ...createdComment,
+      avatar: (await resolveStorageUrl(createdComment.avatar)) || playerAvatar,
+    };
   };
 
   return (
@@ -849,6 +1192,7 @@ export default function Spotlight() {
               currentUserName={playerName}
               onToggleLike={handleToggleLike}
               onShare={handleShare}
+              onDelete={handleDeletePost}
               onLoadComments={handleLoadComments}
               onAddComment={handleAddComment}
             />

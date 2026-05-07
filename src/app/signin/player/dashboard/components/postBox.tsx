@@ -571,7 +571,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
       // Create a new post object for the UI
       const savedPost: Post = {
         id: extractResponsePostId(response),
-        user: { name: playerName, avatar: playerAvatar, timeAgo: "Just now" },
+        user: { name: playerName || "Player", avatar: playerAvatar, timeAgo: "Just now" },
         content: text.trim(),
         image: mediaUrls.length === 1 ? mediaUrls[0] : mediaUrls,
         likes: 0,
@@ -618,11 +618,15 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
 
       <div className="bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
         <div className="flex h-auto items-center space-x-2 sm:space-x-3">
-          <img
-            src={playerAvatar}
-            alt={playerName}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
-          />
+          {playerAvatar ? (
+            <img
+              src={playerAvatar}
+              alt={playerName || "Player profile"}
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 bg-gray-100" />
+          )}
           <div className="flex-1 flex items-center bg-gray-100 rounded-lg px-2 sm:px-3 min-w-0">
             <input
               type="text"

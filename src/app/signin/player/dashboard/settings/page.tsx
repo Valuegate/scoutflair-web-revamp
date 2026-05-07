@@ -1,5 +1,7 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
+import { Cropper } from 'react-cropper';
+import type { ReactCropperElement } from 'react-cropper';
 import { editPlayerProfile } from '@/lib/api';
 import { uploadFileToR2 } from '@/lib/utils';
 import {
@@ -16,6 +18,7 @@ interface FormData {
   email: string;
   phone: string;
   address: string;
+  biography: string;
 }
 
 interface NotificationSection {
@@ -47,8 +50,29 @@ const DEFAULT_FORM_DATA: FormData = {
   email: "",
   phone: "",
   address: "",
+  biography: "",
 };
 const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024;
+const AVATAR_CROP_SIZE = 512;
+
+function canvasToFile(canvas: HTMLCanvasElement, originalFile: File) {
+  return new Promise<File>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Unable to crop image."));
+          return;
+        }
+
+        const extension = originalFile.type === "image/png" ? "png" : "jpg";
+        const fileName = originalFile.name.replace(/\.[^.]+$/, "") || "avatar";
+        resolve(new File([blob], `${fileName}-avatar.${extension}`, { type: blob.type || originalFile.type }));
+      },
+      originalFile.type === "image/png" ? "image/png" : "image/jpeg",
+      0.92,
+    );
+  });
+}
 
 const SettingsPage = () => {
   const playerBasicInfo = usePlayerBasicInfo();
@@ -93,10 +117,24 @@ const SettingsPage = () => {
   const [avatarUrl, setAvatarUrl] = useState<string>(playerAvatar);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
+  const [cropSourceUrl, setCropSourceUrl] = useState("");
+  const [cropOriginalFile, setCropOriginalFile] = useState<File | null>(null);
+  const [cropZoom, setCropZoom] = useState(0);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const cropperRef = useRef<ReactCropperElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const stylesheetId = "cropperjs-stylesheet";
+    if (!document.getElementById(stylesheetId)) {
+      const link = document.createElement("link");
+      link.id = stylesheetId;
+      link.rel = "stylesheet";
+      link.href = "https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css";
+      document.head.appendChild(link);
+    }
+
     const savedData = localStorage.getItem('settingsData');
     if (savedData) {
       const parsed = JSON.parse(savedData);
@@ -116,17 +154,27 @@ const SettingsPage = () => {
       });
     }
 
-    void fetchPlayerProfileFromBackend(true);
+    void fetchPlayerProfileFromBackend(true).then((profile) => {
+      setFormData({
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+        biography: profile.biography,
+      });
+    });
   }, []);
 
   useEffect(() => {
-    setFormData({
+    setFormData((prev) => ({
       firstName: playerBasicInfo.firstName,
       lastName: playerBasicInfo.lastName,
       email: playerBasicInfo.email,
       phone: playerBasicInfo.phone,
       address: playerBasicInfo.address,
-    });
+      biography: prev.biography,
+    }));
   }, [playerBasicInfo]);
 
   useEffect(() => {
@@ -187,7 +235,10 @@ const SettingsPage = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       if (event.target?.result && typeof event.target.result === 'string') {
-        setAvatarUrl(event.target.result);
+        setCropOriginalFile(file);
+        setCropSourceUrl(event.target.result);
+        setCropZoom(0);
+        setIsCropModalOpen(true);
       }
     };
     reader.readAsDataURL(file);
@@ -198,6 +249,51 @@ const SettingsPage = () => {
     setPendingAvatarFile(null);
     setAvatarUploadProgress(0);
     setAvatarUrl("");
+    setCropSourceUrl("");
+    setCropOriginalFile(null);
+    setIsCropModalOpen(false);
+  };
+
+  const handleCropCancel = () => {
+    setCropSourceUrl("");
+    setCropOriginalFile(null);
+    setCropZoom(0);
+    setIsCropModalOpen(false);
+  };
+
+  const handleApplyCrop = async () => {
+    const cropper = cropperRef.current?.cropper;
+    if (!cropper || !cropOriginalFile) {
+      return;
+    }
+
+    const croppedCanvas = cropper.getCroppedCanvas({
+      width: AVATAR_CROP_SIZE,
+      height: AVATAR_CROP_SIZE,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: "high",
+    });
+
+    if (!croppedCanvas) {
+      alert("Unable to crop image. Please choose another image.");
+      return;
+    }
+
+    try {
+      const croppedFile = await canvasToFile(croppedCanvas, cropOriginalFile);
+      setPendingAvatarFile(croppedFile);
+      setAvatarUrl(croppedCanvas.toDataURL(croppedFile.type));
+      setAvatarUploadProgress(0);
+      handleCropCancel();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to crop image.";
+      alert(message);
+    }
+  };
+
+  const handleCropZoomChange = (value: number) => {
+    setCropZoom(value);
+    cropperRef.current?.cropper.zoomTo(1 + value);
   };
 
   const handleSave = async () => {
@@ -222,7 +318,7 @@ const SettingsPage = () => {
 
       const payload = {
         address: formData.address,
-        biography: currentProfile.biography,
+        biography: formData.biography,
         currentTeam: currentProfile.currentTeam,
         dob: currentProfile.dob,
         email: formData.email,
@@ -255,6 +351,7 @@ const SettingsPage = () => {
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        biography: formData.biography,
         imageFileKey,
         avatarUrl: nextAvatarUrl,
       });
@@ -378,17 +475,36 @@ const SettingsPage = () => {
                   />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Biography</label>
+                  <textarea
+                    value={formData.biography}
+                    onChange={(e) => handleInputChange('biography', e.target.value)}
+                    rows={5}
+                    maxLength={1000}
+                    className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-sm leading-6 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Tell scouts about your playing style, strengths, experience, and goals"
+                  />
+                  <div className="mt-1 text-right text-xs text-gray-500">
+                    {formData.biography.length}/1000
+                  </div>
+                </div>
+
                 {/* Avatar */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
                  
                   <div className="lg:col-span-9">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                        <img 
-                          src={avatarUrl || "/images/profile.jpeg"} 
-                          alt="Avatar" 
-                          className="w-full h-full object-cover"
-                        />
+                        {avatarUrl ? (
+                          <img
+                            src={avatarUrl}
+                            alt="Avatar"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-gray-100" />
+                        )}
                       </div>
                       {isSaving && pendingAvatarFile && avatarUploadProgress > 0 && (
                         <div className="w-full max-w-xs overflow-hidden rounded bg-gray-200 sm:w-40">
@@ -404,8 +520,22 @@ const SettingsPage = () => {
                           onClick={() => fileInputRef.current?.click()}
                           className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
                         >
-                          Upload
+                          {avatarUrl ? "Change" : "Upload"}
                         </button>
+                        {pendingAvatarFile ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCropSourceUrl(avatarUrl);
+                              setCropOriginalFile(pendingAvatarFile);
+                              setCropZoom(0);
+                              setIsCropModalOpen(true);
+                            }}
+                            className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            Crop
+                          </button>
+                        ) : null}
                         <button 
                           type="button"
                           onClick={handleAvatarRemove}
@@ -654,6 +784,91 @@ const SettingsPage = () => {
         accept="image/*"
         className="hidden"
       />
+
+      {isCropModalOpen && cropSourceUrl ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4 py-6">
+          <div className="w-full max-w-4xl overflow-hidden rounded-lg bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Crop profile picture</h2>
+                <p className="text-sm text-gray-500">Move and zoom the image until the circular preview looks right.</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCropCancel}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="grid gap-6 p-5 lg:grid-cols-[1fr_220px]">
+              <div className="min-h-[360px] overflow-hidden rounded-lg bg-gray-950">
+                <Cropper
+                  ref={cropperRef}
+                  src={cropSourceUrl}
+                  style={{ height: 360, width: "100%" }}
+                  aspectRatio={1}
+                  viewMode={1}
+                  dragMode="move"
+                  autoCropArea={1}
+                  background={false}
+                  guides={false}
+                  center={false}
+                  cropBoxMovable={false}
+                  cropBoxResizable={false}
+                  responsive
+                  checkOrientation={false}
+                  preview=".avatar-crop-preview"
+                />
+              </div>
+
+              <div className="flex flex-col gap-5">
+                <div>
+                  <div className="mb-3 text-sm font-medium text-gray-800">Preview</div>
+                  <div className="mx-auto h-40 w-40 overflow-hidden rounded-full border-4 border-[#0A2A56] bg-gray-100">
+                    <div className="avatar-crop-preview h-full w-full" />
+                  </div>
+                </div>
+
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-gray-800">Zoom</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={2}
+                    step={0.01}
+                    value={cropZoom}
+                    onChange={(event) => handleCropZoomChange(Number(event.target.value))}
+                    className="w-full accent-[#0A2A56]"
+                  />
+                </label>
+
+                <div className="rounded-lg bg-gray-50 p-3 text-xs leading-5 text-gray-600">
+                  The saved avatar will be cropped to a square image, so it stays sharp in circular dashboard avatars.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-5 py-4 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={handleCropCancel}
+                className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleApplyCrop()}
+                className="rounded-lg bg-[#0A2A56] px-5 py-2 text-sm font-semibold text-white hover:opacity-95"
+              >
+                Apply crop
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

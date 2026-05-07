@@ -3,6 +3,7 @@
 // --- Define the FULL BASE URL for ALL endpoints ---
 // We assume all API calls should go directly to the production backend
 const API_BASE_URL = 'https://scoutflair.top/api/v1';
+const STORAGE_BASE_URL = 'https://scoutflair.top/scoutflair/v1/storage';
 
 type QueryValue = string | number | boolean | null | undefined;
 
@@ -106,13 +107,40 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   return responseBody;
 }
 
+async function storageFetch(endpoint: string, options: RequestInit = {}) {
+  const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+  const fullUrl = `${STORAGE_BASE_URL}/${endpoint}`;
+
+  const res = await fetch(fullUrl, {
+    ...options,
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  });
+
+  const responseBody = await parseApiResponse(res);
+
+  if (!res.ok) {
+    let errorMessage = `Error ${res.status}: ${res.statusText}`;
+    if (responseBody && typeof responseBody === "object" && "message" in responseBody) {
+      errorMessage = String(responseBody.message || errorMessage);
+    }
+    throw new Error(errorMessage);
+  }
+
+  return responseBody;
+}
+
 // POSTS
 export async function getPosts(limit = 10, offset = 0) {
-  return fetchWithAuth(`/getPosts?limit=${limit}&offset=${offset}`);
+  const query = buildQueryString({ limit, offset });
+  return fetchWithAuth(`/getPosts${query}`);
 }
 
 export async function getUserPosts(limit = 10, offset = 0) {
-  return fetchWithAuth(`/getUserPosts?limit=${limit}&offset=${offset}`);
+  const query = buildQueryString({ limit, offset });
+  return fetchWithAuth(`/getUserPosts${query}`);
 }
 
 export async function getUserPostsByScout(params: {
@@ -133,18 +161,28 @@ export async function addPost(text: string, mediaFileKeys: string[] = []) {
   });
 }
 
+export async function deleteSpotlightPost(postId: string | number) {
+  const query = buildQueryString({ postId });
+  return fetchWithAuth(`/deletePost${query}`, {
+    method: 'DELETE',
+  });
+}
+
 // COMMENTS
 export async function getPostComments(postId: string, limit = 10, offset = 0) {
-  return fetchWithAuth(
-    `/getPostComments?limit=${limit}&offset=${offset}&postId=${postId}`
-  );
+  const query = buildQueryString({ limit, offset, postId });
+  return fetchWithAuth(`/getPostComments${query}`);
 }
 
 export async function addComment(postId: string, text: string) {
   return fetchWithAuth(`/addComment`, {
     method: 'POST',
-    body: JSON.stringify({ postId, text }),
+    body: JSON.stringify({ postId, spotLightPostId: postId, text, comment: text }),
   });
+}
+
+export async function getStorageDownloadUrl(fileKey: string) {
+  return storageFetch(`presign-download/${encodeURIComponent(fileKey)}`);
 }
 
 // LIKE
