@@ -1,7 +1,164 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { getUserPosts } from "@/lib/api";
 import { usePlayerAvatar, usePlayerDisplayName } from "./usePlayerAvatar";
 import { playerProfile } from "./profileData";
+
+type UnknownRecord = Record<string, unknown>;
+type ActivityPost = {
+  id: string;
+  date: string;
+  image: string;
+  content: string;
+  comments: number;
+  shares: number;
+};
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function pickString(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return "";
+}
+
+function pickNumber(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === "string" && value.trim()) {
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+  }
+
+  return 0;
+}
+
+function extractPostRecords(payload: unknown): UnknownRecord[] {
+  const queue: unknown[] = [payload];
+  const seen = new Set<unknown>();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (!current || seen.has(current)) {
+      continue;
+    }
+
+    seen.add(current);
+
+    if (Array.isArray(current)) {
+      const records = current.filter(isRecord);
+      if (records.length > 0) {
+        return records;
+      }
+
+      current.forEach((item) => {
+        if (Array.isArray(item) || isRecord(item)) {
+          queue.push(item);
+        }
+      });
+      continue;
+    }
+
+    if (!isRecord(current)) {
+      continue;
+    }
+
+    ["data", "obj", "items", "posts", "rows", "result", "results", "content"].forEach((key) => {
+      if (key in current) {
+        queue.push(current[key]);
+      }
+    });
+
+    Object.values(current).forEach((value) => {
+      if (Array.isArray(value) || isRecord(value)) {
+        queue.push(value);
+      }
+    });
+  }
+
+  return [];
+}
+
+function normalizeMediaUrl(value: unknown): string {
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const nestedUrl = normalizeMediaUrl(item);
+      if (nestedUrl) {
+        return nestedUrl;
+      }
+    }
+    return "";
+  }
+
+  if (!isRecord(value)) {
+    return "";
+  }
+
+  return normalizeMediaUrl(
+    pickString(value.url, value.publicUrl, value.fileUrl, value.imageUrl, value.src, value.path),
+  );
+}
+
+function formatPostDate(value: unknown) {
+  const rawValue = pickString(value);
+  if (!rawValue) {
+    return "Just now";
+  }
+
+  const parsed = new Date(rawValue);
+  if (Number.isNaN(parsed.getTime())) {
+    return rawValue;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  })
+    .format(parsed)
+    .replace(" at ", " | ");
+}
+
+function mapProfilePosts(response: unknown): ActivityPost[] {
+  return extractPostRecords(response).map((record, index) => {
+    const fallbackPost = playerProfile.activityPosts[index % playerProfile.activityPosts.length];
+
+    return {
+      id: pickString(record.id, record.postId, record.spotLightPostId, record._id) || `${Date.now()}-${index}`,
+      date: formatPostDate(record.createdAt ?? record.updatedAt ?? record.date ?? record.timeAgo) || fallbackPost.date,
+      image:
+        normalizeMediaUrl(record.mediaUrls) ||
+        normalizeMediaUrl(record.media) ||
+        normalizeMediaUrl(record.images) ||
+        normalizeMediaUrl(record.image) ||
+        fallbackPost.image,
+      content: pickString(record.text, record.content, record.caption, record.description) || fallbackPost.content,
+      comments: pickNumber(record.commentCount, record.commentsCount, record.totalComments, record.comments),
+      shares: pickNumber(record.shareCount, record.sharesCount, record.totalShares, record.shares),
+    };
+  });
+}
 
 const recommendationItems = [
   {
@@ -95,6 +252,40 @@ const socialPlatforms = [
 export default function ProfilePage() {
   const playerAvatar = usePlayerAvatar();
   const playerName = usePlayerDisplayName();
+  const [activityPosts, setActivityPosts] = useState<ActivityPost[]>(
+    playerProfile.activityPosts.map((post) => ({
+      id: String(post.id),
+      date: post.date,
+      image: post.image,
+      content: post.content,
+      comments: 2,
+      shares: 5,
+    })),
+  );
+
+  useEffect(() => {
+    let active = true;
+
+    const loadUserPosts = async () => {
+      try {
+        const response = await getUserPosts(10, 0);
+        const nextPosts = mapProfilePosts(response);
+
+        if (active && nextPosts.length > 0) {
+          setActivityPosts(nextPosts);
+        }
+      } catch {
+        // Keep existing UI fallback posts if the request fails.
+      }
+    };
+
+    void loadUserPosts();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const aboutItems = [
     {
       label: "Name",
@@ -295,7 +486,7 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex-1 space-y-6">
-          {playerProfile.activityPosts.map((post) => (
+          {activityPosts.map((post) => (
             <div key={post.id} className="rounded-xl bg-white p-4 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
                 <img
@@ -325,8 +516,8 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <span>2 Comments</span>
-                  <span>5 Shares</span>
+                  <span>{post.comments} Comments</span>
+                  <span>{post.shares} Shares</span>
                 </div>
               </div>
 

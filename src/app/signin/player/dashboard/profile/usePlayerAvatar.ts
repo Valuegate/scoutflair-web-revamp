@@ -214,11 +214,13 @@ export function writeStoredPlayerProfile(profile: Partial<StoredPlayerProfile>) 
         ? pickString(profile.lastName)
         : nameParts.lastName,
     avatarUrl:
-      pickString(profile.avatarUrl) ||
-      currentProfile.avatarUrl ||
-      defaultStoredPlayerProfile.avatarUrl,
+      profile.avatarUrl !== undefined
+        ? pickString(profile.avatarUrl)
+        : currentProfile.avatarUrl || defaultStoredPlayerProfile.avatarUrl,
     imageFileKey:
-      pickString(profile.imageFileKey) || currentProfile.imageFileKey || "",
+      profile.imageFileKey !== undefined
+        ? pickString(profile.imageFileKey)
+        : currentProfile.imageFileKey || "",
   };
 
   window.localStorage.setItem(PLAYER_PROFILE_STORAGE_KEY, JSON.stringify(nextProfile));

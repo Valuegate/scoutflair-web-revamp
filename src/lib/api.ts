@@ -165,17 +165,32 @@ export async function increaseShare(postId: string) {
 
 // NOTIFICATIONS
 export async function getNotifications(limit = 10, offset = 0) {
-  return apiFetch(`notifications/getNotifications?limit=${limit}&offset=${offset}`);
+  const query = buildQueryString({ limit, offset });
+  return apiFetch(`notifications/getNotifications${query}`);
 }
 
 export async function findNotificationById(notificationId: string | number) {
-  return apiFetch(`notifications/findById?notificationId=${notificationId}`);
+  const query = buildQueryString({ notificationId });
+  return apiFetch(`notifications/findById${query}`);
 }
 
 export async function saveNotification(notifications: Record<string, unknown>) {
   return apiFetch(`notifications/add`, {
     method: 'POST',
     body: JSON.stringify(notifications),
+  });
+}
+
+export async function markNotificationAsRead(notificationId: string | number) {
+  const query = buildQueryString({ notificationId });
+  return apiFetch(`notifications/markAsRead${query}`, {
+    method: 'PATCH',
+  });
+}
+
+export async function markAllNotificationsAsRead() {
+  return apiFetch(`notifications/markAllAsRead`, {
+    method: 'PATCH',
   });
 }
 
@@ -191,4 +206,3 @@ export async function editPlayerProfile(editProfileDtos: Record<string, unknown>
     body: JSON.stringify(editProfileDtos),
   });
 }
-

@@ -1,8 +1,14 @@
 "use client";
 
-import { Bell, LoaderCircle, RefreshCw, X } from "lucide-react";
+import { Bell, CheckCheck, LoaderCircle, RefreshCw, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { findNotificationById, getNotifications } from "@/lib/api";
+import {
+  findNotificationById,
+  getNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+} from "@/lib/api";
 
 type NotificationRecord = Record<string, unknown>;
 
@@ -195,14 +201,17 @@ function toNotificationItem(record: NotificationRecord): NotificationItem {
 }
 
 export default function NotificationBell({ initialCount = 0 }: NotificationBellProps) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [isMarkingAllAsRead, setIsMarkingAllAsRead] = useState(false);
   const [error, setError] = useState("");
   const [detailsError, setDetailsError] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
+  const usePlayerNotificationRoutes = pathname?.startsWith("/signin/player/dashboard") ?? false;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -229,6 +238,12 @@ export default function NotificationBell({ initialCount = 0 }: NotificationBellP
   }, [initialCount, notifications]);
 
   const loadNotifications = async () => {
+    if (!usePlayerNotificationRoutes) {
+      setNotifications([]);
+      setSelectedNotification(null);
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
@@ -254,6 +269,10 @@ export default function NotificationBell({ initialCount = 0 }: NotificationBellP
   };
 
   const loadNotificationDetails = async (notificationId: string) => {
+    if (!usePlayerNotificationRoutes) {
+      return;
+    }
+
     setIsLoadingDetails(true);
     setDetailsError("");
 
@@ -266,7 +285,8 @@ export default function NotificationBell({ initialCount = 0 }: NotificationBellP
       }
 
       const detailedNotification = toNotificationItem(detailedRecord);
-      setSelectedNotification(detailedNotification);
+      await markNotificationAsRead(notificationId);
+      setSelectedNotification({ ...detailedNotification, unread: false });
       setNotifications((current) =>
         current.map((item) =>
           item.id === notificationId ? { ...detailedNotification, unread: false } : item,
@@ -276,6 +296,26 @@ export default function NotificationBell({ initialCount = 0 }: NotificationBellP
       setDetailsError(detailError instanceof Error ? detailError.message : "Failed to load notification details.");
     } finally {
       setIsLoadingDetails(false);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    if (!usePlayerNotificationRoutes || notifications.length === 0 || isMarkingAllAsRead) {
+      return;
+    }
+
+    setIsMarkingAllAsRead(true);
+    setError("");
+    setDetailsError("");
+
+    try {
+      await markAllNotificationsAsRead();
+      setNotifications((current) => current.map((item) => ({ ...item, unread: false })));
+      setSelectedNotification((current) => (current ? { ...current, unread: false } : current));
+    } catch (markError) {
+      setError(markError instanceof Error ? markError.message : "Failed to mark notifications as read.");
+    } finally {
+      setIsMarkingAllAsRead(false);
     }
   };
 
@@ -312,6 +352,20 @@ export default function NotificationBell({ initialCount = 0 }: NotificationBellP
               <p className="text-xs text-gray-500">Player dashboard updates</p>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => void handleMarkAllAsRead()}
+                disabled={notificationCount === 0 || isMarkingAllAsRead}
+                className="rounded-full p-1 text-gray-500 transition hover:bg-gray-200 hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Mark all notifications as read"
+                title="Mark all as read"
+              >
+                {isMarkingAllAsRead ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCheck className="h-4 w-4" />
+                )}
+              </button>
               <button
                 type="button"
                 onClick={() => void loadNotifications()}

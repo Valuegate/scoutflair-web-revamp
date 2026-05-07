@@ -48,6 +48,7 @@ const DEFAULT_FORM_DATA: FormData = {
   phone: "",
   address: "",
 };
+const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024;
 
 const SettingsPage = () => {
   const playerBasicInfo = usePlayerBasicInfo();
@@ -91,6 +92,7 @@ const SettingsPage = () => {
 
   const [avatarUrl, setAvatarUrl] = useState<string>(playerAvatar);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
+  const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -164,20 +166,37 @@ const SettingsPage = () => {
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      setPendingAvatarFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result && typeof event.target.result === 'string') {
-          setAvatarUrl(event.target.result);
-        }
-      };
-      reader.readAsDataURL(file);
+    if (!file) {
+      return;
     }
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please choose an image file.');
+      e.currentTarget.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_FILE_SIZE) {
+      alert('Profile picture must be 5MB or smaller.');
+      e.currentTarget.value = "";
+      return;
+    }
+
+    setPendingAvatarFile(file);
+    setAvatarUploadProgress(0);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result && typeof event.target.result === 'string') {
+        setAvatarUrl(event.target.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.currentTarget.value = "";
   };
 
   const handleAvatarRemove = () => {
     setPendingAvatarFile(null);
+    setAvatarUploadProgress(0);
     setAvatarUrl("");
   };
 
@@ -191,7 +210,7 @@ const SettingsPage = () => {
       let nextAvatarUrl = currentProfile.avatarUrl;
 
       if (pendingAvatarFile) {
-        const uploadResponse = await uploadFileToR2(pendingAvatarFile);
+        const uploadResponse = await uploadFileToR2(pendingAvatarFile, setAvatarUploadProgress);
         imageFileKey = uploadResponse.fileKey;
         nextAvatarUrl = uploadResponse.url;
       } else if (!avatarUrl) {
@@ -247,6 +266,7 @@ const SettingsPage = () => {
       };
       localStorage.setItem('settingsData', JSON.stringify(data));
       setPendingAvatarFile(null);
+      setAvatarUploadProgress(0);
       notifyPlayerProfileUpdated();
       alert('Changes saved successfully!');
     } catch (error) {
@@ -370,6 +390,14 @@ const SettingsPage = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
+                      {isSaving && pendingAvatarFile && avatarUploadProgress > 0 && (
+                        <div className="w-full max-w-xs overflow-hidden rounded bg-gray-200 sm:w-40">
+                          <div
+                            className="h-2 bg-[#0A2A56] transition-all"
+                            style={{ width: `${avatarUploadProgress}%` }}
+                          />
+                        </div>
+                      )}
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button 
                           type="button"
