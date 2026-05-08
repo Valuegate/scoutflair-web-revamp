@@ -1,6 +1,5 @@
 "use client"
 import React from 'react';
-import Image from 'next/image';
 
 interface PlayerProfileCardProps {
   playerName?: string;
@@ -12,20 +11,23 @@ interface PlayerProfileCardProps {
 }
 
 const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
-  playerName = "Peter Abbas",
-  position = "Midfielder",
-  jerseyNumber = 8,
-  age = 22,
-  playerImage = "/images/profile.jpeg", 
-  stadiumImage = "/images/sta.png"
+  playerName = "",
+  position = "",
+  jerseyNumber,
+  age,
+  playerImage = "",
+  stadiumImage = ""
 }) => {
   return (
    <div className=' relative bg-white shadow-lg w-[1098px] h-[370px] rounded-[12px] '>
-    
-    <p>Hello</p>
-    <p>Hello</p>
-    <p>Hello</p>
-    <p>Hello</p>
+    {playerName ? (
+      <div className="p-6">
+        <h2 className="text-lg font-semibold text-black">{playerName}</h2>
+        <p className="text-sm text-gray-600">
+          {[position, jerseyNumber ? `No. ${jerseyNumber}` : "", age ? `${age} yrs` : ""].filter(Boolean).join(" | ")}
+        </p>
+      </div>
+    ) : null}
    </div>
   );
 };

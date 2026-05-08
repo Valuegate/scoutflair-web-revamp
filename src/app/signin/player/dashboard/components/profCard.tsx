@@ -22,6 +22,7 @@ export const ProfileCard = () => {
     .map((n) => n[0])
     .join("")
     .toUpperCase();
+  const profileLabel = name || "Loading profile...";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,7 +51,7 @@ export const ProfileCard = () => {
           className="relative flex items-center p-1 rounded-full hover:bg-gray-100 transition-colors active:scale-95"
           aria-label="Open profile menu"
         >
-          {!imgError ? (
+          {playerAvatar && !imgError ? (
             <Image
               src={playerAvatar}
               alt="Profile"
@@ -76,7 +77,7 @@ export const ProfileCard = () => {
         className="hidden sm:flex items-center gap-3 p-2 rounded-lg bg-white hover:bg-gray-50 transition-colors w-full"
       >
         <div className="flex items-center gap-3 flex-1">
-          {!imgError ? (
+          {playerAvatar && !imgError ? (
             <Image
               src={playerAvatar}
               alt="Profile"
@@ -91,7 +92,7 @@ export const ProfileCard = () => {
             </div>
           )}
           <div className="hidden md:block text-left">
-            <p className="font-semibold text-sm text-gray-800 truncate max-w-[100px]">{name}</p>
+            <p className="font-semibold text-sm text-gray-800 truncate max-w-[100px]">{profileLabel}</p>
             <p className="text-xs text-gray-500">{role}</p>
           </div>
         </div>
@@ -104,7 +105,7 @@ export const ProfileCard = () => {
       {open && (
         <div className="absolute right-0 top-12 sm:top-14 bg-white border rounded-lg shadow-lg w-48 py-2 z-50">
           <div className="sm:hidden px-4 py-3 border-b border-gray-100">
-            <p className="font-semibold text-gray-800">{name}</p>
+            <p className="font-semibold text-gray-800">{profileLabel}</p>
             <p className="text-sm text-gray-500">{role}</p>
           </div>
 

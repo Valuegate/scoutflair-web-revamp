@@ -27,11 +27,6 @@ const dataURLtoFile = (dataurl: string, filename: string): File | null => {
 };
 
 // --- SVG Icons ---
-const VideoIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-  </svg>
-);
 const OutlinePhoto = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -74,6 +69,7 @@ interface EmojiOverlay {
 }
 
 type UnknownRecord = Record<string, unknown>;
+const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024;
 
 const isRecord = (value: unknown): value is UnknownRecord =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -500,67 +496,54 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
   const [text, setText] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<ImageItem[]>([]);
   const [selectedVideos, setSelectedVideos] = useState<VideoItem[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<Record<number, number>>({});
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [editingImage, setEditingImage] = useState<ImageItem | null>(null);
   const [postError, setPostError] = useState<string | null>(null); // For showing errors
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
-  const videoInputRef = useRef<HTMLInputElement | null>(null);
 
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>, source: "camera" | "gallery") => {
     const files = Array.from(event.target.files || []);
     files.forEach((file) => {
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          const url = e.target?.result;
-          if (typeof url === "string") {
-            const newImage: ImageItem = {
-              id: Date.now() + Math.random(),
-              file,
-              url,
-              source,
-            };
-            setSelectedImages((prev) => [...prev, newImage]);
-          }
-        };
-        reader.readAsDataURL(file);
+      if (!file.type.startsWith("image/")) {
+        setPostError("Only image files can be attached to Spotlight posts.");
+        return;
       }
-    });
-    event.currentTarget.value = "";
-  };
 
-  const handleVideoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    files.forEach((file) => {
-      if (file.type.startsWith("video/")) {
-        const reader = new FileReader();
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          const url = e.target?.result;
-          if (typeof url === "string") {
-            const newVideo: VideoItem = {
-              id: Date.now() + Math.random(),
-              file,
-              url,
-              name: file.name,
-            };
-            setSelectedVideos((prev) => [...prev, newVideo]);
-          }
-        };
-        reader.readAsDataURL(file);
+      if (file.size > MAX_IMAGE_FILE_SIZE) {
+        setPostError("Each Spotlight image must be 5MB or smaller.");
+        return;
       }
+
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const url = e.target?.result;
+        if (typeof url === "string") {
+          const newImage: ImageItem = {
+            id: Date.now() + Math.random(),
+            file,
+            url,
+            source,
+          };
+          setSelectedImages((prev) => [...prev, newImage]);
+          setPostError(null);
+        }
+      };
+      reader.readAsDataURL(file);
     });
     event.currentTarget.value = "";
   };
 
   // --- UPDATED handlePost FUNCTION ---
   const handlePost = async () => {
-    if (!text.trim() && selectedImages.length === 0 && selectedVideos.length === 0) return;
+    if (!text.trim() && selectedImages.length === 0) return;
 
     setIsPosting(true);
     setPostError(null); // Clear previous errors
+    setUploadProgress({});
     
     try {
       const fileKeys: string[] = [];
@@ -569,14 +552,9 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
       // Upload all images
       for (const image of selectedImages) {
         // We use 'image.file' which is the edited or original file
-        const { url, fileKey } = await uploadFileToR2(image.file);
-        fileKeys.push(fileKey);
-        mediaUrls.push(url); // 'url' here is the publicUrl
-      }
-
-      // Upload all videos
-      for (const video of selectedVideos) {
-        const { url, fileKey } = await uploadFileToR2(video.file);
+        const { url, fileKey } = await uploadFileToR2(image.file, (progress) => {
+          setUploadProgress((current) => ({ ...current, [image.id]: progress }));
+        });
         fileKeys.push(fileKey);
         mediaUrls.push(url); // 'url' here is the publicUrl
       }
@@ -593,7 +571,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
       // Create a new post object for the UI
       const savedPost: Post = {
         id: extractResponsePostId(response),
-        user: { name: playerName, avatar: playerAvatar, timeAgo: "Just now" },
+        user: { name: playerName || "Player", avatar: playerAvatar, timeAgo: "Just now" },
         content: text.trim(),
         image: mediaUrls.length === 1 ? mediaUrls[0] : mediaUrls,
         likes: 0,
@@ -611,7 +589,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
       // Reset the form
       setText("");
       setSelectedImages([]);
-      setSelectedVideos([]);
+      setUploadProgress({});
 
     } catch (error) {
       console.error("Failed to create post:", error);
@@ -630,7 +608,7 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
     setEditingImage(null);
   };
 
-  const canPost = (text.trim() || selectedImages.length > 0 || selectedVideos.length > 0) && !isPosting;
+  const canPost = (text.trim() || selectedImages.length > 0) && !isPosting;
 
   return (
     <>
@@ -640,11 +618,15 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
 
       <div className="bg-white shadow-md rounded-xl p-3 w-full max-w-[1250px] mx-auto">
         <div className="flex h-auto items-center space-x-2 sm:space-x-3">
-          <img
-            src={playerAvatar}
-            alt={playerName}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
-          />
+          {playerAvatar ? (
+            <img
+              src={playerAvatar}
+              alt={playerName || "Player profile"}
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 bg-gray-100" />
+          )}
           <div className="flex-1 flex items-center bg-gray-100 rounded-lg px-2 sm:px-3 min-w-0">
             <input
               type="text"
@@ -659,9 +641,6 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
               </button>
               <button onClick={() => fileInputRef.current?.click()} className="text-gray-500 hover:text-gray-700 p-1 sm:p-2" title="Upload photo" disabled={isPosting}>
                 <OutlinePhoto />
-              </button>
-              <button onClick={() => videoInputRef.current?.click()} className="text-gray-500 hover:text-gray-700 p-1 sm:p-2" title="Upload video" disabled={isPosting}>
-                <VideoIcon />
               </button>
             </div>
           </div>
@@ -685,12 +664,20 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
           </div>
         )}
 
-        {(selectedImages.length > 0 || selectedVideos.length > 0) && (
+        {selectedImages.length > 0 && (
           <div className="mt-3 ml-10 sm:ml-12">
             <div className="flex flex-wrap gap-4">
               {selectedImages.map((image) => (
                 <div key={image.id} className="relative group">
                   <img src={image.url} alt="Selected" className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200" />
+                  {isPosting && uploadProgress[image.id] !== undefined && (
+                    <div className="absolute inset-x-1 bottom-1 overflow-hidden rounded bg-white/80">
+                      <div
+                        className="h-1.5 bg-[#0A2A56] transition-all"
+                        style={{ width: `${uploadProgress[image.id]}%` }}
+                      />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 rounded-lg flex items-center justify-center">
                     <button
                       onClick={() => setEditingImage(image)}
@@ -733,7 +720,6 @@ export default function PostBox({ onCreatePost }: PostBoxProps) {
 
         <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={(e) => handleImageSelect(e, "gallery")} className="hidden" disabled={isPosting} />
         <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => handleImageSelect(e, "camera")} className="hidden" disabled={isPosting} />
-        <input ref={videoInputRef} type="file" accept="video/*" multiple onChange={handleVideoSelect} className="hidden" disabled={isPosting} />
       </div>
     </>
   );
