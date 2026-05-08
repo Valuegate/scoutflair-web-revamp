@@ -1,14 +1,22 @@
 "use client";
 
-import { Search, PencilLine, Trash2 } from "lucide-react";
+import { Search, PencilLine, Trash2, RefreshCw, Play } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getStorageDownloadUrl } from "@/lib/api";
+import { usePlayerProfile } from "../profile/usePlayerAvatar";
 
 type GalleryEntry = {
   id: string;
   image: string;
   alt: string;
+  title: string;
+  description: string;
+  category: string;
+  createdDate: string;
   dateLabel: string;
+  isVideo: boolean;
 };
 
 type NewsItem = {
@@ -19,32 +27,10 @@ type NewsItem = {
   headline: string;
 };
 
-const galleryEntries: GalleryEntry[] = [
-  { id: "g1", image: "/images/spotlight1.png", alt: "Players resting during a training break", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g2", image: "/images/spotlight2.png", alt: "Football drills during match preparation", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g3", image: "/images/post_1.png", alt: "Player making a forward run in training", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g4", image: "/images/post_2.png", alt: "Late run into midfield space during a session", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g5", image: "/images/scoutplayertwo.png", alt: "Attacking sequence on the edge of the area", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g6", image: "/images/scoutplayerfour.png", alt: "Wide player carrying the ball forward", dateLabel: "THURSDAY, AUGUST 29,2024" },
+type UnknownRecord = Record<string, unknown>;
 
-  { id: "g7", image: "/images/allpone.png", alt: "Competitive play in a crowded final third", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g8", image: "/images/updatesone.png", alt: "Goalkeeper preparing during a finishing drill", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g9", image: "/images/updatestwo.png", alt: "Shot taken across goal during a scrimmage", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g10", image: "/images/updatesthree.png", alt: "Player dribbling in open space", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g11", image: "/images/grass.jpg", alt: "Wide pitch setup before an evening session", dateLabel: "THURSDAY, AUGUST 29,2024" },
-  { id: "g12", image: "/images/actone.png", alt: "Training activity viewed from touchline level", dateLabel: "THURSDAY, AUGUST 29,2024" },
-
-  { id: "g13", image: "/images/acttwo.png", alt: "Players holding shape in a line during drills", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
-  { id: "g14", image: "/images/actthree.png", alt: "Recovery work taking place beside the pitch", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
-  { id: "g15", image: "/images/actfour.png", alt: "Indoor football training session", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
-  { id: "g16", image: "/images/prosimgone.png", alt: "Youth players listening during a coaching block", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
-  { id: "g17", image: "/images/prosimgtwo.png", alt: "Senior player directing a buildup phase", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
-  { id: "g18", image: "/images/prosimgthree.png", alt: "Player striking the ball under pressure", dateLabel: "WEDNESDAY, AUGUST 28,2024" },
-
-  { id: "g19", image: "/images/topone.png", alt: "Night training under floodlights", dateLabel: "TUESDAY, AUGUST 27,2024" },
-  { id: "g20", image: "/images/toptwo.png", alt: "Small-sided game between academy players", dateLabel: "TUESDAY, AUGUST 27,2024" },
-  { id: "g21", image: "/images/topthree.png", alt: "Touchline coaching during a team session", dateLabel: "TUESDAY, AUGUST 27,2024" },
-];
+const R2_PUBLIC_BASE_URL = "https://pub-cc6bfa4db4fa4eb8b3d35333dcfdca5e.r2.dev";
+const PAGE_SIZE = 12;
 
 const newsItems: NewsItem[] = [
   {
@@ -84,6 +70,191 @@ const newsItems: NewsItem[] = [
   },
 ];
 
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function pickString(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return "";
+}
+
+function pickNumber(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === "string" && value.trim()) {
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+  }
+
+  return 0;
+}
+
+function extractFirstArray(payload: unknown): UnknownRecord[] {
+  const queue: unknown[] = [payload];
+  const seen = new Set<unknown>();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (!current || seen.has(current)) {
+      continue;
+    }
+
+    seen.add(current);
+
+    if (Array.isArray(current)) {
+      return current.filter(isRecord);
+    }
+
+    if (!isRecord(current)) {
+      continue;
+    }
+
+    ["data", "obj", "items", "rows", "content", "result", "results"].forEach((key) => {
+      if (key in current) {
+        queue.push(current[key]);
+      }
+    });
+  }
+
+  return [];
+}
+
+function extractTotalCount(payload: unknown) {
+  if (!isRecord(payload)) {
+    return 0;
+  }
+
+  const data = isRecord(payload.data) ? payload.data : null;
+  return pickNumber(payload.totalCount, data?.totalCount, data?.total, payload.total);
+}
+
+function extractFirstRecord(payload: unknown): UnknownRecord | null {
+  if (isRecord(payload)) {
+    for (const key of ["data", "obj", "item", "result"]) {
+      if (key in payload) {
+        const nested = extractFirstRecord(payload[key]);
+        if (nested) {
+          return nested;
+        }
+      }
+    }
+
+    return payload;
+  }
+
+  if (Array.isArray(payload)) {
+    for (const item of payload) {
+      const nested = extractFirstRecord(item);
+      if (nested) {
+        return nested;
+      }
+    }
+  }
+
+  return null;
+}
+
+function isDisplayableUrl(value: string) {
+  return /^(https?:\/\/|blob:|data:|\/images\/|\/)/i.test(value);
+}
+
+function fileKeyToPublicUrl(value: string) {
+  return `${R2_PUBLIC_BASE_URL}/${value.replace(/^\/+/, "")}`;
+}
+
+function isVideoUrl(url: string) {
+  return /\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i.test(url);
+}
+
+async function resolveMediaUrl(value: string) {
+  if (!value.trim()) {
+    return "";
+  }
+
+  if (isDisplayableUrl(value)) {
+    return value.trim();
+  }
+
+  try {
+    const response = await getStorageDownloadUrl(value.trim());
+    const record = extractFirstRecord(response);
+    const downloadUrl = record
+      ? pickString(record.presignedUrl, record.publicUrl, record.url, record.downloadUrl)
+      : "";
+    return downloadUrl || fileKeyToPublicUrl(value);
+  } catch {
+    return fileKeyToPublicUrl(value);
+  }
+}
+
+function formatDateLabel(value: string) {
+  const parsedDate = value ? new Date(value) : null;
+
+  if (!parsedDate || Number.isNaN(parsedDate.getTime())) {
+    return "RECENT UPLOADS";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
+    .format(parsedDate)
+    .toUpperCase()
+    .replace(", ", ",");
+}
+
+async function mapGalleryRecord(record: UnknownRecord): Promise<GalleryEntry | null> {
+  const mediaKey = pickString(
+    record.mediaFileKey,
+    record.file,
+    record.fileKey,
+    record.url,
+    record.publicUrl,
+    record.imageUrl,
+  );
+
+  if (!mediaKey) {
+    return null;
+  }
+
+  const image = await resolveMediaUrl(mediaKey);
+  if (!image) {
+    return null;
+  }
+
+  const title = pickString(record.title, record.fileName) || "Untitled media";
+  const description = pickString(record.description);
+  const category = pickString(record.category);
+  const createdDate = pickString(record.createdDate, record.createdAt, record.date);
+
+  return {
+    id: String(pickNumber(record.id, record.mediaId) || mediaKey),
+    image,
+    alt: description || title,
+    title,
+    description,
+    category,
+    createdDate,
+    dateLabel: formatDateLabel(createdDate),
+    isVideo: isVideoUrl(mediaKey) || isVideoUrl(image),
+  };
+}
+
 function groupGalleryByDate(entries: GalleryEntry[]) {
   return entries.reduce<Record<string, GalleryEntry[]>>((acc, entry) => {
     if (!acc[entry.dateLabel]) {
@@ -96,18 +267,137 @@ function groupGalleryByDate(entries: GalleryEntry[]) {
 
 export default function GalleryPage() {
   const [query, setQuery] = useState("");
+  const [entries, setEntries] = useState<GalleryEntry[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedId, setSelectedId] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const profile = usePlayerProfile();
+
+  const fetchGalleryPage = useCallback(async (offset: number, append = false) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("Please log in again to view your gallery.");
+      }
+
+      const params = new URLSearchParams({
+        limit: String(PAGE_SIZE),
+        offset: String(offset),
+      });
+
+      if (profile.email) {
+        params.set("playeremail", profile.email);
+      }
+
+      const response = await fetch(`/api/gallery?${params.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "*/*",
+        },
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const message =
+          payload && typeof payload === "object" && "message" in payload
+            ? String(payload.message)
+            : payload && typeof payload === "object" && "error" in payload
+              ? String(payload.error)
+              : "Failed to load gallery.";
+        throw new Error(message);
+      }
+
+      const mappedEntries = await Promise.all(extractFirstArray(payload).map(mapGalleryRecord));
+      const nextEntries = mappedEntries.filter((entry): entry is GalleryEntry => Boolean(entry));
+      setEntries((currentEntries) => (append ? [...currentEntries, ...nextEntries] : nextEntries));
+      setTotalCount(extractTotalCount(payload));
+      setSelectedId("");
+    } catch (loadError) {
+      setEntries([]);
+      setTotalCount(0);
+      setError(loadError instanceof Error ? loadError.message : "Failed to load gallery.");
+    } finally {
+      setLoading(false);
+    }
+  }, [profile.email]);
+
+  const loadGallery = useCallback(() => fetchGalleryPage(0), [fetchGalleryPage]);
+
+  useEffect(() => {
+    void loadGallery();
+  }, [loadGallery]);
 
   const filteredEntries = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
     if (!normalized) {
-      return galleryEntries;
+      return entries;
     }
 
-    return galleryEntries.filter((entry) => entry.alt.toLowerCase().includes(normalized));
-  }, [query]);
+    return entries.filter((entry) =>
+      [entry.title, entry.description, entry.category, entry.alt]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalized),
+    );
+  }, [entries, query]);
 
   const groupedEntries = useMemo(() => groupGalleryByDate(filteredEntries), [filteredEntries]);
+  const selectedEntry = entries.find((entry) => entry.id === selectedId);
+  const canLoadMore = totalCount > entries.length;
+
+  const handleDelete = async () => {
+    if (!selectedEntry || deleting) {
+      return;
+    }
+
+    const shouldDelete = window.confirm(`Delete "${selectedEntry.title}" from your gallery?`);
+    if (!shouldDelete) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("Please log in again to delete gallery media.");
+      }
+
+      const response = await fetch(`/api/gallery?mediaId=${encodeURIComponent(selectedEntry.id)}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "*/*",
+        },
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        const message =
+          payload && typeof payload === "object" && "message" in payload
+            ? String(payload.message)
+            : payload && typeof payload === "object" && "error" in payload
+              ? String(payload.error)
+              : "Failed to delete gallery media.";
+        throw new Error(message);
+      }
+
+      setEntries((currentEntries) => currentEntries.filter((entry) => entry.id !== selectedEntry.id));
+      setTotalCount((currentTotal) => Math.max(0, currentTotal - 1));
+      setSelectedId("");
+    } catch (deleteError) {
+      alert(deleteError instanceof Error ? deleteError.message : "Failed to delete gallery media.");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="px-2 py-7 md:px-1">
@@ -125,10 +415,20 @@ export default function GalleryPage() {
                   className="w-full bg-transparent text-sm text-[#374151] outline-none placeholder:text-[#9CA3AF]"
                 />
                 <div className="ml-3 flex items-center gap-3 text-[#6B7280]">
-                  <button type="button" className="transition hover:text-[#0A2342]">
+                  <Link
+                    href="/signin/player/dashboard/gallery/uploadgallery"
+                    className="transition hover:text-[#0A2342]"
+                    title="Add media"
+                  >
                     <PencilLine className="h-4 w-4" strokeWidth={1.8} />
-                  </button>
-                  <button type="button" className="transition hover:text-[#0A2342]">
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={!selectedEntry || deleting}
+                    className="transition hover:text-[#0A2342] disabled:cursor-not-allowed disabled:opacity-40"
+                    title="Delete selected media"
+                  >
                     <Trash2 className="h-4 w-4" strokeWidth={1.8} />
                   </button>
                 </div>
@@ -136,43 +436,89 @@ export default function GalleryPage() {
 
               <button
                 type="button"
-                className="h-12 min-w-[90px] rounded-[10px] border border-[#A7B2C3] px-6 text-sm font-medium text-[#384152] transition hover:bg-[#F8FAFC]"
+                onClick={() => loadGallery()}
+                disabled={loading}
+                className="flex h-12 min-w-[90px] items-center justify-center gap-2 rounded-[10px] border border-[#A7B2C3] px-6 text-sm font-medium text-[#384152] transition hover:bg-[#F8FAFC] disabled:opacity-60"
               >
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} strokeWidth={1.8} />
                 Filter
               </button>
             </div>
           </div>
 
           <div className="mt-6 rounded-[24px] bg-white p-4 shadow-[0_14px_32px_rgba(15,23,42,0.08)] sm:p-5">
-            {filteredEntries.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="h-[138px] animate-pulse rounded-[10px] bg-[#F5F5F5]" />
+                ))}
+              </div>
+            ) : error ? (
               <div className="rounded-2xl border border-dashed border-[#D1D5DB] px-6 py-12 text-center text-sm text-[#6B7280]">
-                No gallery items match your search.
+                {error}
+              </div>
+            ) : filteredEntries.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-[#D1D5DB] px-6 py-12 text-center text-sm text-[#6B7280]">
+                {query.trim() ? "No gallery items match your search." : "Your gallery is empty."}
               </div>
             ) : (
-              Object.entries(groupedEntries).map(([dateLabel, entries]) => (
-                <section key={dateLabel} className="mb-6 last:mb-0">
-                  <h2 className="mb-4 text-[15px] font-semibold uppercase tracking-tight text-[#404040]">
-                    {dateLabel}
-                  </h2>
+              <>
+                {Object.entries(groupedEntries).map(([dateLabel, dateEntries]) => (
+                  <section key={dateLabel} className="mb-6 last:mb-0">
+                    <h2 className="mb-4 text-[15px] font-semibold uppercase tracking-tight text-[#404040]">
+                      {dateLabel}
+                    </h2>
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {entries.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="overflow-hidden rounded-[10px] bg-[#F5F5F5]"
-                      >
-                        <Image
-                          src={entry.image}
-                          alt={entry.alt}
-                          width={520}
-                          height={320}
-                          className="h-[138px] w-full object-cover"
-                        />
-                      </div>
-                    ))}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {dateEntries.map((entry) => (
+                        <button
+                          type="button"
+                          key={entry.id}
+                          onClick={() => setSelectedId((currentId) => (currentId === entry.id ? "" : entry.id))}
+                          className={`relative overflow-hidden rounded-[10px] bg-[#F5F5F5] text-left ring-offset-2 transition ${
+                            selectedId === entry.id ? "ring-2 ring-[#0A2342]" : "hover:opacity-95"
+                          }`}
+                          title={entry.title}
+                        >
+                          {entry.isVideo ? (
+                            <>
+                              <video
+                                src={entry.image}
+                                className="h-[138px] w-full object-cover"
+                                muted
+                                playsInline
+                                preload="metadata"
+                              />
+                              <span className="absolute inset-0 flex items-center justify-center bg-black/10 text-white">
+                                <Play className="h-8 w-8 fill-white" strokeWidth={1.8} />
+                              </span>
+                            </>
+                          ) : (
+                            <img
+                              src={entry.image}
+                              alt={entry.alt}
+                              className="h-[138px] w-full object-cover"
+                            />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+
+                {canLoadMore && (
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => fetchGalleryPage(entries.length, true)}
+                      disabled={loading}
+                      className="rounded-[10px] border border-[#A7B2C3] px-5 py-2 text-xs font-medium text-[#384152] transition hover:bg-[#F8FAFC] disabled:opacity-60"
+                    >
+                      Load more
+                    </button>
                   </div>
-                </section>
-              ))
+                )}
+              </>
             )}
           </div>
         </div>
@@ -217,7 +563,7 @@ export default function GalleryPage() {
 
             <div>
               {newsItems.map((item, index) => (
-                <div key={item.id} className={`${index < newsItems.length - 1 ? "border-b border-[#ECECEC] pb-4 mb-4" : ""}`}>
+                <div key={item.id} className={`${index < newsItems.length - 1 ? "mb-4 border-b border-[#ECECEC] pb-4" : ""}`}>
                   <div className="flex gap-4">
                     <Image
                       src={item.image}

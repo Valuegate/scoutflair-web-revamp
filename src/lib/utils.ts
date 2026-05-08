@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge"
 
 const STORAGE_API_BASE_URL = "https://scoutflair.top/scoutflair/v1/storage";
 const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_MEDIA_FILE_SIZE = 50 * 1024 * 1024;
 
 // 1. Utility for Tailwind classes
 export function cn(...inputs: ClassValue[]) {
@@ -124,6 +125,16 @@ function validateImageFile(file: File) {
   }
 }
 
+function validateMediaFile(file: File) {
+  if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+    throw new Error("Only image or video files can be uploaded.");
+  }
+
+  if (file.size > MAX_MEDIA_FILE_SIZE) {
+    throw new Error("Media file must be 50MB or smaller.");
+  }
+}
+
 function uploadToPresignedUrl(
   presignedUrl: string,
   file: File,
@@ -161,6 +172,21 @@ export async function uploadFileToR2(
   file: File,
   onProgress?: (progress: number) => void,
 ): Promise<{ url: string; fileKey: string }> {
+  return uploadFileToR2WithValidator(file, validateImageFile, onProgress);
+}
+
+export async function uploadMediaFileToR2(
+  file: File,
+  onProgress?: (progress: number) => void,
+): Promise<{ url: string; fileKey: string }> {
+  return uploadFileToR2WithValidator(file, validateMediaFile, onProgress);
+}
+
+async function uploadFileToR2WithValidator(
+  file: File,
+  validateFile: (file: File) => void,
+  onProgress?: (progress: number) => void,
+): Promise<{ url: string; fileKey: string }> {
   // SAFETY CHECK: Prevent running on the server
   if (typeof window === 'undefined') {
     throw new Error("Upload can only happen in the browser");
@@ -173,7 +199,7 @@ export async function uploadFileToR2(
     throw new Error("No token found, please login again");
   }
 
-  validateImageFile(file);
+  validateFile(file);
 
   try {
     const presignRes = await fetch(`${STORAGE_API_BASE_URL}/presign-upload`, {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { addComment, deleteSpotlightPost, getPlayerProfile, getPostComments, getUserPosts, increaseShare, toggleLike } from "@/lib/api";
 import { usePlayerAvatar, usePlayerDisplayName, usePlayerProfile } from "./usePlayerAvatar";
 
@@ -729,7 +729,7 @@ const socialPlatforms = [
   },
 ] as const;
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const searchParams = useSearchParams();
   const viewedPlayerEmail = searchParams.get("playerEmail") || "";
   const playerAvatar = usePlayerAvatar();
@@ -1112,5 +1112,13 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div className="rounded-xl bg-white p-4 text-sm text-gray-500 shadow-sm">Loading profile...</div>}>
+      <ProfilePageContent />
+    </Suspense>
   );
 }
