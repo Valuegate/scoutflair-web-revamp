@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { addComment, deleteSpotlightPost, getPlayerProfile, getPostComments, getUserPosts, increaseShare, toggleLike } from "@/lib/api";
-import { usePlayerAvatar, usePlayerDisplayName, usePlayerProfile } from "./usePlayerAvatar";
+import { normalizePlayerName, usePlayerAvatar, usePlayerDisplayName, usePlayerProfile } from "./usePlayerAvatar";
 
 type UnknownRecord = Record<string, unknown>;
 const R2_PUBLIC_BASE_URL = "https://pub-cc6bfa4db4fa4eb8b3d35333dcfdca5e.r2.dev";
@@ -43,6 +43,51 @@ type DisplayPlayerProfile = {
   weight: string;
   status: string;
 };
+
+function getInitials(name: string) {
+  return (
+    name
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "P"
+  );
+}
+
+function ProfileAvatar({
+  src,
+  name,
+  className,
+}: {
+  src: string;
+  name: string;
+  className: string;
+}) {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  if (src && !hasError) {
+    return (
+      <img
+        src={src}
+        alt={name || "Player profile"}
+        className={className}
+        onError={() => setHasError(true)}
+      />
+    );
+  }
+
+  return (
+    <div className={`${className} flex items-center justify-center bg-gray-100 font-semibold text-gray-600`}>
+      {getInitials(name)}
+    </div>
+  );
+}
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -198,10 +243,11 @@ function mapDisplayProfile(response: unknown): DisplayPlayerProfile | null {
     return null;
   }
 
+  const name = normalizePlayerName(record);
   const imageFileKey = pickString(record.imageFileKey, record.imageUrl, record.avatarUrl, record.avatar);
 
   return {
-    fullName: pickString(record.fullName, record.name, record.playerName),
+    fullName: name.fullName,
     avatar: normalizeMediaUrl(imageFileKey),
     biography: pickString(record.biography, record.bio),
     position: pickString(record.position),
@@ -507,15 +553,11 @@ function ProfileActivityPostCard({
   return (
     <div className="rounded-xl bg-white p-4 shadow-sm">
       <div className="mb-4 flex items-center gap-3">
-        {post.avatar || currentUserAvatar ? (
-          <img
-            src={post.avatar || currentUserAvatar}
-            alt={post.author || currentUserName || "Player profile"}
-            className="h-9 w-9 rounded object-cover"
-          />
-        ) : (
-          <div className="h-9 w-9 rounded bg-gray-100" />
-        )}
+        <ProfileAvatar
+          src={post.avatar || currentUserAvatar}
+          name={post.author || currentUserName}
+          className="h-9 w-9 rounded object-cover text-xs"
+        />
 
         <div className="flex flex-col">
           <div className="text-sm font-bold text-black">{post.author || currentUserName}</div>
@@ -549,11 +591,11 @@ function ProfileActivityPostCard({
       </div>
 
       <div className="border-t border-gray-200 pt-3">
-        <div className="flex items-center justify-around">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => void onToggleLike(post)}
-            className={`flex items-center gap-2 rounded px-3 py-2 text-xs font-medium hover:bg-gray-50 ${
+            className={`flex min-w-0 flex-1 basis-[calc(50%-0.25rem)] items-center justify-center gap-2 rounded px-3 py-2 text-xs font-medium hover:bg-gray-50 sm:basis-auto sm:flex-none ${
               post.isLiked ? "text-[#C0392B]" : "text-black"
             }`}
           >
@@ -565,40 +607,40 @@ function ProfileActivityPostCard({
                 fill={post.isLiked ? "currentColor" : "none"}
               />
             </svg>
-            <span>Like</span>
+            <span className="truncate whitespace-nowrap">Like</span>
           </button>
 
           <button
             type="button"
             onClick={() => void handleToggleComments()}
-            className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-black hover:bg-gray-50"
+            className="flex min-w-0 flex-1 basis-[calc(50%-0.25rem)] items-center justify-center gap-2 rounded px-3 py-2 text-xs font-medium text-black hover:bg-gray-50 sm:basis-auto sm:flex-none"
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14 2H2C1.45 2 1 2.45 1 3v7c0 .55.45 1 1 1h9l3 3V3c0-.55-.45-1-1-1z" stroke="black" strokeWidth="0.76" fill="none" />
             </svg>
-            <span>Comment</span>
+            <span className="truncate whitespace-nowrap">Comment</span>
           </button>
 
           <button
             type="button"
             onClick={() => void onShare(post)}
-            className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-black hover:bg-gray-50"
+            className="flex min-w-0 flex-1 basis-[calc(50%-0.25rem)] items-center justify-center gap-2 rounded px-3 py-2 text-xs font-medium text-black hover:bg-gray-50 sm:basis-auto sm:flex-none"
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 1.5L12 5.5H9v6H7v-6H4l4-4z" stroke="black" strokeWidth="1" fill="black" />
             </svg>
-            <span>Share</span>
+            <span className="truncate whitespace-nowrap">Share</span>
           </button>
 
           <button
             type="button"
             onClick={() => void onDelete(post)}
-            className="flex items-center gap-2 rounded px-3 py-2 text-xs font-medium text-[#C0392B] hover:bg-red-50"
+            className="flex min-w-0 flex-1 basis-[calc(50%-0.25rem)] items-center justify-center gap-2 rounded px-3 py-2 text-xs font-medium text-[#C0392B] hover:bg-red-50 sm:basis-auto sm:flex-none"
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 4h12M6 4V2h4v2m3 0l-.7 9.1A1 1 0 0111.3 14H4.7a1 1 0 01-1-.9L3 4m3 3v4m4-4v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span>Delete</span>
+            <span className="truncate whitespace-nowrap">Delete</span>
           </button>
         </div>
       </div>
@@ -611,15 +653,11 @@ function ProfileActivityPostCard({
             <div className="space-y-3">
               {comments.map((comment) => (
                 <div key={comment.id} className="flex items-start gap-3">
-                  {comment.avatar ? (
-                    <img
-                      src={comment.avatar}
-                      alt={comment.author}
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-8 w-8 rounded-full bg-gray-100" />
-                  )}
+                  <ProfileAvatar
+                    src={comment.avatar}
+                    name={comment.author}
+                    className="h-8 w-8 rounded-full object-cover text-[11px]"
+                  />
                   <div className="flex-1 rounded-lg bg-gray-50 px-3 py-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs font-semibold text-black">{comment.author}</span>
@@ -635,15 +673,11 @@ function ProfileActivityPostCard({
           )}
 
           <div className="mt-4 flex items-center gap-3">
-            {currentUserAvatar ? (
-              <img
-                src={currentUserAvatar}
-                alt={currentUserName || "Player profile"}
-                className="h-9 w-9 rounded object-cover"
-              />
-            ) : (
-              <div className="h-9 w-9 rounded bg-gray-100" />
-            )}
+            <ProfileAvatar
+              src={currentUserAvatar}
+              name={currentUserName}
+              className="h-9 w-9 rounded object-cover text-xs"
+            />
             <input
               type="text"
               value={commentText}
@@ -997,15 +1031,11 @@ function ProfilePageContent() {
           />
 
           <div className="absolute bottom-0 left-4 translate-y-1/2 transform">
-            {displayProfile.avatar ? (
-              <img
-                src={displayProfile.avatar}
-                alt={displayProfile.fullName || "Player profile"}
-                className="mt-[-30px] h-16 w-16 rounded-full border-3 border-[#0A2A56] bg-white object-cover sm:h-20 sm:w-20 md:h-24 md:w-24"
-              />
-            ) : (
-              <div className="mt-[-30px] h-16 w-16 rounded-full border-3 border-[#0A2A56] bg-gray-100 sm:h-20 sm:w-20 md:h-24 md:w-24" />
-            )}
+            <ProfileAvatar
+              src={displayProfile.avatar}
+              name={displayProfile.fullName}
+              className="mt-[-30px] h-16 w-16 rounded-full border-3 border-[#0A2A56] bg-white object-cover text-lg sm:h-20 sm:w-20 md:h-24 md:w-24"
+            />
           </div>
         </div>
 
