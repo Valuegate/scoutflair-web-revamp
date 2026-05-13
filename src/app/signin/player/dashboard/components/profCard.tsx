@@ -1,11 +1,16 @@
 "use client";
 
-import { ChevronDown, LogOut, Repeat } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { links } from "./links"; // Assuming 'links' is the correct import for this component
-import { usePlayerAvatar, usePlayerDisplayName } from "../profile/usePlayerAvatar";
+import {
+  clearPlayerProfileStorage,
+  clearPlayerSettingsStorage,
+  usePlayerAvatar,
+  usePlayerDisplayName,
+} from "../profile/usePlayerAvatar";
 
 export const ProfileCard = () => {
   const [imgError, setImgError] = useState(false);
@@ -21,8 +26,12 @@ export const ProfileCard = () => {
     .split(" ")
     .map((n) => n[0])
     .join("")
-    .toUpperCase();
+    .toUpperCase() || "P";
   const profileLabel = name || "Loading profile...";
+
+  useEffect(() => {
+    setImgError(false);
+  }, [playerAvatar]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -40,6 +49,14 @@ export const ProfileCard = () => {
   const handleNavigate = (path: string) => {
     router.push(path);
     setOpen(false);
+  };
+
+  const handleLogout = () => {
+    clearPlayerProfileStorage();
+    clearPlayerSettingsStorage();
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userSession");
+    handleNavigate("/");
   };
 
   return (
@@ -110,15 +127,6 @@ export const ProfileCard = () => {
           </div>
 
           <div className="py-1">
-            {/* "Switch to Scout" button added */}
-            <button
-              onClick={() => handleNavigate("/signin/scout/dashboard")}
-              className="flex items-center gap-3 w-full text-left px-4 py-3 sm:py-2 hover:bg-gray-100 transition-colors text-gray-700"
-            >
-              <Repeat size={18} />
-              <span className="text-sm font-medium">Switch to Scout</span>
-            </button>
-
             {/* Filter updated to remove "Profile" */}
             {links
               .filter((link) => link.label === "Settings")
@@ -134,7 +142,7 @@ export const ProfileCard = () => {
               ))}
 
             <button
-              onClick={() => handleNavigate("/")}
+              onClick={handleLogout}
               className="flex items-center gap-3 w-full text-left px-4 py-3 sm:py-2 hover:bg-gray-100 transition-colors text-red-600 border-t border-gray-100 mt-1"
             >
               <LogOut size={18} />

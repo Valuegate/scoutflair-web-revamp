@@ -115,6 +115,7 @@ const SettingsPage = () => {
   });
 
   const [avatarUrl, setAvatarUrl] = useState<string>(playerAvatar);
+  const [avatarError, setAvatarError] = useState(false);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
   const [cropSourceUrl, setCropSourceUrl] = useState("");
@@ -179,7 +180,15 @@ const SettingsPage = () => {
 
   useEffect(() => {
     setAvatarUrl(playerAvatar);
+    setAvatarError(false);
   }, [playerAvatar]);
+
+  const avatarInitials =
+    [formData.firstName, formData.lastName]
+      .filter(Boolean)
+      .map((name) => name[0])
+      .join("")
+      .toUpperCase() || "P";
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
@@ -316,6 +325,7 @@ const SettingsPage = () => {
 
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
 
+      // Backend should accept and persist first_name/last_name; fullName stays for current API compatibility.
       const payload = {
         address: formData.address,
         biography: formData.biography,
@@ -323,6 +333,8 @@ const SettingsPage = () => {
         dob: currentProfile.dob,
         email: formData.email,
         facebookUrl: currentProfile.facebookUrl,
+        firstName: formData.firstName,
+        first_name: formData.firstName,
         fullName,
         height: currentProfile.height,
         igUrl: currentProfile.igUrl,
@@ -330,6 +342,8 @@ const SettingsPage = () => {
         jerseyNumber: currentProfile.jerseyNumber,
         licenceNumber: currentProfile.licenceNumber,
         location: currentProfile.location,
+        lastName: formData.lastName,
+        last_name: formData.lastName,
         nationality: currentProfile.nationality,
         nin: currentProfile.nin,
         phone: formData.phone,
@@ -496,14 +510,17 @@ const SettingsPage = () => {
                   <div className="lg:col-span-9">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                        {avatarUrl ? (
+                        {avatarUrl && !avatarError ? (
                           <img
                             src={avatarUrl}
                             alt="Avatar"
                             className="w-full h-full object-cover"
+                            onError={() => setAvatarError(true)}
                           />
                         ) : (
-                          <div className="h-full w-full bg-gray-100" />
+                          <div className="flex h-full w-full items-center justify-center bg-gray-100 text-sm font-semibold text-gray-600">
+                            {avatarInitials}
+                          </div>
                         )}
                       </div>
                       {isSaving && pendingAvatarFile && avatarUploadProgress > 0 && (

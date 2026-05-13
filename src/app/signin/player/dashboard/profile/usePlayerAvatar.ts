@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { getPlayerProfile } from "@/lib/api";
 const SETTINGS_STORAGE_KEY = "settingsData";
-const PLAYER_PROFILE_STORAGE_KEY = "playerProfileCache";
+const LEGACY_PLAYER_PROFILE_STORAGE_KEY = "playerProfileCache";
+const PLAYER_PROFILE_STORAGE_KEY_PREFIX = "playerProfileCache:";
 const PLAYER_PROFILE_EVENT = "player-profile-updated";
 const LEGACY_SEEDED_PROFILE_EMAIL = "peter.abbas@scoutflair.com";
 const LEGACY_SEEDED_PROFILE_AVATAR = "/images/profile.jpeg";
@@ -125,10 +126,33 @@ function splitFullName(fullName: string) {
   }
 
   const [firstName, ...rest] = normalizedName.split(/\s+/);
-    return {
-      firstName,
-      lastName: rest.join(" "),
-    };
+  return {
+    firstName,
+    lastName: rest.join(" "),
+  };
+}
+
+export function normalizePlayerName(record: unknown) {
+  const source: UnknownRecord = isRecord(record) ? record : {};
+  const fallbackFullName = pickString(source.fullName, source.name, source.playerName);
+  const fallbackNameParts = splitFullName(fallbackFullName);
+  const hasExplicitFirstName = source.first_name !== undefined || source.firstName !== undefined;
+  const hasExplicitLastName = source.last_name !== undefined || source.lastName !== undefined;
+  const firstName = hasExplicitFirstName
+    ? pickString(source.first_name, source.firstName)
+    : fallbackNameParts.firstName;
+  const lastName = hasExplicitLastName
+    ? pickString(source.last_name, source.lastName)
+    : hasExplicitFirstName
+      ? ""
+      : fallbackNameParts.lastName;
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+
+  return {
+    firstName,
+    lastName,
+    fullName: fullName || fallbackFullName,
+  };
 }
 
 function isUsableAvatarUrl(value: string) {
@@ -177,6 +201,22 @@ function getPlayerSessionEmail() {
   return isRecord(session) ? pickString(session.email) : "";
 }
 
+function normalizeEmail(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function getPlayerProfileStorageKey(email = getPlayerSessionEmail()) {
+  const normalizedEmail = normalizeEmail(email);
+  return `${PLAYER_PROFILE_STORAGE_KEY_PREFIX}${normalizedEmail || "anonymous"}`;
+}
+
+function profileMatchesCurrentSession(profile: Partial<StoredPlayerProfile>) {
+  const sessionEmail = normalizeEmail(getPlayerSessionEmail());
+  const profileEmail = normalizeEmail(pickString(profile.email));
+
+  return !sessionEmail || !profileEmail || sessionEmail === profileEmail;
+}
+
 function isLegacySeededProfile(profile: Partial<StoredPlayerProfile>) {
   return (
     pickString(profile.email).toLowerCase() === LEGACY_SEEDED_PROFILE_EMAIL ||
@@ -190,26 +230,25 @@ export function readStoredPlayerProfile(): StoredPlayerProfile {
   }
 
   try {
-    const rawProfile = window.localStorage.getItem(PLAYER_PROFILE_STORAGE_KEY);
+    const rawProfile = window.localStorage.getItem(getPlayerProfileStorageKey());
     if (!rawProfile) {
       return defaultStoredPlayerProfile;
     }
 
     const parsedProfile = JSON.parse(rawProfile) as Partial<StoredPlayerProfile>;
-    if (isLegacySeededProfile(parsedProfile)) {
-      window.localStorage.removeItem(PLAYER_PROFILE_STORAGE_KEY);
+    if (isLegacySeededProfile(parsedProfile) || !profileMatchesCurrentSession(parsedProfile)) {
+      window.localStorage.removeItem(getPlayerProfileStorageKey());
       return defaultStoredPlayerProfile;
     }
 
-    const fullName = pickString(parsedProfile.fullName) || defaultStoredPlayerProfile.fullName;
-    const nameParts = splitFullName(fullName);
+    const nameParts = normalizePlayerName(parsedProfile);
 
     return {
       ...defaultStoredPlayerProfile,
       ...parsedProfile,
-      fullName,
-      firstName: pickString(parsedProfile.firstName) || nameParts.firstName,
-      lastName: pickString(parsedProfile.lastName) || nameParts.lastName,
+      fullName: nameParts.fullName,
+      firstName: nameParts.firstName,
+      lastName: nameParts.lastName,
       avatarUrl:
         pickString(parsedProfile.avatarUrl) || defaultStoredPlayerProfile.avatarUrl,
       imageFileKey: pickString(parsedProfile.imageFileKey),
@@ -225,18 +264,27 @@ export function writeStoredPlayerProfile(profile: Partial<StoredPlayerProfile>) 
   }
 
   const currentProfile = readStoredPlayerProfile();
-  const nextFullName = pickString(profile.fullName) || currentProfile.fullName;
-  const nameParts = splitFullName(nextFullName);
+  const nameSource: UnknownRecord = {
+    fullName: profile.fullName ?? currentProfile.fullName,
+  };
+  const nextFirstName = profile.firstName ?? currentProfile.firstName;
+  const nextLastName = profile.lastName ?? currentProfile.lastName;
+  if (profile.firstName !== undefined || nextFirstName) {
+    nameSource.firstName = nextFirstName;
+  }
+  if (profile.lastName !== undefined || nextLastName) {
+    nameSource.lastName = nextLastName;
+  }
+  const nameParts = normalizePlayerName(nameSource);
+  const nextEmail = pickString(profile.email) || currentProfile.email || getPlayerSessionEmail();
 
   const nextProfile: StoredPlayerProfile = {
     ...currentProfile,
     ...profile,
-    fullName: nextFullName,
-    firstName: pickString(profile.firstName) || nameParts.firstName,
-    lastName:
-      profile.lastName !== undefined
-        ? pickString(profile.lastName)
-        : nameParts.lastName,
+    fullName: nameParts.fullName,
+    firstName: nameParts.firstName,
+    lastName: nameParts.lastName,
+    email: nextEmail,
     avatarUrl:
       profile.avatarUrl !== undefined
         ? pickString(profile.avatarUrl)
@@ -247,7 +295,7 @@ export function writeStoredPlayerProfile(profile: Partial<StoredPlayerProfile>) 
         : currentProfile.imageFileKey || "",
   };
 
-  window.localStorage.setItem(PLAYER_PROFILE_STORAGE_KEY, JSON.stringify(nextProfile));
+  window.localStorage.setItem(getPlayerProfileStorageKey(nextEmail), JSON.stringify(nextProfile));
   return nextProfile;
 }
 
@@ -284,11 +332,16 @@ function normalizePlayerProfile(rawProfile: unknown) {
     return null;
   }
 
-  const currentProfile = readStoredPlayerProfile();
-  const fullName =
-    pickString(record.fullName, record.name, record.playerName) ||
-    currentProfile.fullName;
-  const nameParts = splitFullName(fullName);
+  const sessionEmail = getPlayerSessionEmail();
+  const responseEmail = pickString(record.email, record.playerEmail);
+  if (sessionEmail && responseEmail && normalizeEmail(sessionEmail) !== normalizeEmail(responseEmail)) {
+    return null;
+  }
+
+  const currentProfile = profileMatchesCurrentSession({ email: responseEmail })
+    ? readStoredPlayerProfile()
+    : defaultStoredPlayerProfile;
+  const nameParts = normalizePlayerName(record);
 
   const imageFileKey = pickString(record.imageFileKey, record.fileKey);
   const avatarCandidate = pickString(
@@ -304,17 +357,15 @@ function normalizePlayerProfile(rawProfile: unknown) {
   return {
     ...currentProfile,
     playerId: pickNumber(record.playerId, record.id, record.profileId) ?? currentProfile.playerId,
-    fullName,
+    fullName: nameParts.fullName || currentProfile.fullName,
     firstName: nameParts.firstName,
     lastName: nameParts.lastName,
     email:
-      pickString(record.email, record.playerEmail, getPlayerSessionEmail()) ||
+      pickString(responseEmail, sessionEmail) ||
       currentProfile.email,
     phone: pickString(record.phone, record.phoneNumber) || currentProfile.phone,
     address: pickString(record.address) || currentProfile.address,
-    avatarUrl:
-      normalizeAvatarUrl(avatarCandidate) ||
-      currentProfile.avatarUrl,
+    avatarUrl: normalizeAvatarUrl(avatarCandidate),
     imageFileKey: imageFileKey || currentProfile.imageFileKey,
     biography: pickString(record.biography, record.bio) || currentProfile.biography,
     currentTeam: pickString(record.currentTeam) || currentProfile.currentTeam,
@@ -340,16 +391,15 @@ export async function fetchPlayerProfileFromBackend(force = false) {
     return defaultStoredPlayerProfile;
   }
 
-  if (!force && inflightPlayerProfileRequest) {
+  if (inflightPlayerProfileRequest) {
     return inflightPlayerProfileRequest;
   }
 
   inflightPlayerProfileRequest = (async () => {
     try {
-      const playerEmail =
-        getPlayerSessionEmail() ||
-        readStoredPlayerProfile().email ||
-        defaultStoredPlayerProfile.email;
+      window.localStorage.removeItem(LEGACY_PLAYER_PROFILE_STORAGE_KEY);
+
+      const playerEmail = getPlayerSessionEmail() || readStoredPlayerProfile().email;
 
       const response = await getPlayerProfile(playerEmail || undefined);
       const normalizedProfile = normalizePlayerProfile(response);
@@ -407,10 +457,8 @@ export function usePlayerAvatar() {
     const syncAvatar = () => setAvatar(resolvePlayerAvatar());
 
     syncAvatar();
-    void fetchPlayerProfileFromBackend().then((profile) => {
-      if (profile?.avatarUrl) {
-        setAvatar(profile.avatarUrl);
-      }
+    void fetchPlayerProfileFromBackend(true).then((profile) => {
+      setAvatar(profile?.avatarUrl || "");
     });
 
     window.addEventListener("storage", syncAvatar);
@@ -432,7 +480,7 @@ export function usePlayerBasicInfo() {
     const syncBasicInfo = () => setBasicInfo(resolvePlayerBasicInfo());
 
     syncBasicInfo();
-    void fetchPlayerProfileFromBackend().then((profile) => {
+    void fetchPlayerProfileFromBackend(true).then((profile) => {
       if (profile) {
         setBasicInfo({
           firstName: profile.firstName,
@@ -463,7 +511,7 @@ export function usePlayerProfile() {
     const syncProfile = () => setProfile(readStoredPlayerProfile());
 
     syncProfile();
-    void fetchPlayerProfileFromBackend().then((nextProfile) => {
+    void fetchPlayerProfileFromBackend(true).then((nextProfile) => {
       setProfile(nextProfile);
     });
 
@@ -496,4 +544,18 @@ export function clearPlayerSettingsStorage() {
       }),
     );
   }
+}
+
+export function clearPlayerProfileStorage() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const scopedKey = getPlayerProfileStorageKey();
+  window.localStorage.removeItem(scopedKey);
+  window.localStorage.removeItem(LEGACY_PLAYER_PROFILE_STORAGE_KEY);
+  window.localStorage.removeItem("playerAvatar");
+  window.localStorage.removeItem("playerProfile");
+  window.localStorage.removeItem("profileImage");
+  window.localStorage.removeItem("avatarUrl");
 }
