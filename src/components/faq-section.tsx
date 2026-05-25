@@ -16,7 +16,7 @@ const generalFaqs = [
         value: "general-1"
     },
     {
-        question: "Who can use Scoutflair—players, scouts, or coaches?",
+        question: "Who can use Scoutflair - players, scouts, or coaches?",
         answer: "Scoutflair is for everyone in the football ecosystem. Players can build their profiles, scouts can discover new talent, and coaches can find the right players for their teams. Our platform is designed to bridge the gap between all parties.",
         value: "general-2"
     },
@@ -30,7 +30,7 @@ const generalFaqs = [
 const playerFaqs = [
     {
         question: "How do I create a profile as a player?",
-        answer: "Creating a profile on Scoutflair is simple and essential for getting noticed by scouts and coaches. To get started, sign up on the platform and choose the \"Player\" account type. Once registered, you’ll need to fill out your profile with key details, including your position, playing style, height, weight, preferred foot, and team history.\nTo stand out, upload high-quality highlight videos, showcase your match stats and achievements, and add a short bio describing your football journey.",
+        answer: "Creating a profile on Scoutflair is simple and essential for getting noticed by scouts and coaches. To get started, sign up on the platform and choose the \"Player\" account type. Once registered, you'll need to fill out your profile with key details, including your position, playing style, height, weight, preferred foot, and team history.\nTo stand out, upload high-quality highlight videos, showcase your match stats and achievements, and add a short bio describing your football journey.",
         value: "player-1"
     },
     {
@@ -66,7 +66,7 @@ const scoutFaqs = [
 const coachFaqs = [
      {
         question: "How can coaches use Scoutflair to find and recruit players?",
-        answer: "Coaches can leverage Scoutflair to identify, evaluate, and connect with top football talent. The platform provides access to a vast pool of players, each with a detailed profile showcasing stats, skills, and highlight videos, making it easier to assess potential recruits. Coaches can search for players based on specific criteria, compare prospects, track their progress over time, and build a shortlist of those who match their team’s requirements. With advanced scouting tools, streamlined communication features, and real-time player updates,",
+        answer: "Coaches can leverage Scoutflair to identify, evaluate, and connect with top football talent. The platform provides access to a broad pool of players, each with a detailed profile showcasing stats, skills, and highlight videos, making it easier to assess potential recruits. Coaches can search for players based on specific criteria, compare prospects, track their progress over time, and build a shortlist of those who match their team's requirements.",
         value: "coach-1"
     },
     {
