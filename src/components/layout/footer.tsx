@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Facebook, Instagram, Linkedin, Twitter, Copyright } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
 
 const FooterLogo = () => (
   <Link href="/" className="flex items-center gap-2" aria-label="ScoutFlair Home">
@@ -72,9 +72,9 @@ export function Footer() {
                     <h3 className="font-merriweather font-bold text-lg text-white/90">Resources</h3>
                     <nav className="flex flex-col gap-3 font-lato text-white/80">
                         <Link href="/faq" className="hover:text-white transition-colors">F. A. Q</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Cookies</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Terms & Conditions</Link>
+                        <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
+                        <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms & Conditions</Link>
                     </nav>
                 </div>
 
@@ -97,9 +97,8 @@ export function Footer() {
 
             </div>
             <Separator className="bg-white/20" />
-            <div className="pt-6 flex justify-center items-center gap-2">
-                <Copyright className="w-4 h-4" />
-                <p className="text-sm font-lato text-white/80"> Copyright {new Date().getFullYear()}, All Right Reserved. Scoutflair</p>
+            <div className="pt-6 flex justify-center items-center text-center">
+                <p className="text-sm font-lato text-white/80">© Copyright 2026. All rights reserved by Scoutflair. A Product by ValueGate Consulting.</p>
             </div>
         </div>
     </footer>
