@@ -1,90 +1,83 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
-const ACADEMIES_DATA = [
-  {
-    id: 1,
-    name: "Pepsi Football Academy",
-    location: "Lagos",
-    quality: "Premium",
-    level: "Elite",
-    rating: 5,
-    ages: ["10-15", "16-20", "21-25"],
-  },
-  {
-    id: 2,
-    name: "Kwara Football Academy",
-    location: "Ilorin",
-    quality: "Standard",
-    level: "Intermediate",
-    rating: 4,
-    ages: ["10-15", "16-20"],
-  },
-  {
-    id: 3,
-    name: "Mikel Obi Chelsea FA",
-    location: "Jos",
-    quality: "Premium",
-    level: "Elite",
-    rating: 5,
-    ages: ["16-20", "21-25"],
-  },
-  {
-    id: 4,
-    name: "Siaone Soccer Academy",
-    location: "Abuja",
-    quality: "Basic",
-    level: "Beginner",
-    rating: 3,
-    ages: ["10-15"],
-  },
-  {
-    id: 5,
-    name: "Remo Stars Junior",
-    location: "Ikenne",
-    quality: "Premium",
-    level: "Elite",
-    rating: 5,
-    ages: ["10-15", "16-20", "21-25"],
-  },
-  {
-    id: 6,
-    name: "Valegate Academy",
-    location: "Kaduna",
-    quality: "Standard",
-    level: "Intermediate",
-    rating: 4,
-    ages: ["10-15", "16-20", "21-25"],
-  },
-];
+const BASE_URL = "https://scoutflair.top";
+
+function getToken() {
+  return localStorage.getItem("authToken") || "";
+}
+
+type Academy = {
+  id: number;
+  name: string;
+  address: string;
+  state: string;
+  country: string;
+  rating: number;
+  playersCount: number;
+  description: string;
+  phone: string;
+  email: string;
+  website: string;
+  founded: string;
+  imageUrl: string;
+  logoUrl: string;
+};
 
 export default function AcademiesListPage() {
   const router = useRouter();
-
-  // States for Filters
+  const [academies, setAcademies] = useState<Academy[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("All");
-  const [quality, setQuality] = useState("All");
-  const [level, setLevel] = useState("All");
   const [minRating, setMinRating] = useState(0);
 
-  // Unified Filter Logic
-  const filteredAcademies = ACADEMIES_DATA.filter((a) => {
-    const matchSearch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchLoc = location === "All" || a.location === location;
-    const matchQual = quality === "All" || a.quality === quality;
-    const matchLev = level === "All" || a.level === level;
-    const matchRate = a.rating >= minRating;
-    return matchSearch && matchLoc && matchQual && matchLev && matchRate;
+  useEffect(() => {
+    async function fetchAcademies() {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch(
+          `${BASE_URL}/api/v1/est/academy/getAcademies?limit=50&offset=0`,
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        );
+        if (!res.ok)
+          throw new Error(`Failed to fetch academies (${res.status})`);
+        const data = await res.json();
+        const list: Academy[] = data?.content || data || [];
+        setAcademies(list);
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAcademies();
+  }, []);
+
+  const locations = [
+    "All",
+    ...Array.from(new Set(academies.map((a) => a.state).filter(Boolean))),
+  ];
+
+  const filtered = academies.filter((a) => {
+    const matchSearch = a.name
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchLoc = location === "All" || a.state === location;
+    const matchRate = (a.rating || 0) >= minRating;
+    return matchSearch && matchLoc && matchRate;
   });
 
   return (
     <div className="flex flex-col lg:flex-row w-full min-h-screen bg-gray-50">
       <div className="w-full lg:w-1/2 bg-white rounded-xl shadow-md overflow-y-auto max-h-screen">
-        {/* Main Filter Header */}
+        {/* Filter Header */}
         <div className="flex flex-col border-b border-gray-200 p-3 sticky top-0 bg-white z-10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
@@ -95,45 +88,29 @@ export default function AcademiesListPage() {
                   onChange={(e) => setLocation(e.target.value)}
                   className="border border-gray-600 rounded px-2 py-1 w-40 text-[10px] font-semibold outline-none bg-white"
                 >
-                  <option value="All">All Locations</option>
-                  <option value="Lagos">Lagos</option>
-                  <option value="Abuja">Abuja</option>
-                  <option value="Kaduna">Kaduna</option>
+                  {locations.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc === "All" ? "All Locations" : loc}
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              {/* Quality */}
+              {/* Min Rating */}
               <div className="flex flex-col text-black text-xs">
-                <span className="opacity-80 text-[9px]">
-                  Facilities Quality
-                </span>
+                <span className="opacity-80 text-[9px]">Minimum Rating</span>
                 <select
-                  onChange={(e) => setQuality(e.target.value)}
+                  onChange={(e) => setMinRating(Number(e.target.value))}
                   className="border border-gray-600 rounded px-2 py-1 w-40 text-[10px] font-semibold outline-none bg-white"
                 >
-                  <option value="All">Select Option</option>
-                  <option value="Premium">Premium</option>
-                  <option value="Standard">Standard</option>
-                  <option value="Basic">Basic</option>
-                </select>
-              </div>
-
-              {/* Level */}
-              <div className="flex flex-col text-black text-xs">
-                <span className="opacity-80 text-[9px]">Academy Level</span>
-                <select
-                  onChange={(e) => setLevel(e.target.value)}
-                  className="border border-gray-600 rounded px-2 py-1 w-40 text-[10px] font-semibold outline-none bg-white"
-                >
-                  <option value="All">Select Option</option>
-                  <option value="Elite">Elite</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Beginner">Beginner</option>
+                  <option value="0">All Ratings</option>
+                  <option value="4">4+ Stars</option>
+                  <option value="3">3+ Stars</option>
+                  <option value="2">2+ Stars</option>
                 </select>
               </div>
             </div>
 
-            {/* Toggle Advanced Filters Button */}
             <button
               onClick={() => setShowAdvanced(!showAdvanced)}
               className={`p-2 mt-4 rounded self-start lg:self-auto transition-colors ${
@@ -144,9 +121,8 @@ export default function AcademiesListPage() {
             </button>
           </div>
 
-          {/* Advanced Filters: Search & Ratings (Conditional Rendering) */}
           {showAdvanced && (
-            <div className="flex flex-col sm:flex-row gap-4 mt-4 p-3 bg-gray-50 rounded-lg border border-dashed border-gray-300 animate-in fade-in slide-in-from-top-2">
+            <div className="flex flex-col sm:flex-row gap-4 mt-4 p-3 bg-gray-50 rounded-lg border border-dashed border-gray-300">
               <div className="flex-1 flex flex-col">
                 <span className="text-[9px] font-bold text-gray-500 mb-1">
                   SEARCH BY NAME
@@ -157,20 +133,6 @@ export default function AcademiesListPage() {
                   className="border p-2 rounded text-xs outline-none"
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[9px] font-bold text-gray-500 mb-1">
-                  MINIMUM RATING
-                </span>
-                <select
-                  onChange={(e) => setMinRating(Number(e.target.value))}
-                  className="border p-2 rounded text-xs outline-none"
-                >
-                  <option value="0">All Ratings</option>
-                  <option value="5">5 Stars only</option>
-                  <option value="4">4+ Stars</option>
-                  <option value="3">3+ Stars</option>
-                </select>
               </div>
             </div>
           )}
@@ -191,15 +153,42 @@ export default function AcademiesListPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {filteredAcademies.map((academy) => (
-              <AcademyCard key={academy.id} academy={academy} />
-            ))}
-          </div>
+          {loading && (
+            <div className="flex justify-center py-10">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            </div>
+          )}
+
+          {error && !loading && (
+            <div className="text-center py-10 text-red-500 text-sm">
+              <p>⚠️ {error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-2 text-xs underline text-gray-500"
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && filtered.length === 0 && (
+            <div className="text-center py-10 text-gray-400 text-sm">
+              <p className="text-2xl mb-2">🏫</p>
+              <p>No academies found</p>
+            </div>
+          )}
+
+          {!loading && !error && filtered.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {filtered.map((academy) => (
+                <AcademyCard key={academy.id} academy={academy} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Map Image Section */}
+      {/* Map */}
       <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center p-6 sticky top-0 h-screen">
         <img
           src="/images/map-copy.png"
@@ -211,16 +200,29 @@ export default function AcademiesListPage() {
   );
 }
 
-function AcademyCard({ academy }: { academy: any }) {
+function AcademyCard({ academy }: { academy: Academy }) {
   const router = useRouter();
   return (
     <div className="bg-white rounded-lg shadow-md p-4 flex gap-4 border border-gray-100 hover:border-blue-200 transition-all">
       <div className="flex flex-col items-center">
-        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 text-xs">
-          {academy.name.charAt(0)}
-        </div>
+        {academy.logoUrl ? (
+          <img
+            src={academy.logoUrl}
+            alt={academy.name}
+            className="w-10 h-10 rounded-full object-cover"
+            onError={(e) => {
+              const t = e.target as HTMLImageElement;
+              t.onerror = null;
+              t.src = "";
+            }}
+          />
+        ) : (
+          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 text-xs">
+            {academy.name?.charAt(0) || "A"}
+          </div>
+        )}
         <div className="flex items-center text-xs mt-1 text-[#222]">
-          ⭐ {academy.rating}.0
+          ⭐ {academy.rating?.toFixed(1) || "—"}
         </div>
       </div>
       <div className="flex flex-col flex-1 justify-between">
@@ -238,23 +240,22 @@ function AcademyCard({ academy }: { academy: any }) {
         <div className="flex items-center gap-1 mt-1">
           <LocationIcon />
           <span className="text-[8px] text-black">
-            {academy.location}, Nigeria
+            {academy.state || academy.address || "—"},{" "}
+            {academy.country || "Nigeria"}
           </span>
         </div>
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {academy.ages.map((age: string, i: number) => (
-            <div key={i}>
-              <p className="text-[7px] text-gray-500">Age</p>
-              <p className="text-[8px] font-bold text-black">{age}</p>
-            </div>
-          ))}
+        <div className="mt-2 flex gap-2 text-[8px] text-gray-600">
+          {academy.playersCount != null && (
+            <span className="bg-gray-100 px-2 py-0.5 rounded-full">
+              {academy.playersCount} players
+            </span>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-// Icons
 const SettingsIcon = () => (
   <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
     <path
@@ -265,14 +266,9 @@ const SettingsIcon = () => (
     />
   </svg>
 );
+
 const LocationIcon = () => (
-  <svg
-    width="10"
-    height="10"
-    viewBox="0 0 10 11"
-    fill="none"
-    className="text-black"
-  >
+  <svg width="10" height="10" viewBox="0 0 10 11" fill="none">
     <path
       d="M5.41634 4.25065C5.41634 4.36116 5.37244 4.46714 5.2943 4.54528C5.21616 4.62342 5.11018 4.66732 4.99967 4.66732C4.88917 4.66732 4.78319 4.62342 4.70505 4.54528C4.62691 4.46714 4.58301 4.36116 4.58301 4.25065C4.58301 4.14014 4.62691 4.03416 4.70505 3.95602C4.78319 3.87788 4.88917 3.83398 4.99967 3.83398C5.11018 3.83398 5.21616 3.87788 5.2943 3.95602C5.37244 4.03416 5.41634 4.14014 5.41634 4.25065Z"
       stroke="black"
@@ -287,6 +283,7 @@ const LocationIcon = () => (
     />
   </svg>
 );
+
 const AcademyIcon = () => (
   <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
     <path
