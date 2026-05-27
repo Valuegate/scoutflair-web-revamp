@@ -3,15 +3,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, Bell, X, Loader2 } from "lucide-react";
 import { ScoutProfileCard } from "./scoutprofCard";
-import SearchContainer from "../../scout/components/searchContainer";
-import { useLanguage, Language } from "./LanguageContext"; // Ensure Language type is exported from your context
+import SearchContainer from "../../player/dashboard/components/searchContainer";
 
 const BASE_URL = "https://scoutflair.top";
 
 function getToken() {
-  return typeof window !== "undefined"
-    ? localStorage.getItem("authToken") || ""
-    : "";
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("authToken") || "";
+  }
+  return "";
 }
 
 interface Notification {
@@ -65,9 +65,8 @@ export default function ScoutTopbar({
 }: {
   onMenuClick: () => void;
 }) {
-  const { language, setLanguage } = useLanguage();
-
   const [showNotifications, setShowNotifications] = useState(false);
+  const [language, setLanguage] = useState("English");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,8 +118,11 @@ export default function ScoutTopbar({
     if (showNotifications) fetchNotifications();
   }, [showNotifications]);
 
+  const unreadCount = notifications.length;
+
   return (
     <div className="flex w-full justify-between items-center px-3 sm:px-6 py-3 border-b bg-white shadow-sm relative z-50">
+      {/* Left side */}
       <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
         <button
           onClick={onMenuClick}
@@ -129,24 +131,23 @@ export default function ScoutTopbar({
           <Menu className="w-5 h-5 text-[#0A2342]" />
         </button>
         <div className="flex-1 max-w-sm sm:max-w-md">
-          <SearchContainer
-            placeholder={
-              language === "Français" ? "Rechercher..." : "Search..."
-            }
-          />
+          {/* Removed unsupported placeholder prop to satisfy typings */}
+          <SearchContainer />
         </div>
       </div>
 
+      {/* Right side */}
       <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+        {/* Notification Bell */}
         <div className="relative" ref={notificationRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
           >
             <Bell className="w-5 h-5 text-gray-600" />
-            {notifications.length > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full border border-white">
-                {notifications.length > 9 ? "9+" : notifications.length}
+                {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
           </button>
@@ -159,10 +160,16 @@ export default function ScoutTopbar({
                   <X className="w-4 h-4 text-gray-400 hover:text-black" />
                 </button>
               </div>
+
               <div className="max-h-96 overflow-y-auto">
                 {loading ? (
                   <div className="flex justify-center items-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                  </div>
+                ) : error ? (
+                  <div className="p-8 text-center text-gray-500 text-sm">
+                    <p className="text-2xl mb-2">🔔</p>
+                    <p>No notifications yet</p>
                   </div>
                 ) : notifications.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 text-sm">
@@ -170,35 +177,44 @@ export default function ScoutTopbar({
                     <p>No notifications yet</p>
                   </div>
                 ) : (
-                  notifications.map((n) => (
+                  notifications.map((notification) => (
                     <div
-                      key={n.id}
+                      key={notification.id}
                       className="p-4 border-b last:border-0 hover:bg-gray-50 transition cursor-pointer"
                     >
-                      <p className="text-sm text-gray-800">{n.message}</p>
+                      <p className="text-sm text-gray-800">
+                        {notification.message}
+                      </p>
                       <span className="text-xs text-gray-400 mt-1 block">
-                        {n.date}
+                        {notification.date}
                       </span>
                     </div>
                   ))
                 )}
               </div>
+
+              <div className="p-3 border-t text-center">
+                <button className="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                  View all notifications
+                </button>
+              </div>
             </div>
           )}
         </div>
 
+        {/* Language Flag */}
         <div className="hidden sm:block">
-          {language === "Français" ? <FrenchFlag /> : <UKFlag />}
+          {language === "French" ? <FrenchFlag /> : <UKFlag />}
         </div>
 
-        {/* FIXED: Added 'as Language' to resolve Error 2345 */}
+        {/* Language Selector */}
         <select
           value={language}
-          onChange={(e) => setLanguage(e.target.value as Language)}
+          onChange={(e) => setLanguage(e.target.value)}
           className="hidden sm:block text-gray-600 px-2 py-1 text-xs rounded border border-gray-300 outline-none bg-white cursor-pointer hover:border-gray-400"
         >
           <option value="English">English</option>
-          <option value="Français">Français</option>
+          <option value="French">Français</option>
         </select>
 
         <ScoutProfileCard />
