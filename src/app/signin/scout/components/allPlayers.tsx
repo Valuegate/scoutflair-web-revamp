@@ -16,9 +16,12 @@ async function getImageUrl(fileKey: string): Promise<string> {
   if (!fileKey || fileKey.trim() === "") return "";
   try {
     const res = await fetch(
-      `${BASE_URL}/scoutflair/v1/storage/presign-download/${fileKey}`,
+      `${BASE_URL}/scoutflair/v1/storage/presign-download?fileKey=${encodeURIComponent(
+        fileKey
+      )}`,
       { headers: { Authorization: `Bearer ${getToken()}` } }
     );
+    if (!res.ok) return "";
     const data = await res.json();
     return data?.presignedUrl || "";
   } catch {
