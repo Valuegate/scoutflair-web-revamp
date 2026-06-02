@@ -12,8 +12,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-const MAILCHIMP_ACTION_URL =
-  "https://app.us18.list-manage.com/subscribe/post?u=c48a89cf321f270ef403139c1&id=e2af7c923a&f_id=00eca4e6f0";
+const BREVO_ACTION_URL =
+  "https://6895434f.sibforms.com/serve/MUIFAHa4C9VFIW6wFQhuVrxjXHDX1KzWMQDCn4x6MYZEXyaqzL5-OJmrMALWTpY3jEFVPMrvv3l6XbJmsk8ZHF3XDD8NFCbz9smG3_ESS4TW0O0_xK9h6V_nifIbRktAEzdXgHU-h4XFqohIvof61YNJAJyps9P-8ytQZ9pm1_ax5Zbf4pSj5EWs-x_EsPxg3mBQbnW4fB6NkeVHAw==";
 
 const features = [
   {
@@ -62,7 +62,7 @@ export default function WaitlistPage() {
       return;
     }
 
-    // Let the form submit natively to Mailchimp via the hidden iframe.
+    // Let the form submit natively to Brevo via the hidden iframe.
     // Show a brief submitting state, then display success message.
     setIsSubmitting(true);
 
@@ -129,13 +129,13 @@ export default function WaitlistPage() {
               professional football.
             </p>
 
-            {/* Mailchimp form — posts directly via hidden iframe, user stays on page */}
+            {/* Brevo form — posts directly via hidden iframe, user stays on page */}
             <form
               className="mt-8 w-full max-w-[465px]"
               id="waitlist-form"
-              action={MAILCHIMP_ACTION_URL}
+              action={BREVO_ACTION_URL}
               method="POST"
-              target="mailchimp-hidden-frame"
+              target="brevo-hidden-frame"
               onSubmit={handleSubmit}
             >
               <div className="rounded-[6px] bg-white p-1.5 shadow-[0_20px_60px_rgba(2,22,55,0.2)] sm:flex sm:items-center sm:gap-2">
@@ -186,18 +186,7 @@ export default function WaitlistPage() {
                 </Button>
               </div>
 
-              {/* Mailchimp honeypot — prevents bot signups, must stay hidden */}
-              <div
-                aria-hidden="true"
-                style={{ position: "absolute", left: "-5000px" }}
-              >
-                <input
-                  type="text"
-                  name="b_c48a89cf321f270ef403139c1_e2af7c923a"
-                  tabIndex={-1}
-                  defaultValue=""
-                />
-              </div>
+
 
               {errorMessage ? (
                 <p
@@ -228,13 +217,13 @@ export default function WaitlistPage() {
               </p>
             </form>
 
-            {/* Hidden iframe to catch Mailchimp's response without leaving the page */}
+            {/* Hidden iframe to catch Brevo's response without leaving the page */}
             <iframe
-              name="mailchimp-hidden-frame"
+              name="brevo-hidden-frame"
               className="hidden"
               aria-hidden="true"
               tabIndex={-1}
-              title="Mailchimp form submission target"
+              title="Brevo form submission target"
             />
           </div>
         </div>
