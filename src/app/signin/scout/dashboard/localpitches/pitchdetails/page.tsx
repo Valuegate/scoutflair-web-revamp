@@ -237,8 +237,8 @@ function MapModal({
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
-export default function PitchDetailsPage() {
+// ── Main Page Content ───────────────────────────────────────────────────────────
+function PitchDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -421,5 +421,22 @@ export default function PitchDetailsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+// ── Wrapper with Suspense ─────────────────────────────────────────────────────
+import React from "react";
+
+export default function PitchDetailsPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      }
+    >
+      <PitchDetailsContent />
+    </React.Suspense>
   );
 }

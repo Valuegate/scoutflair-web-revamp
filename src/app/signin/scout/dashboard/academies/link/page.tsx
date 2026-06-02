@@ -239,8 +239,8 @@ function MapModal({
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
-export default function AcademyDetailsPage() {
+// ── Main Page Content ───────────────────────────────────────────────────────────
+function AcademyDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const academyId = searchParams.get("id");
@@ -463,5 +463,20 @@ export default function AcademyDetailsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+// ── Wrapper with Suspense ─────────────────────────────────────────────────────
+export default function AcademyDetailsPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      }
+    >
+      <AcademyDetailsContent />
+    </React.Suspense>
   );
 }

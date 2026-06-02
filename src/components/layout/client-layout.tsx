@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { WaitlistFooter } from "@/components/layout/waitlist-footer";
 import { cn } from "@/lib/utils";
 
 export default function ClientLayout({
@@ -11,8 +12,10 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const hideHeaderFooter =
+  const isWaitlistRoute = pathname.startsWith("/waitlist");
+  const isAuthRoute =
     pathname.startsWith("/signup") || pathname.startsWith("/signin");
+  const hideHeaderFooter = isAuthRoute || isWaitlistRoute;
 
   return (
     <div
@@ -30,7 +33,11 @@ export default function ClientLayout({
     >
       {!hideHeaderFooter && <Header />}
       <main className="flex-grow">{children}</main>
-      {!hideHeaderFooter && <Footer />}
+      {isWaitlistRoute ? (
+        <WaitlistFooter />
+      ) : (
+        !hideHeaderFooter && <Footer />
+      )}
     </div>
   );
 }
