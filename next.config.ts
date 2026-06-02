@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**" }, // catch-all for any other external image URLs
     ],
   },
+  turbopack: {
+    root: process.cwd(),
+  },
   allowedDevOrigins: ["f9fptg-9002.csb.app"],
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
