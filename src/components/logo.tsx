@@ -1,5 +1,10 @@
 import Link from 'next/link';
 
+type LogoProps = {
+  className?: string;
+  textClassName?: string;
+};
+
 const ScoutFlairLogoSvg = () => (
     <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clipPath="url(#clip0_1572_2140)">
@@ -15,11 +20,13 @@ const ScoutFlairLogoSvg = () => (
     </svg>
 );
 
-export function Logo() {
+export function Logo({ className, textClassName }: LogoProps) {
   return (
-    <Link href="/" className="flex items-center gap-2" aria-label="ScoutFlair Home">
+    <Link href="/" className={`flex items-center gap-2 ${className ?? ''}`.trim()} aria-label="ScoutFlair Home">
       <ScoutFlairLogoSvg />
-      <span className="text-2xl font-bold tracking-tight text-[#1B1B1B]">ScoutFlair</span>
+      <span className={`text-2xl font-bold tracking-tight text-[#1B1B1B] ${textClassName ?? ''}`.trim()}>
+        ScoutFlair
+      </span>
     </Link>
   );
 }

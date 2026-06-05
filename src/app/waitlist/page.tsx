@@ -10,6 +10,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
 const BREVO_ACTION_URL =
@@ -97,12 +98,7 @@ export default function WaitlistPage() {
 
         <header className="relative z-10">
           <div className="mx-auto flex h-20 w-full max-w-[900px] items-center justify-between px-5 sm:px-8 lg:h-[86px]">
-            <a
-              className="text-lg font-medium leading-none tracking-normal text-white sm:text-xl"
-              href="/waitlist"
-            >
-              ScoutFlair
-            </a>
+            <Logo className="scale-[0.9] sm:scale-100" textClassName="text-white" />
             <a
               className="inline-flex h-10 items-center justify-center rounded-[4px] bg-[#fdaa2f] px-5 text-sm font-bold leading-none tracking-normal text-[#021637] transition hover:bg-[#ffbc58] sm:h-11 sm:px-6"
               href="#waitlist-form"
