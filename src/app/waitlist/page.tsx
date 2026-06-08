@@ -109,7 +109,7 @@ export default function WaitlistPage() {
         </header>
 
         <div className="relative z-10 mx-auto flex w-full max-w-[1180px] flex-1 items-center px-5 pb-14 pt-8 sm:px-8 sm:pb-20 lg:pb-28 lg:px-12">
-          <div className="w-full max-w-[760px] lg:pl-10">
+          <div className="w-full max-w-[760px]">
             <span className="inline-flex rounded-full bg-[#fdaa2f] px-4 py-1.5 text-[11px] font-bold uppercase leading-none tracking-normal text-[#021637] lg:px-5 lg:py-2 lg:text-[12px]">
               Future of football discovery
             </span>
